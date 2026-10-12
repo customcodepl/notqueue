@@ -2,7 +2,7 @@
 
 A multi-tenant SaaS for virtual queues and waitlists. Venues such as restaurants, car service shops and other service businesses use it to let customers wait without standing in line.
 
-> Status: pre-1.0, design phase. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> Status: pre-1.0, Stage 0 (Foundations) in progress. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Who it's for
 
@@ -44,6 +44,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | Date & time | `date-fns` + `@date-fns/tz` for timezone arithmetic; `Intl` via next-intl for display | Small and tree-shakeable (customer JS budget); Temporal can replace it once browser support allows |
 | Background jobs | Outbox table + Next.js `after()` + Vercel Cron | Reliable delivery with no extra vendor |
 | Testing | Vitest (unit and integration on real Postgres), Playwright (E2E) | Fast, and covers multi-browser realtime scenarios |
+| Tooling | Node 24, pnpm, ESLint + Prettier, dependency-cruiser (layer boundaries), commitlint + husky (Conventional Commits) | Strict, automated checks that keep the layering and commit history consistent |
 | CI/CD | GitHub Actions + Vercel Git integration | Gated DB migrations, then deploy |
 | Monitoring | Sentry (EU host), uptime checks | Error tracking with PII scrubbing |
 | SMS (v1.1) | SMSAPI.pl behind a channel adapter | Cheap, with good deliverability in Poland; Twilio as an international fallback |
@@ -94,8 +95,24 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 - **Table and time-slot reservations**: `resources` and `bookings` entities that can convert into queue entries.
 - **Payments and client billing**: subscriptions and plans on the organization, plus SMS usage metering.
 
+## Development
+
+Requires Node 24 (see `.nvmrc`) and corepack.
+
+```
+corepack enable
+pnpm install                                  # also installs the commit-msg hook
+pnpm exec playwright install chromium webkit  # once, for E2E
+pnpm dev                                      # http://localhost:3000
+pnpm check                                    # lint, typecheck, layer boundaries, unit tests
+pnpm e2e                                      # Playwright on desktop, phone and tablet profiles
+```
+
+All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
+
 ## Documentation
 
 - [docs/ROADMAP.md](docs/ROADMAP.md): delivery stages, definitions of done, open questions.
-- [docs/FEATURES.md](docs/FEATURES.md): feature IDs, dependency graph, happy paths.
+- [docs/FEATURES.md](docs/FEATURES.md): progress per stage, feature IDs and status, dependency graph, happy paths.
+- `docs/features/<feature-id>/plan.md`: the approved plan of each feature, including its deviations.
 - [docs/DESIGN.md](docs/DESIGN.md): surface principles, branding, design system, accessibility, the "you're called" moment, mockup process (decisions pending).

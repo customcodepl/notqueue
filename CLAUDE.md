@@ -34,7 +34,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
 4. **Small steps.** Implement in small increments. After each one, run lint, typecheck and tests, and fix any failures before moving on.
 5. **Close out the feature.**
    - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo.
-   - Set its status in `docs/FEATURES.md`, and update the "Next up" section there.
+   - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
    - List any deviations from the plan in your summary and in the plan's "Deviations" section.
    - Check it against the baseline definition of done in ROADMAP.md.
