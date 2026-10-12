@@ -1,7 +1,7 @@
 # F-FOUND-REPO: Repository & tooling
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-10-11)
+- **Status:** done (2026-10-12); plan approved 2026-10-11
 - **Depends on:** none
 - **Unblocks:** F-FOUND-PIPELINE, F-FOUND-DB, F-FOUND-API, F-FOUND-I18N
 
@@ -111,4 +111,16 @@ Run the checks that exist so far after each step.
 8. **Playwright server:** `next build && next start`, not `next dev`.
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-10-12). Versions at implementation time: Next.js 16.4, React 19.3, Tailwind 4.3, TypeScript 5.9, pnpm 12.11, ESLint 9.39, Vitest 5.0, Playwright 1.64, commitlint 21, husky 9.
+
+1. **`AGENTS.md` is committed.** Next.js 16 writes it on `next dev` when it detects an AI agent (it points agents at the version-matched docs in `node_modules/next/dist/docs/`). Committing it keeps the tree clean; the alternative is `agentRules: false` in `next.config.ts`.
+2. **Template defaults kept in `next.config.ts`:** `cacheComponents`, `partialPrefetching` and the `@tailwindcss/turbopack` CSS loader, as in the official Next.js 16 setup. `pnpm-workspace.yaml` (from the template) blocks install scripts of `sharp` and `unrs-resolver`, the pnpm 12 default.
+3. **TypeScript:** `target` raised to `ES2022` and `allowJs` turned off. The `typecheck` script is `next typegen && tsc --noEmit`, because global route types such as `LayoutProps` are generated into `.next/` and a fresh clone has none.
+4. **Markdown is excluded from Prettier.** Prettier pads every table row, which turns the wide doc tables into very long lines and noisy diffs. Docs stay hand-formatted.
+5. **ESLint stays on 9.** ESLint 10 works, but `eslint-plugin-react`, `-jsx-a11y` and `-import` (used by `eslint-config-next` 16.4) declare peer support only up to 9. Upgrade in a separate `chore` once Next.js supports it. `lint` runs with `--max-warnings=0`.
+6. **No type-aware lint rules** (e.g. `no-floating-promises`); they are outside this plan. Worth adding with the first async code (F-FOUND-DB or F-FOUND-API).
+7. **Boundary fixture covers every rule**, not only "`core` imports `infra`": one violation per rule plus allowed imports, and the test asserts the exact set. The test moved from step 4 to step 5 because it needs Vitest. A mutation check (weakening one rule) made it fail as expected.
+8. **Framework-package regex simplified** after dependency-cruiser rejected the first one as unsafe; it matches both plain and pnpm (`.pnpm/<pkg>@<ver>/node_modules/<pkg>/`) paths.
+9. **Extra script `test:coverage`** (not in the plan's script list).
+10. **Playwright profiles:** iPhone 15 (`mobile-webkit`) and iPad (gen 11) portrait (`tablet-webkit`). A landscape tablet profile is added with the first staff dashboard screen (DESIGN.md requires both orientations). Browsers are installed once with `pnpm exec playwright install chromium webkit`.
+11. **No stage demo update:** Stage 0's demo needs a deployed app (F-FOUND-PIPELINE); `docs/demos/stage-0.md` is created there.
