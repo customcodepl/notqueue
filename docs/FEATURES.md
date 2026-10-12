@@ -4,6 +4,21 @@ Features for v1.0, derived from [ROADMAP.md](ROADMAP.md). One feature is one uni
 
 Status: `planned` · `in progress` · `done` · `dropped`
 
+## Progress
+Stage status: `not started` · `in progress` · `done`. A stage is `done` when all its features are `done`, its "Done when" in [ROADMAP.md](ROADMAP.md) is met and its demo script has been run.
+
+| Stage | Features done | Status |
+|---|---|---|
+| 0: Foundations | 1 / 5 | in progress |
+| 1: Tenancy, auth & operator console | 0 / 6 | not started |
+| 2: Design foundations | 0 / 3 | not started |
+| 3: Queue core & customer journey | 0 / 6 | not started |
+| 4: Staff dashboard & real-time | 0 / 6 | not started |
+| 5: Venue admin | 0 / 5 | not started |
+| 6: Notifications & i18n completeness | 0 / 3 | not started |
+| 7: Hardening, GDPR & handover | 0 / 6 | not started |
+| **v1.0** | **1 / 40** | in progress |
+
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
 
@@ -361,6 +376,7 @@ The one place a cycle could appear is **F-REALTIME ↔ F-NOTIF-CORE**. The statu
 - **Before writing a plan.md**, find the feature here (or add one) and save its plan as `docs/features/<feature-id>/plan.md` (from [`features/TEMPLATE.md`](features/TEMPLATE.md)), e.g. `docs/features/F-QUEUE-JOIN/plan.md`.
 - **Update "Next up"** whenever a feature is closed or its plan changes state (`not started` → `drafted` → `approved` → `in implementation`). Keep at most one code-track item, plus the active product-track items.
 - **Change the status** when work starts (`in progress`) and when the feature merges and meets the definition of done (`done`). Do it in the same PR.
+- **Update "Progress"** in the same PR whenever a feature becomes `done` or `dropped` (a dropped feature leaves the count), and when a stage starts or is closed.
 - **New or split features** get a new ID. IDs are never renamed or reused; a dropped feature is marked `dropped` instead of being deleted.
 - **When dependencies change**, update the table, the Mermaid graph and any affected happy path together. Re-check the review findings if a feature moves between stages.
 - **When a finding is resolved**, move it to a one-line note with the decision and date.
