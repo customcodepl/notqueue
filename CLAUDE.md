@@ -45,18 +45,22 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
 - Write all code, comments, commit messages, PR descriptions and docs in **English**.
 
 ## Commands
-TODO: fill these in after Stage 0 (F-FOUND-REPO, F-FOUND-DB, F-FOUND-PIPELINE).
+Setup on a fresh clone: `corepack enable && pnpm install` (also installs the commit-msg hook), then `pnpm exec playwright install chromium webkit` once for E2E.
 ```
-dev:          TODO
-build:        TODO
-lint:         TODO
-typecheck:    TODO
-test:         TODO   # unit + integration (needs the local Supabase stack)
-e2e:          TODO   # Playwright
-db:start:     TODO   # local Supabase
-db:generate:  TODO   # create a migration
-db:migrate:   TODO   # apply migrations
+dev:              pnpm dev
+build:            pnpm build
+lint:             pnpm lint              # --max-warnings=0; pnpm lint:fix to autofix
+format:           pnpm format            # pnpm format:check to verify; *.md is not formatted
+typecheck:        pnpm typecheck
+check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
+test:             pnpm test              # unit; pnpm test:coverage for coverage
+e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
+check:            pnpm check             # lint + typecheck + boundaries + unit tests
+db:start:         TODO   # local Supabase (F-FOUND-DB)
+db:generate:      TODO   # create a migration (F-FOUND-DB)
+db:migrate:       TODO   # apply migrations (F-FOUND-DB)
 ```
+Integration tests (real Postgres with RLS) are added to `test` in F-FOUND-DB.
 
 ## Conventions that apply to every change
 - **Tenant isolation.**

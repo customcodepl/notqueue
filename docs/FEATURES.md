@@ -14,7 +14,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
-| Code | F-FOUND-REPO | approved | [`docs/features/F-FOUND-REPO/plan.md`](features/F-FOUND-REPO/plan.md) |
+| Code | F-FOUND-PIPELINE | not started | – |
 | Product | F-DESIGN-DECISIONS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
@@ -23,7 +23,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 ### Stage 0: Foundations
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
-| F-FOUND-REPO | Repository & tooling | planned | – | Strict TS, Tailwind, lint/format, Vitest, Playwright, layer-boundary checks, Conventional Commits via commitlint and a husky `commit-msg` hook |
+| F-FOUND-REPO | Repository & tooling | done | – | Strict TS, Tailwind, lint/format, Vitest, Playwright, layer-boundary checks, Conventional Commits via commitlint and a husky `commit-msg` hook |
 | F-FOUND-PIPELINE | CI/CD & environments | planned | F-FOUND-REPO | GitHub Actions (including PR-title validation against Conventional Commits), Vercel `fra1` previews, Supabase staging/prod, gated migration job, Vercel Cron, Sentry EU, uptime check |
 | F-FOUND-DB | Database layer | planned | F-FOUND-REPO | Drizzle, schema `app`, migrations, local Supabase stack, pooler config; outbox table and a helper that writes a domain event in the caller's transaction |
 | F-FOUND-API | API skeleton | planned | F-FOUND-REPO | Hono at `/api/v1`, problem+json errors, OpenAPI, `/health`; `Clock` port and shared Zod schemas for time formats (ISO 8601 UTC, dates, `HH:mm`, durations), `serverTime` in responses |
