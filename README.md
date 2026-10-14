@@ -32,17 +32,17 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | Area | Choice | Why |
 |---|---|---|
 | Framework | Next.js (App Router), TypeScript, Tailwind CSS | Decided; one codebase for UI and API |
-| Hosting | Vercel Pro, functions in `fra1` | No ops work, preview deploy per PR, EU region |
-| Database | Supabase Postgres (`eu-central-1`) | Managed Postgres with RLS, same region as compute, self-hostable |
+| Hosting | Vercel Pro, functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
+| Database | Supabase Postgres (`eu-central-1`) | Managed Postgres with RLS, same region as compute, self-hostable ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
 | ORM | Drizzle | SQL-first, light on serverless, RLS policies and roles declared in schema |
 | Auth | Supabase Auth (staff, admins, operator) | Included, EU-hosted, JWTs usable by future native apps |
 | Roles | Own `memberships` table plus a permission map in code | Portable, testable, independent of the auth vendor |
-| API | Hono + `@hono/zod-openapi`, mounted at `/api/v1` | REST and an OpenAPI spec for mobile and integrations; can run standalone later |
+| API | Hono + `@hono/zod-openapi`, mounted at `/api/v1` | REST and an OpenAPI spec for mobile and integrations; can run standalone later ([ADR-0004](docs/adr/0004-business-logic-in-own-api.md)) |
 | Validation | Zod | One schema for the API, forms and OpenAPI |
-| Real-time | Supabase Realtime Broadcast ("changed" signal → refetch via API) | Works with serverless, no PII on the wire, logic stays in the API |
+| Real-time | Supabase Realtime Broadcast ("changed" signal → refetch via API) | Works with serverless, no PII on the wire, logic stays in the API ([ADR-0007](docs/adr/0007-realtime-changed-signal.md)) |
 | i18n | next-intl (ICU messages) | Built for the App Router, handles Polish plurals |
 | Date & time | `date-fns` + `@date-fns/tz` for timezone arithmetic; `Intl` via next-intl for display | Small and tree-shakeable (customer JS budget); Temporal can replace it once browser support allows |
-| Background jobs | Outbox table + Next.js `after()` + Vercel Cron | Reliable delivery with no extra vendor |
+| Background jobs | Outbox table + Next.js `after()` + Vercel Cron | Reliable delivery with no extra vendor ([ADR-0006](docs/adr/0006-transactional-outbox.md)) |
 | Testing | Vitest (unit and integration on real Postgres), Playwright (E2E) | Fast, and covers multi-browser realtime scenarios |
 | Tooling | Node 24, pnpm, ESLint + Prettier, dependency-cruiser (layer boundaries), commitlint + husky (Conventional Commits) | Strict, automated checks that keep the layering and commit history consistent |
 | CI/CD | GitHub Actions + Vercel Git integration | Gated DB migrations, then deploy |
@@ -51,14 +51,14 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 
 ## Architecture overview
 
-- **Multi-tenancy.** The tenant is an **Organization**, which owns **Venues**, which own **Queues**. All tables share one schema and every tenant row has an `org_id`.
+- **Multi-tenancy.** The tenant is an **Organization**, which owns **Venues**, which own **Queues**. All tables share one schema and every tenant row has an `org_id`. See [ADR-0005](docs/adr/0005-tenant-isolation-rls.md).
   - Isolation is enforced twice: by application-level scoping and by Postgres **Row-Level Security**. The API runs as a non-owner DB role with a transaction-local tenant context.
   - Operator access uses a separate, audited role.
   - Tables live in a schema (`app`) that is not exposed through Supabase's Data API.
-- **API layer.** All business logic lives in our own versioned REST API (`/api/v1`). Clients never query Supabase directly.
+- **API layer.** All business logic lives in our own versioned REST API (`/api/v1`). Clients never query Supabase directly. See [ADR-0004](docs/adr/0004-business-logic-in-own-api.md).
   - The layering is `core` (pure domain) → `application` (use cases) → `infra` (DB, realtime, channels) → `api` / `app` (HTTP, UI).
   - The web UI uses the same API that native apps and integrations will use.
-- **Real-time.** State changes write domain events to an **outbox** in the same transaction.
+- **Real-time.** State changes write domain events to an **outbox** in the same transaction. See [ADR-0006](docs/adr/0006-transactional-outbox.md) and [ADR-0007](docs/adr/0007-realtime-changed-signal.md).
   - A dispatcher sends a small "changed" broadcast to Supabase Realtime: a private channel per venue for staff and a public channel per queue for customers.
   - Clients refetch through the API. Polling and refetch-on-focus are the fallback.
 - **i18n.**
@@ -79,12 +79,12 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 
 ## Data residency & GDPR
 
-- All data is stored and processed in the EU: Vercel `fra1`, Supabase `eu-central-1`, Sentry EU. US-owned providers are covered by DPAs and SCCs/DPF.
+- All data is stored and processed in the EU: Vercel `fra1`, Supabase `eu-central-1`, Sentry EU. US-owned providers are covered by DPAs and SCCs/DPF; see [ADR-0003](docs/adr/0003-eu-regions-of-us-providers.md) for the rationale and the portability exit.
 - Each venue's organization is the **data controller**; the platform is the **processor**. We provide a DPA, a subprocessor list and a privacy notice template.
 - **Minimization:** each venue chooses which contact fields are required, optional or hidden. No PII appears in realtime payloads, URLs, logs or error reports.
 - **Retention:** customer PII is anonymized automatically after a per-organization period (default 30 days). Anonymized statistics are kept.
 - Each venue's consent text version and timestamp are recorded per entry. There are tools for data export and erasure requests.
-- End customers have no account. Access to an entry uses an unguessable token, and only its hash is stored.
+- End customers have no account. Access to an entry uses an unguessable token, and only its hash is stored ([ADR-0008](docs/adr/0008-hashed-entry-tokens.md)).
 
 ## Future extensions
 
@@ -116,3 +116,4 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 - [docs/FEATURES.md](docs/FEATURES.md): progress per stage, feature IDs and status, dependency graph, happy paths.
 - `docs/features/<feature-id>/plan.md`: the approved plan of each feature, including its deviations.
 - [docs/DESIGN.md](docs/DESIGN.md): surface principles, branding, design system, accessibility, the "you're called" moment, mockup process (decisions pending).
+- [docs/adr/](docs/adr/README.md): architecture decision records: the rationale and rejected alternatives behind system-wide choices.

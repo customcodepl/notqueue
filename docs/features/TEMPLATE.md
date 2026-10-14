@@ -14,6 +14,7 @@ The [F-FOUND-REPO plan](F-FOUND-REPO/plan.md) is a good example of the expected 
 - **Status:** plan drafted (<YYYY-MM-DD>)
 - **Depends on:** <IDs, or none>
 - **Unblocks:** <IDs of the features that depend on this one>
+- **ADRs:** <related ADRs, or none>
 
 ## Goal
 _One or two sentences: what can be observed once this is done._
@@ -51,6 +52,7 @@ _This feature's part of the stage's "Done when", plus the applicable items of th
 _Risks with mitigations. List any blocking ROADMAP questions with a recommended answer; the plan can't be approved until they're answered._
 
 ## Decisions to confirm
+_Mark decisions that need an ADR (CLAUDE.md rule 7) with **(ADR)**._
 1. **<Topic>:** recommended <X>, because <reason>. Alternative: <Y>.
 
 ## Deviations

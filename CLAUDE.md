@@ -16,6 +16,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Before planning a feature: its stage, scope and the **baseline definition of done** |
 | [docs/DESIGN.md](docs/DESIGN.md) | **Before any UI work**: surface principles, tokens, components, accessibility, the called moment |
 | `docs/features/<feature-id>/plan.md` | Before implementing or changing that feature |
+| [docs/adr/](docs/adr/README.md) | Before changing anything an ADR covers, and when a plan touches architecture, hosting, data residency or security |
 
 ## Workflow rules
 1. **Pick the next feature.** "Next up" in `docs/FEATURES.md` has two tracks.
@@ -26,9 +27,10 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    - Before writing it, read:
      - the open questions in ROADMAP whose **Blocks:** names the feature;
      - the features that depend on this one, for what they need from it;
-     - the "Deviations" sections in its dependencies' plans.
-   - Set the plan state to `drafted` in "Next up" and list the decisions I need to make.
-   - When I approve, set it to `approved` and record my answers in the plan (and in ROADMAP if they resolve an open question).
+     - the "Deviations" sections in its dependencies' plans;
+     - the ADRs that cover the areas the feature touches.
+   - Set the plan state to `drafted` in "Next up" and list the decisions I need to make. Mark every decision that meets rule 7 with **(ADR)**.
+   - When I approve, set it to `approved` and record my answers in the plan (and in ROADMAP if they resolve an open question). Write the ADRs for the decisions marked **(ADR)** as `accepted` in the same branch.
 
    **No code until I approve the plan.**
 4. **Small steps.** Implement in small increments. After each one, run lint, typecheck and tests, and fix any failures before moving on.
@@ -37,8 +39,16 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
    - List any deviations from the plan in your summary and in the plan's "Deviations" section.
+   - If a deviation changes a decision covered by an ADR, or makes a new decision that meets rule 7, write the ADR (superseding the old one if needed).
    - Check it against the baseline definition of done in ROADMAP.md.
-6. **Don't diverge silently.** If implementation shows that the plan or the docs are wrong, stop and propose a doc change before continuing.
+6. **Don't diverge silently.** If implementation shows that the plan or the docs are wrong, stop and propose a doc change before continuing. If it contradicts an accepted ADR, stop and propose a superseding ADR instead.
+7. **Record architecture decisions.** Write an ADR in `docs/adr/` (from [TEMPLATE.md](docs/adr/TEMPLATE.md)) when a decision
+   - affects more than one feature or the whole system, **and**
+   - is costly to reverse, or its rationale and rejected alternatives are worth keeping.
+
+   Feature-local choices stay in the plan's "Decisions". An ADR starts as `proposed`; I approve it, then it becomes `accepted`.
+   Accepted ADRs are not edited except for status and links. To change a decision, write a new ADR that supersedes it.
+   When an ADR resolves a ROADMAP open question, mark the question "Resolved → ADR-NNNN". Plans link to ADRs instead of repeating their rationale.
 
 ## Communication
 - Reply to me in **Polish**.
