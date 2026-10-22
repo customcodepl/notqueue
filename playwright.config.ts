@@ -21,7 +21,10 @@ export default defineConfig({
     { name: "tablet-webkit", use: { ...devices["iPad (gen 11)"] } },
   ],
   webServer: {
-    command: `pnpm build && pnpm start --port ${PORT}`,
+    // CI builds in a separate step, so a build failure is reported on its own.
+    command: isCI
+      ? `pnpm start --port ${PORT}`
+      : `pnpm build && pnpm start --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !isCI,
     timeout: 180_000,

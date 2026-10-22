@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Actions are pinned to commit SHAs; Dependabot keeps the pins current.
+  - package-ecosystem: github-actions
+    directories: ["/", "/.github/actions/*"]
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
