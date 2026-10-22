@@ -1,6 +1,6 @@
 # ADR-0009: Gated deploy and migration pipeline
 
-- **Status:** accepted
+- **Status:** superseded by [ADR-0010](0010-deploy-pipeline-without-staging-deployment.md)
 - **Date:** 2026-10-22
 - **Related:** [ADR-0002](0002-hosting-and-database.md), [ADR-0003](0003-eu-regions-of-us-providers.md), F-FOUND-PIPELINE, F-FOUND-DB
 

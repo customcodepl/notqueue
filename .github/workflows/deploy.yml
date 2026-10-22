@@ -1,0 +1,91 @@
+name: Deploy
+
+# ADR-0010: main is deployed only from here. Migrate staging → approval
+# (GitHub environment `production`) → migrate production → deploy production.
+# PR previews from the Vercel Git integration serve as staging.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  HUSKY: "0"
+  NEXT_TELEMETRY_DISABLED: "1"
+  # The commit CI passed for, or the dispatched one.
+  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+jobs:
+  migrate-staging:
+    name: Migrate staging
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+      # Until F-FOUND-DB adds `pnpm db:migrate`, this only proves the secret
+      # and the network path to the session pooler.
+      - name: Check database connectivity
+        env:
+          MIGRATIONS_DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
+        run: psql "$MIGRATIONS_DATABASE_URL" -v ON_ERROR_STOP=1 -tAc 'select 1'
+
+  migrate-production:
+    name: Migrate production
+    needs: migrate-staging
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+      - name: Check database connectivity
+        env:
+          MIGRATIONS_DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
+        run: psql "$MIGRATIONS_DATABASE_URL" -v ON_ERROR_STOP=1 -tAc 'select 1'
+
+  deploy-production:
+    name: Deploy production
+    needs: migrate-production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+      - uses: ./.github/actions/setup
+
+      - name: Pull Vercel settings
+        run: pnpm dlx vercel@64.7.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build
+        env:
+          # Sensitive Vercel variables are not returned by `vercel pull`.
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT: production
+        run: pnpm dlx vercel@64.7.0 build --prod --token="$VERCEL_TOKEN"
+
+      - name: Deploy
+        run: pnpm dlx vercel@64.7.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+      - name: Smoke check
+        env:
+          URL: https://${{ vars.PRODUCTION_HOST }}
+        run: .github/scripts/smoke.sh

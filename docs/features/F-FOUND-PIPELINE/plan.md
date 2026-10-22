@@ -4,7 +4,7 @@
 - **Status:** plan approved (2026-10-22)
 - **Depends on:** F-FOUND-REPO (done)
 - **Unblocks:** F-DESIGN-SYSTEM, F-EVENTS-OUTBOX, F-SEC-HARDENING
-- **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0009](../../adr/0009-gated-deploy-and-migration-pipeline.md)
+- **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0009](../../adr/0009-gated-deploy-and-migration-pipeline.md) (superseded), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md)
 
 ## Goal
 Every PR runs the full check suite in GitHub Actions, gets a validated Conventional Commit title and a Vercel preview URL in `fra1`. Every merge to `main` deploys to staging automatically and to production after a manual approval, with a migration step in front of each deploy. Errors reach Sentry EU without PII, and production has an uptime check.
@@ -47,6 +47,8 @@ Every PR runs the full check suite in GitHub Actions, gets a validated Conventio
 |---|---|---|---|
 | GitHub repo | `VERCEL_TOKEN` | secret | Vercel CLI in the deploy workflow |
 | GitHub repo | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | variables | Vercel CLI project link |
+| GitHub repo | `PRODUCTION_HOST` | variable | Smoke-check target (`notqueue.vercel.app`) |
+| GitHub repo | `SENTRY_AUTH_TOKEN` | secret | Source-map upload in `vercel build` (sensitive Vercel variables are not returned by `vercel pull`) |
 | GitHub env `staging` | `MIGRATIONS_DATABASE_URL` | secret | Supabase staging, session pooler URL (IPv4) |
 | GitHub env `production` | `MIGRATIONS_DATABASE_URL` | secret | Supabase production, session pooler URL (IPv4) |
 | Vercel (all envs) | `NEXT_PUBLIC_SENTRY_DSN` | variable | Sentry ingest (EU) |
@@ -140,6 +142,10 @@ All recommendations accepted as proposed. Decision 1 (with 2) is recorded in [AD
 8. **Action pinning:** recommended: full SHAs plus Dependabot for `github-actions` only. Alternative: major-version tags (simpler, weaker supply-chain protection on a public repo).
 9. **Production URL:** recommended: the default `*.vercel.app` URL until go-live; the custom domain comes in F-RELEASE-READINESS. Alternative: set up the domain now.
 10. **Who sets up accounts and secrets:** recommended: you create the accounts and projects (prerequisites above); I set branch protection and secrets with `gh` and the Vercel CLI, each command approved by you. Alternative: you set everything in the web UIs from the table above.
+
+### Clarifications (2026-10-22)
+11. **Vercel plan:** the project starts on Hobby; moving to Pro is required before the first client (Vercel terms) and for Vercel Cron (F-EVENTS-OUTBOX).
+12. **No staging deployment for now** ([ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md), accepted 2026-10-22, supersedes ADR-0009): the Supabase staging project and its migration step stay; PR previews serve as staging. The workflow sets `NEXT_PUBLIC_SENTRY_ENVIRONMENT=production` for production builds, since `vercel build` in Actions may not provide `VERCEL_TARGET_ENV`.
 
 ## Deviations
 _To be filled in after implementation._
