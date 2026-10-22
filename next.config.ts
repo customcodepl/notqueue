@@ -19,7 +19,7 @@ export default withSentryConfig(nextConfig, {
   // EU data residency (ADR-0003). The auth token comes from SENTRY_AUTH_TOKEN;
   // without it (local builds, CI) source maps are not uploaded.
   sentryUrl: "https://de.sentry.io/",
-  org: "customcode",
+  org: "customcode-tv",
   project: "notqueue",
   silent: !process.env.CI,
   telemetry: false,
