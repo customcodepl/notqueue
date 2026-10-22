@@ -29,7 +29,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
-| Code | F-FOUND-PIPELINE | not started | – |
+| Code | F-FOUND-PIPELINE | approved | [plan](features/F-FOUND-PIPELINE/plan.md) |
 | Product | F-DESIGN-DECISIONS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
@@ -39,7 +39,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
 | F-FOUND-REPO | Repository & tooling | done | – | Strict TS, Tailwind, lint/format, Vitest, Playwright, layer-boundary checks, Conventional Commits via commitlint and a husky `commit-msg` hook |
-| F-FOUND-PIPELINE | CI/CD & environments | planned | F-FOUND-REPO | GitHub Actions (including PR-title validation against Conventional Commits), Vercel `fra1` previews, Supabase staging/prod, gated migration job, Vercel Cron, Sentry EU, uptime check |
+| F-FOUND-PIPELINE | CI/CD & environments | planned | F-FOUND-REPO | GitHub Actions (including PR-title validation against Conventional Commits), Vercel `fra1` previews, Supabase staging/prod, gated migration job ([ADR-0009](adr/0009-gated-deploy-and-migration-pipeline.md)), `CRON_SECRET` (cron entry in F-EVENTS-OUTBOX), Sentry EU, uptime check (Sentry Uptime) |
 | F-FOUND-DB | Database layer | planned | F-FOUND-REPO | Drizzle, schema `app`, migrations, local Supabase stack, pooler config; outbox table and a helper that writes a domain event in the caller's transaction |
 | F-FOUND-API | API skeleton | planned | F-FOUND-REPO | Hono at `/api/v1`, problem+json errors, OpenAPI, `/health`; `Clock` port and shared Zod schemas for time formats (ISO 8601 UTC, dates, `HH:mm`, durations), `serverTime` in responses |
 | F-FOUND-I18N | i18n foundation | planned | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
@@ -76,7 +76,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 |---|---|---|---|---|
 | F-STAFF-DASHBOARD | Staff dashboard (read) | planned | F-QUEUE-MODEL, F-AUTH-RBAC, F-DESIGN-SYSTEM | Active entries per queue, overdue highlighting, tablet layouts |
 | F-STAFF-ACTIONS | Staff queue actions | planned | F-STAFF-DASHBOARD, F-QUEUE-JOIN | Call, call next, recall, serve, no-show, remove, return; walk-ins; optimistic concurrency; undo; idempotent mutations (middleware from F-QUEUE-JOIN) |
-| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, cron sweep endpoint (`CRON_SECRET`) |
+| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE) |
 | F-REALTIME | Real-time updates | planned | F-EVENTS-OUTBOX, F-AUTH-RBAC, F-STAFF-DASHBOARD, F-QUEUE-STATUS | Publisher interface, Supabase Broadcast, private channel authorization, client invalidation, polling fallback, connection indicator; `NotificationChannel` interface with the `status_page` channel |
 | F-CALLED-EXPERIENCE | "You're called" | planned | F-REALTIME, F-STAFF-ACTIONS | Enable-alerts step, sound and vibration, wake lock, re-alerts, acknowledgement, staff fallback signals |
 | F-QUEUE-ETA | Throughput ETA | planned | F-QUEUE-MODEL, F-STAFF-ACTIONS | Rolling throughput from entry events, ETA ranges, fallback to configured defaults |

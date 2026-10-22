@@ -40,7 +40,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 - next-intl with PL/EN, a missing-translation-key CI gate, and the `LocalizedText` type with its fallback resolver.
 - Sentry (EU).
 
-**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel Pro team; Supabase staging and production projects in `eu-central-1`; a Sentry organization on the EU host; an uptime-check account. The exact list of secrets is in the F-FOUND-PIPELINE plan.
+**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel Pro team; Supabase staging and production projects in `eu-central-1`; a Sentry organization on the EU host (it also runs the uptime check). The exact list of secrets is in the F-FOUND-PIPELINE plan.
 
 **Done when:** the deployed app switches PL/EN, `/api/v1/health` and the OpenAPI spec respond, CI is green, and every PR gets a preview URL.
 

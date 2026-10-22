@@ -12,3 +12,4 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0006](0006-transactional-outbox.md) | Transactional outbox for domain events | accepted | 2026-10-11 |
 | [0007](0007-realtime-changed-signal.md) | Supabase Realtime Broadcast as a "changed" signal | accepted | 2026-10-11 |
 | [0008](0008-hashed-entry-tokens.md) | Unguessable entry tokens, stored hashed | accepted | 2026-10-11 |
+| [0009](0009-gated-deploy-and-migration-pipeline.md) | Gated deploy and migration pipeline | accepted | 2026-10-22 |
