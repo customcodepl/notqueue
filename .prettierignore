@@ -7,5 +7,8 @@ playwright-report/
 test-results/
 next-env.d.ts
 
+# Local Claude Code settings, not part of the repo.
+.claude/
+
 # Docs are hand-formatted: Prettier would pad every table row.
 *.md
