@@ -110,6 +110,13 @@ pnpm e2e                                      # Playwright on desktop, phone and
 
 All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 
+### CI/CD
+
+- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, build and E2E, and check that the PR title is a Conventional Commit. The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
+- **Merge to `main`:** the deploy workflow migrates the staging database, waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
+- **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches production.
+- Secrets and variables are listed in the [F-FOUND-PIPELINE plan](docs/features/F-FOUND-PIPELINE/plan.md#secrets-and-variables).
+
 ## Documentation
 
 - [docs/ROADMAP.md](docs/ROADMAP.md): delivery stages, definitions of done, open questions.

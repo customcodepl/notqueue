@@ -1,7 +1,7 @@
 # F-FOUND-PIPELINE: CI/CD & environments
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-10-22)
+- **Status:** done (2026-10-23); plan approved 2026-10-22
 - **Depends on:** F-FOUND-REPO (done)
 - **Unblocks:** F-DESIGN-SYSTEM, F-EVENTS-OUTBOX, F-SEC-HARDENING
 - **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0009](../../adr/0009-gated-deploy-and-migration-pipeline.md) (superseded), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md)
@@ -148,4 +148,16 @@ All recommendations accepted as proposed. Decision 1 (with 2) is recorded in [AD
 12. **No staging deployment for now** ([ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md), accepted 2026-10-22, supersedes ADR-0009): the Supabase staging project and its migration step stay; PR previews serve as staging. The workflow sets `NEXT_PUBLIC_SENTRY_ENVIRONMENT=production` for production builds, since `vercel build` in Actions may not provide `VERCEL_TARGET_ENV`.
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-10-22/23). Versions: `@sentry/nextjs` 11.8, Vercel CLI 64.7, Playwright image `v1.64.0-noble`.
+
+1. **No staging deployment** ([ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md) supersedes ADR-0009; clarifications 11 and 12). The deploy workflow is migrate staging → approval → migrate production → deploy production. There is no Vercel `staging` environment, alias or protection-bypass secret.
+2. **Deploy workflow verified only after merge.** `workflow_dispatch` and `workflow_run` only work once the workflow is on the default branch, so the pre-merge `workflow_dispatch` run from "Test plan" is dropped. The first run on `main` is the check; a failure is fixed in a `fix` PR before any other feature.
+3. **E2E runs in the official Playwright container** (`mcr.microsoft.com/playwright`, pinned by tag and digest). Installing WebKit's ~200 system packages with apt on `ubuntu-26.04` runners hit the 20-minute timeout on a slow mirror. The image tag must be bumped together with `@playwright/test`; a mismatch fails with a missing-browser error. In CI, Playwright's `webServer` only starts the app, because the build runs as its own step.
+4. **Sentry 11 API changes:** `sendDefaultPii` is replaced by `dataCollection`, which collects user info, cookies, headers, bodies, query params and local variables by default. Every category is turned off explicitly; the scrubber stays as a second line of defence. `withSentryConfig` is imported from `@sentry/nextjs/config`. Session data still carries the browser user agent, which is not treated as PII.
+5. **Sentry environment:** `release` and `environment` come from the SDK's Vercel defaults; the deploy workflow sets `NEXT_PUBLIC_SENTRY_ENVIRONMENT=production` because `vercel build` in Actions may not provide `VERCEL_TARGET_ENV`.
+6. **`SENTRY_AUTH_TOKEN` is also a GitHub secret.** `vercel pull` does not return sensitive Vercel variables, so the production build in Actions gets the token from GitHub.
+7. **Customer JS budget:** the home page loads 170 KB gzip of JS without Sentry and 207 KB with it (+37 KB, the plan estimated 25–30 KB). The Next.js 16 + React 19 baseline alone exceeds the proposed 100 KB budget in DESIGN.md, so the budget is to be revisited in F-DESIGN-DECISIONS. Sentry stays eagerly loaded (approved 2026-10-22).
+8. **Region check:** the home page is prerendered and served from the CDN, so `x-vercel-id` shows only the edge location, never a function region. `fra1` was confirmed in the Vercel project settings; the smoke check asserts only HTTP 200, and the `fra1` assertion is added with `/api/v1/health` in F-FOUND-API.
+9. **Vercel import deployed `main` once** with default settings, before `vercel.json` existed. It served only the placeholder page; production is replaced by the first workflow deploy.
+10. **Sentry organization slug** is `customcode-tv` (organization in the EU region).
+11. **Unplanned small changes:** `.claude/` added to `.prettierignore` (local Claude Code settings).
