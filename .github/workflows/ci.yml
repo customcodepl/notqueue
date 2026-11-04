@@ -29,7 +29,33 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm check:boundaries
-      - run: pnpm test
+      - run: pnpm test:unit
+
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # The local stack started below; never a hosted database.
+      MIGRATIONS_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      # Postgres plus Auth (for the auth schema); nothing else is used yet (ADR-0012).
+      - name: Start Supabase local stack
+        run: >-
+          pnpm exec supabase start
+          -x realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - run: pnpm db:migrate
+      - run: pnpm test:integration
+      - name: Check that migrations match the schema
+        run: |
+          pnpm db:generate
+          if [ -n "$(git status --porcelain -- src/infra/db/migrations)" ]; then
+            git status --short -- src/infra/db/migrations
+            echo "::error::The Drizzle schema changed without a migration. Run pnpm db:generate and commit the result."
+            exit 1
+          fi
 
   e2e:
     name: Build and E2E
