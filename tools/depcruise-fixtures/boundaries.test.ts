@@ -34,6 +34,7 @@ describe("layer boundary rules", () => {
       .sort();
 
     expect(violations).toEqual([
+      "application-imports-db-client: src/application/imports-drizzle.ts",
       "application-imports-outer-layer: src/application/imports-infra.ts",
       "core-imports-framework-or-io: src/core/imports-react.ts",
       "core-imports-other-layer: src/core/imports-infra.ts",

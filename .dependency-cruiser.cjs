@@ -5,7 +5,11 @@
 
 // Matches both plain and pnpm (.pnpm/<pkg>@<ver>/node_modules/<pkg>/) paths.
 const FRAMEWORK_AND_IO_PACKAGES =
-  "node_modules/(next|react|react-dom|drizzle-orm|hono|@supabase/[a-z-]+)/";
+  "node_modules/(next|react|react-dom|drizzle-orm|pg|@types/pg|@vercel/functions|hono|@supabase/[a-z-]+)/";
+
+// Database and Supabase clients: only infra talks to them (ADR-0013).
+const DB_PACKAGES =
+  "node_modules/(drizzle-orm|pg|@types/pg|@supabase/[a-z-]+)/";
 
 /** @type {import("dependency-cruiser").IConfiguration} */
 module.exports = {
@@ -30,6 +34,14 @@ module.exports = {
       severity: "error",
       from: { path: "^src/application/" },
       to: { path: "^src/(infra|api|app|i18n)/" },
+    },
+    {
+      name: "application-imports-db-client",
+      comment:
+        "application depends on ports; database and Supabase clients live in infra.",
+      severity: "error",
+      from: { path: "^src/application/" },
+      to: { path: DB_PACKAGES },
     },
     {
       name: "infra-imports-outer-layer",
