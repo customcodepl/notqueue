@@ -29,7 +29,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
-| Code | F-FOUND-DB | not started | – |
+| Code | F-FOUND-DB | approved | [plan](features/F-FOUND-DB/plan.md) |
 | Product | F-DESIGN-DECISIONS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
