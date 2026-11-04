@@ -133,6 +133,7 @@ None. This feature has no UI.
 - **Transaction pooler limits:** no prepared statements, no session state, no `listen/notify`. All of it is covered by `prepare: false` and transaction-local settings; the dispatcher in F-EVENTS-OUTBOX must not rely on `listen`.
 - **Connection count on Vercel Fluid compute:** many instances times `max` 5 could exhaust the pooler's client limit under load. Mitigation: `max` is an env-configurable value, checked in the Stage 7 load test.
 - **`force row level security` and the owner role:** if Supabase's `postgres` role loses `bypassrls` on some plan or version, tests that insert as owner break. Mitigation: the tests would then switch to a dedicated test role; checked in step 4.
+- **Pinned CA expiry or rotation:** the Supabase root CA expires on 2031-04-26, and Supabase may rotate it earlier; connections then fail with a certificate error. Mitigation: a runbook entry in F-RELEASE-READINESS; a failed migrate job on staging catches it before production.
 - **Docker becomes a local prerequisite for `pnpm test` and `pnpm check`.** Accepted with decision 4; `test:unit` stays available without it.
 - No ROADMAP open question blocks this feature.
 
@@ -150,6 +151,7 @@ All recommendations were accepted as proposed. Decision 1 is recorded in [ADR-00
 
 ### Amendment (2026-11-04)
 9. **Driver (supersedes decision 1, ADR):** `pg` (node-postgres) instead of postgres.js, because `attachDatabasePool` supports only pools that emit `release`, which postgres.js doesn't. Recorded in [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), which supersedes ADR-0011.
+10. **TLS to hosted databases:** `pg` doesn't use TLS unless asked, and Supabase accepts plain connections unless SSL enforcement is on. Every non-local connection therefore requires TLS verified against the pinned **Supabase Root 2021 CA** (`src/infra/db/supabase-ca.ts`, SHA-256 `80:70:25:AD:…:CA:FA`, valid until 2031-04-26). SSL parameters in the URL are dropped so they can't override the pinning. The local stack stays plain TCP. SSL enforcement is turned on in the staging and production projects (a setting). The CA was read from the `eu-central-1` poolers' TLS chain (trust on first use) because the dashboard showed no download; verify the fingerprint against Supabase's published certificate when possible.
 
 ## Deviations
 _To be filled in after implementation._
