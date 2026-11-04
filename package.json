@@ -23,13 +23,20 @@
     "check": "pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/infra/db/migrate.ts",
+    "db:reset": "supabase db reset && pnpm db:migrate",
     "prepare": "husky"
   },
   "dependencies": {
     "@sentry/nextjs": "11.8.0",
+    "@vercel/functions": "3.10.6",
+    "drizzle-orm": "0.45.4",
     "next": "16.4.4",
+    "pg": "8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",
@@ -37,10 +44,12 @@
     "@playwright/test": "^1.64.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^24",
+    "@types/pg": "8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.0.3",
     "dependency-cruiser": "^18.5.0",
+    "drizzle-kit": "0.31.11",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.4.4",
     "eslint-config-prettier": "^10.1.8",
@@ -49,6 +58,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "supabase": "3.0.0",
     "tailwindcss": "^4",
+    "tsx": "4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.3"
   }
