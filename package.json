@@ -17,6 +17,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check:boundaries": "depcruise src --config .dependency-cruiser.cjs",
     "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
