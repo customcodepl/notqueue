@@ -14,5 +14,6 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0008](0008-hashed-entry-tokens.md) | Unguessable entry tokens, stored hashed | accepted | 2026-10-11 |
 | [0009](0009-gated-deploy-and-migration-pipeline.md) | Gated deploy and migration pipeline | superseded by 0010 | 2026-10-22 |
 | [0010](0010-deploy-pipeline-without-staging-deployment.md) | Deploy pipeline without a staging deployment | accepted | 2026-10-22 |
-| [0011](0011-database-access-and-pooling.md) | Database access: Drizzle and postgres.js over the Supavisor transaction pooler | accepted | 2026-11-04 |
+| [0011](0011-database-access-and-pooling.md) | Database access: Drizzle and postgres.js over the Supavisor transaction pooler | superseded by 0013 | 2026-11-04 |
 | [0012](0012-integration-tests-on-supabase-local-stack.md) | Integration tests on the Supabase local stack | accepted | 2026-11-04 |
+| [0013](0013-database-access-with-node-postgres.md) | Database access: Drizzle and node-postgres over the Supavisor transaction pooler | accepted | 2026-11-04 |

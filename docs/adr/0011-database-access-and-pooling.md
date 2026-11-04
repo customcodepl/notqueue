@@ -1,6 +1,6 @@
 # ADR-0011: Database access: Drizzle and postgres.js over the Supavisor transaction pooler
 
-- **Status:** accepted
+- **Status:** superseded by [ADR-0013](0013-database-access-with-node-postgres.md)
 - **Date:** 2026-11-04
 - **Related:** [ADR-0002](0002-hosting-and-database.md), [ADR-0004](0004-business-logic-in-own-api.md), [ADR-0005](0005-tenant-isolation-rls.md), [ADR-0010](0010-deploy-pipeline-without-staging-deployment.md), F-FOUND-DB, F-TENANT-CORE, F-EVENTS-OUTBOX
 

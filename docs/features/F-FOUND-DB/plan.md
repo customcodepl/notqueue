@@ -4,17 +4,17 @@
 - **Status:** plan approved (2026-11-04)
 - **Depends on:** F-FOUND-REPO (done)
 - **Unblocks:** F-TENANT-CORE, F-AUTH-LOGIN, F-EVENTS-OUTBOX
-- **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0004](../../adr/0004-business-logic-in-own-api.md), [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md); [ADR-0011](../../adr/0011-database-access-and-pooling.md) (decision 1), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md) (decision 4)
+- **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0004](../../adr/0004-business-logic-in-own-api.md), [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md); [ADR-0011](../../adr/0011-database-access-and-pooling.md) (decision 1, superseded by [ADR-0013](../../adr/0013-database-access-with-node-postgres.md)), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md) (decision 4)
 
 ## Goal
 A developer runs `pnpm db:start` and `pnpm db:migrate` and gets a local Supabase stack with the `app` schema and the outbox table. `pnpm test` runs integration tests against it, CI runs them on every PR, and every merge to `main` applies the Drizzle migrations to Supabase staging and, after approval, production. Application code can write a domain event to the outbox in the caller's transaction.
 
 ## Scope
-- **Drizzle:** `drizzle-orm`, `drizzle-kit` and the `postgres` (postgres.js) driver, versions pinned. `drizzle.config.ts` at the root: dialect `postgresql`, schema filter `app`, migrations in `src/infra/db/migrations/`, migration journal table in schema `drizzle` (drizzle-kit default).
+- **Drizzle:** `drizzle-orm`, `drizzle-kit` and the `pg` (node-postgres) driver, versions pinned. `drizzle.config.ts` at the root: dialect `postgresql`, schema filter `app`, migrations in `src/infra/db/migrations/`, migration journal table in schema `drizzle` (drizzle-kit default).
 - **Schema `app`** declared with `pgSchema("app")` in `src/infra/db/schema/`. It isn't exposed through the Supabase Data API (decision 5) and gets no grants to `anon`, `authenticated` or `public`.
 - **Outbox table** `app.outbox_events` (see "Data model"), with RLS enabled and no policies yet. F-TENANT-CORE adds the API role's insert policy, and F-EVENTS-OUTBOX adds the dispatcher's access.
 - **Connection** (`src/infra/db/client.ts`), see decision 1:
-  - runtime: `DATABASE_URL` on the Supavisor **transaction pooler** (port 6543), `prepare: false`, a small pool (`max` 5, `idle_timeout` 20 s), created lazily once per function instance and registered with `attachDatabasePool` from `@vercel/functions` so idle connections are closed before the instance is suspended;
+  - runtime: `DATABASE_URL` on the Supavisor **transaction pooler** (port 6543), a `pg` `Pool` without named prepared statements, small (`max` 5, `idleTimeoutMillis` 5 s), created lazily once per function instance and registered with `attachDatabasePool` from `@vercel/functions` so idle connections are closed before the instance is suspended;
   - migrations: `MIGRATIONS_DATABASE_URL` on the **session pooler** (IPv4, already provisioned in F-FOUND-PIPELINE).
   - Env is read and validated (Zod) only in `infra`; a missing URL fails with a clear message that names the variable but never prints its value.
 - **Transaction helper (internal)** `withTransaction(db, fn)` in `src/infra/db/transaction.ts`, plus exported `Db` and `Tx` types. It's the building block for the tenant-scoped helper in F-TENANT-CORE, which sets the tenant context transaction-locally (`set_config(..., true)`, compatible with the transaction pooler). Only `infra/db` may use it directly; application code goes through the tenant-scoped helper once it exists.
@@ -22,7 +22,7 @@ A developer runs `pnpm db:start` and `pnpm db:migrate` and gets a local Supabase
   - `core`: a `DomainEvent` type (`type`, `orgId`, `aggregateType`, `aggregateId`, `payload` as JSON of IDs, enums and numbers only) and a documented no-PII rule.
   - `application`: an `EventOutbox` port with `append(event)`.
   - `infra`: `drizzleEventOutbox(tx)` implements it by inserting into `app.outbox_events` in the given transaction. The row's `created_at` is set by the database (`now()`).
-- **Local Supabase stack:** the Supabase CLI as a devDependency (allowed in `pnpm-workspace.yaml` `allowBuilds`), `supabase/config.toml` from `supabase init`, with the Data API schemas limited to the defaults and unused services disabled. The `supabase/migrations/` folder stays empty: Drizzle owns migrations (decision 2). Requires Docker.
+- **Local Supabase stack:** the Supabase CLI as a devDependency, `supabase/config.toml` from `supabase init`, with the Data API schemas limited to the defaults and unused services disabled. The `supabase/migrations/` folder stays empty: Drizzle owns migrations (decision 2). Requires Docker.
 - **Scripts:**
   - `db:start` / `db:stop`: `supabase start` / `supabase stop`;
   - `db:generate`: `drizzle-kit generate` (with `--custom` for hand-written SQL);
@@ -34,7 +34,7 @@ A developer runs `pnpm db:start` and `pnpm db:migrate` and gets a local Supabase
 - **Deploy** (`deploy.yml`): both migrate jobs replace the `psql` connectivity check with the setup action and `pnpm db:migrate`.
 - **Vercel env:** `DATABASE_URL` (transaction pooler) for Preview (Supabase staging) and Production (Supabase production), marked sensitive. It isn't read by any route yet; F-FOUND-API decides whether `/health` checks the database.
 - **Lint:** type-aware ESLint rules for async code (`@typescript-eslint/no-floating-promises`, `no-misused-promises`), as suggested in the F-FOUND-REPO deviations (decision 7).
-- **Boundaries:** `postgres` and `@vercel/functions` are added to the framework/I/O packages forbidden in `core`; a new rule forbids `application` from importing `drizzle-orm`, `postgres` and `@supabase/*` (it depends on ports only). The fixture and its test get one case per new rule.
+- **Boundaries:** `pg` and `@vercel/functions` are added to the framework/I/O packages forbidden in `core`; a new rule forbids `application` from importing `drizzle-orm`, `pg` and `@supabase/*` (it depends on ports only). The fixture and its test get one case per new rule.
 - **Docs:** `.env.example` (`DATABASE_URL`, `MIGRATIONS_DATABASE_URL` with local defaults), CLAUDE.md Commands (`db:*`, `test:*`, Docker prerequisite), README "Development", `src/infra/README.md` (DB folder layout), Stage 0 demo step, FEATURES.md.
 
 ## Out of scope
@@ -54,7 +54,7 @@ A developer runs `pnpm db:start` and `pnpm db:migrate` and gets a local Supabase
 - **application:** `src/application/ports/event-outbox.ts`.
 - **infra:** `src/infra/db/` (`client.ts`, `env.ts`, `transaction.ts`, `outbox.ts`, `schema/`, `migrations/`, `testing/`), `src/infra/db/migrate.ts` (script entry).
 - **Repo config:** `package.json`, lockfile, `pnpm-workspace.yaml`, `drizzle.config.ts`, `supabase/config.toml`, `vitest.config.mts` (projects), `eslint.config.mjs`, `.dependency-cruiser.cjs` and fixtures, `.github/workflows/ci.yml` and `deploy.yml`, `.env.example`, `.gitignore` (`supabase/.temp`, `supabase/.branches`).
-- **Docs:** this plan, ADR-0011, ADR-0012, CLAUDE.md, README, `src/infra/README.md`, `docs/demos/stage-0.md`, FEATURES.md.
+- **Docs:** this plan, ADR-0011 (superseded), ADR-0012, ADR-0013, CLAUDE.md, README, `src/infra/README.md`, `docs/demos/stage-0.md`, FEATURES.md.
 
 ## Data model and API changes
 Migration `0000_app_schema_and_outbox` (generated by drizzle-kit; the `revoke` and RLS lines are checked in the generated SQL and added with `--custom` if Drizzle doesn't emit them):
@@ -112,13 +112,13 @@ None. This feature has no UI.
 
 ## Implementation steps
 1. `build(db): add local supabase stack`: Supabase CLI, `supabase/config.toml`, `db:start` / `db:stop`, `.gitignore`.
-2. `feat(db): add drizzle schema app with outbox table`: Drizzle, postgres.js, config, env, client, schema, migration `0000`, `db:generate`, `db:migrate`, `db:reset`.
+2. `feat(db): add drizzle schema app with outbox table`: Drizzle, node-postgres, config, env, client, schema, migration `0000`, `db:generate`, `db:migrate`, `db:reset`.
 3. `feat(db): add transaction and outbox write helpers`: `DomainEvent`, `EventOutbox` port, `withTransaction`, `drizzleEventOutbox`.
 4. `test(db): add integration test project`: Vitest projects, `globalSetup`, rollback helper, the integration tests above; `test`, `test:unit`, `test:integration`.
 5. `build(lint): enable type-aware async rules`: ESLint rules and fixes.
 6. `build(deps): tighten layer rules for db packages`: dependency-cruiser rules, fixtures, test.
 7. `ci(db): run integration tests and migrations in pipeline`: `Integration` job with drift check; `db:migrate` in `deploy.yml`; `DATABASE_URL` set in Vercel (settings, recorded in the PR).
-8. `docs(db): document database setup`: CLAUDE.md, README, `src/infra/README.md`, `.env.example`, Stage 0 demo, ADR-0011/0012 links, FEATURES.md.
+8. `docs(db): document database setup`: CLAUDE.md, README, `src/infra/README.md`, `.env.example`, Stage 0 demo, ADR-0012/0013 links, FEATURES.md.
 
 ## Done when
 - A clean clone with Docker runs `pnpm db:start && pnpm db:migrate && pnpm check` green.
@@ -132,7 +132,6 @@ None. This feature has no UI.
 - **Supabase stack in CI is slow** (image pulls, about 1–2 minutes). Mitigation: exclude unused services and run it as a parallel job; if it gets too slow, cache the Docker images.
 - **Transaction pooler limits:** no prepared statements, no session state, no `listen/notify`. All of it is covered by `prepare: false` and transaction-local settings; the dispatcher in F-EVENTS-OUTBOX must not rely on `listen`.
 - **Connection count on Vercel Fluid compute:** many instances times `max` 5 could exhaust the pooler's client limit under load. Mitigation: `max` is an env-configurable value, checked in the Stage 7 load test.
-- **Supabase CLI install script:** pnpm 12 blocks install scripts by default; `supabase` needs it to download its binary, so it's allowed explicitly in `pnpm-workspace.yaml`.
 - **`force row level security` and the owner role:** if Supabase's `postgres` role loses `bypassrls` on some plan or version, tests that insert as owner break. Mitigation: the tests would then switch to a dedicated test role; checked in step 4.
 - **Docker becomes a local prerequisite for `pnpm test` and `pnpm check`.** Accepted with decision 4; `test:unit` stays available without it.
 - No ROADMAP open question blocks this feature.
@@ -148,6 +147,9 @@ All recommendations were accepted as proposed. Decision 1 is recorded in [ADR-00
 6. **Where migrations run:** recommended: unchanged from [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md): only from the deploy workflow (staging, then production after approval) and locally; never from Vercel builds or previews.
 7. **Type-aware lint rules:** recommended: enable `no-floating-promises` and `no-misused-promises` now, with the first async DB code. Alternative: leave them for a later `chore`.
 8. **Who sets `DATABASE_URL` in Vercel:** recommended: I set it with the Vercel CLI (each command approved by you), using the transaction pooler URLs you give me for staging and production. Alternative: you set it in the Vercel UI.
+
+### Amendment (2026-11-04)
+9. **Driver (supersedes decision 1, ADR):** `pg` (node-postgres) instead of postgres.js, because `attachDatabasePool` supports only pools that emit `release`, which postgres.js doesn't. Recorded in [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), which supersedes ADR-0011.
 
 ## Deviations
 _To be filled in after implementation._
