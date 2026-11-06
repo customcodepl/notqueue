@@ -52,10 +52,13 @@ Every PR runs the full check suite in GitHub Actions, gets a validated Conventio
 | GitHub env `staging` | `MIGRATIONS_DATABASE_URL` | secret | Supabase staging, session pooler URL (IPv4) |
 | GitHub env `production` | `MIGRATIONS_DATABASE_URL` | secret | Supabase production, session pooler URL (IPv4) |
 | Vercel (all envs) | `NEXT_PUBLIC_SENTRY_DSN` | variable | Sentry ingest (EU) |
-| Vercel (preview, staging, production) | `SENTRY_AUTH_TOKEN` | secret | Source-map upload during build |
-| Vercel (staging, production) | `CRON_SECRET` | secret | Used from F-EVENTS-OUTBOX |
+| Vercel (preview, production) | `SENTRY_AUTH_TOKEN` | secret | Source-map upload during build |
+| Vercel (preview, production) | `CRON_SECRET` | secret | Used from F-EVENTS-OUTBOX; a different value per environment |
+| Vercel (preview) | `DATABASE_URL` | secret | Supabase staging, transaction pooler URL (port 6543); added in F-FOUND-DB |
+| Vercel (production) | `DATABASE_URL` | secret | Supabase production, transaction pooler URL (port 6543); added in F-FOUND-DB |
+| Vercel (optional) | `DATABASE_POOL_MAX` | variable | Pool size per function instance, default 5 (F-FOUND-DB); not set |
 
-Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app keys (URL, publishable and secret keys) are added by F-FOUND-DB / F-AUTH-LOGIN when code uses them.
+Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app keys (URL, publishable and secret keys) are added by F-AUTH-LOGIN when code uses them. Later features add their rows to this table. In the hosted Supabase projects, SSL enforcement is on and the Data API is off (F-FOUND-DB).
 
 ### Product owner prerequisites (before step 4)
 - Vercel Pro team, project imported from `customcodepl/notqueue`, custom environment `staging` created.
