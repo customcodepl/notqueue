@@ -28,8 +28,16 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
 8. Open the uptime monitor in Sentry.
    - **Expected:** production is shown as up.
 
+### Database (F-FOUND-DB)
+9. In the "Deploy" run from step 5, open the "Migrate staging" and "Migrate production" logs.
+   - **Expected:** `pnpm db:migrate` prints `Migrations applied.` in both jobs.
+10. In the Supabase dashboard of the staging and production projects, open the Table Editor and pick schema `app`.
+    - **Expected:** the table `outbox_events` exists, with RLS enabled.
+11. On a fresh clone with Docker running: `pnpm install && pnpm db:start && pnpm db:migrate && pnpm check`.
+    - **Expected:** all checks pass, including the integration tests.
+
 ### API skeleton (F-FOUND-API) — _pending_
-9. `/api/v1/health` and the OpenAPI spec respond; `x-vercel-id` on `/api/v1/health` contains `fra1`.
+12. `/api/v1/health` and the OpenAPI spec respond; `x-vercel-id` on `/api/v1/health` contains `fra1`.
 
 ### i18n (F-FOUND-I18N) — _pending_
-10. The deployed app switches between PL and EN.
+13. The deployed app switches between PL and EN.

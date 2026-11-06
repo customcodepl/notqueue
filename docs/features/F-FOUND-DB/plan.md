@@ -1,7 +1,7 @@
 # F-FOUND-DB: Database layer
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-11-04)
+- **Status:** done (2026-11-06); plan approved 2026-11-04
 - **Depends on:** F-FOUND-REPO (done)
 - **Unblocks:** F-TENANT-CORE, F-AUTH-LOGIN, F-EVENTS-OUTBOX
 - **ADRs:** [ADR-0002](../../adr/0002-hosting-and-database.md), [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md), [ADR-0004](../../adr/0004-business-logic-in-own-api.md), [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md); [ADR-0011](../../adr/0011-database-access-and-pooling.md) (decision 1, superseded by [ADR-0013](../../adr/0013-database-access-with-node-postgres.md)), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md) (decision 4)
@@ -154,4 +154,17 @@ All recommendations were accepted as proposed. Decision 1 is recorded in [ADR-00
 10. **TLS to hosted databases:** `pg` doesn't use TLS unless asked, and Supabase accepts plain connections unless SSL enforcement is on. Every non-local connection therefore requires TLS verified against the pinned **Supabase Root 2021 CA** (`src/infra/db/supabase-ca.ts`, SHA-256 `80:70:25:AD:…:CA:FA`, valid until 2031-04-26). SSL parameters in the URL are dropped so they can't override the pinning. The local stack stays plain TCP. SSL enforcement is turned on in the staging and production projects (a setting). The CA was read from the `eu-central-1` poolers' TLS chain (trust on first use) because the dashboard showed no download; verify the fingerprint against Supabase's published certificate when possible.
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-11-04/06). Versions: `drizzle-orm` 0.45.4, `drizzle-kit` 0.31.11, `pg` 8.23.1, `@vercel/functions` 3.10.6, `zod` 4.6.7, Supabase CLI 3.0.0 (local Postgres 17.11).
+
+1. **Driver: `pg` instead of postgres.js** ([ADR-0013](../../adr/0013-database-access-with-node-postgres.md) supersedes ADR-0011; decision 9). `attachDatabasePool` only works with pools that emit `release`.
+2. **TLS with a pinned CA** (decision 10). Not in the original plan: `pg` would otherwise connect to Supabase without encryption. SSL enforcement is on in both hosted projects.
+3. **CI uses the Supabase CLI from devDependencies** (`pnpm exec supabase start`) instead of the `supabase/setup-cli` action: the same pinned version as locally, and one third-party action less. The stack starts with Postgres and Auth only.
+4. **Drift check** uses `git status --porcelain` on the migrations folder instead of `git diff --exit-code`, so new untracked migration files are caught too.
+5. **Integration tests ignore `DATABASE_URL`.** They always use the local stack, or `TEST_DATABASE_URL` when set, so a hosted URL in the shell can't make them write to staging.
+6. **Hand-written SQL appended to `0000`** (`REVOKE ALL ON SCHEMA app FROM PUBLIC`, `FORCE ROW LEVEL SECURITY`) instead of a separate `--custom` migration: one reviewed migration, as in the plan. drizzle-kit doesn't track these lines, so the drift check is unaffected.
+7. **`src/infra/db/migrations/` is excluded from Prettier.** drizzle-kit's files must stay as it writes them; reformatting the journal also changed the migration timestamp Drizzle compares against.
+8. **pnpm build scripts:** `esbuild: false` (pulled in by `tsx` and `drizzle-kit`; its binary comes as an optional package). The Supabase CLI 3 needs no install script, so it isn't listed.
+9. **`DATABASE_POOL_MAX`** (default 5, 1–50) makes the pool size configurable, as the risks section asked.
+10. **Local stack:** default ports (543xx). Storage, edge runtime, analytics and vector buckets are disabled, as are the CLI's own migrations and seeding. Another project's stack on the same ports has to be stopped first.
+11. **Staging migrated before merge.** The deploy workflow is on `main` now, so a `workflow_dispatch` from this branch ran the staging half (2026-11-04, run 41856414484): `0000` applied over TLS with SSL enforcement on. Production is migrated after merge.
+12. **Unplanned separate fix:** Next.js 16.4.0 had critical advisories and made `next build` fail intermittently; it was updated to 16.4.4 in [#5](https://github.com/customcodepl/notqueue/pull/5) before this PR.

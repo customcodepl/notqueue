@@ -34,7 +34,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | Framework | Next.js (App Router), TypeScript, Tailwind CSS | Decided; one codebase for UI and API |
 | Hosting | Vercel Pro, functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
 | Database | Supabase Postgres (`eu-central-1`) | Managed Postgres with RLS, same region as compute, self-hostable ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
-| ORM | Drizzle | SQL-first, light on serverless, RLS policies and roles declared in schema |
+| ORM | Drizzle + node-postgres over the Supavisor transaction pooler | SQL-first, light on serverless, RLS policies and roles declared in schema ([ADR-0013](docs/adr/0013-database-access-with-node-postgres.md)) |
 | Auth | Supabase Auth (staff, admins, operator) | Included, EU-hosted, JWTs usable by future native apps |
 | Roles | Own `memberships` table plus a permission map in code | Portable, testable, independent of the auth vendor |
 | API | Hono + `@hono/zod-openapi`, mounted at `/api/v1` | REST and an OpenAPI spec for mobile and integrations; can run standalone later ([ADR-0004](docs/adr/0004-business-logic-in-own-api.md)) |
@@ -43,7 +43,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | i18n | next-intl (ICU messages) | Built for the App Router, handles Polish plurals |
 | Date & time | `date-fns` + `@date-fns/tz` for timezone arithmetic; `Intl` via next-intl for display | Small and tree-shakeable (customer JS budget); Temporal can replace it once browser support allows |
 | Background jobs | Outbox table + Next.js `after()` + Vercel Cron | Reliable delivery with no extra vendor ([ADR-0006](docs/adr/0006-transactional-outbox.md)) |
-| Testing | Vitest (unit and integration on real Postgres), Playwright (E2E) | Fast, and covers multi-browser realtime scenarios |
+| Testing | Vitest (unit, and integration on the Supabase local stack), Playwright (E2E) | Fast, real RLS and Supabase roles, and covers multi-browser realtime scenarios ([ADR-0012](docs/adr/0012-integration-tests-on-supabase-local-stack.md)) |
 | Tooling | Node 24, pnpm, ESLint + Prettier, dependency-cruiser (layer boundaries), commitlint + husky (Conventional Commits) | Strict, automated checks that keep the layering and commit history consistent |
 | CI/CD | GitHub Actions + Vercel Git integration | Gated DB migrations, then deploy |
 | Monitoring | Sentry (EU host), uptime checks | Error tracking with PII scrubbing |
@@ -97,14 +97,15 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 
 ## Development
 
-Requires Node 24 (see `.nvmrc`) and corepack.
+Requires Node 24 (see `.nvmrc`), corepack and Docker (local Supabase stack).
 
 ```
 corepack enable
 pnpm install                                  # also installs the commit-msg hook
 pnpm exec playwright install chromium webkit  # once, for E2E
+pnpm db:start && pnpm db:migrate              # local Supabase stack with the app schema
 pnpm dev                                      # http://localhost:3000
-pnpm check                                    # lint, typecheck, layer boundaries, unit tests
+pnpm check                                    # lint, typecheck, layer boundaries, unit and integration tests
 pnpm e2e                                      # Playwright on desktop, phone and tablet profiles
 ```
 
@@ -112,8 +113,8 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 
 ### CI/CD
 
-- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, build and E2E, and check that the PR title is a Conventional Commit. The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
-- **Merge to `main`:** the deploy workflow migrates the staging database, waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
+- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, and check that the PR title is a Conventional Commit. The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
+- **Merge to `main`:** the deploy workflow migrates the staging database (`pnpm db:migrate` over TLS with the pinned Supabase CA), waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
 - **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches production.
 - Secrets and variables are listed in the [F-FOUND-PIPELINE plan](docs/features/F-FOUND-PIPELINE/plan.md#secrets-and-variables).
 

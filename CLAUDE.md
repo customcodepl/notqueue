@@ -55,7 +55,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
 - Write all code, comments, commit messages, PR descriptions and docs in **English**.
 
 ## Commands
-Setup on a fresh clone: `corepack enable && pnpm install` (also installs the commit-msg hook), then `pnpm exec playwright install chromium webkit` once for E2E.
+Setup on a fresh clone: `corepack enable && pnpm install` (also installs the commit-msg hook), then `pnpm exec playwright install chromium webkit` once for E2E. Integration tests and `pnpm check` need Docker and the local Supabase stack: `pnpm db:start && pnpm db:migrate`.
 ```
 dev:              pnpm dev
 build:            pnpm build
@@ -63,14 +63,15 @@ lint:             pnpm lint              # --max-warnings=0; pnpm lint:fix to au
 format:           pnpm format            # pnpm format:check to verify; *.md is not formatted
 typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
-test:             pnpm test              # unit; pnpm test:coverage for coverage
+test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
-check:            pnpm check             # lint + typecheck + boundaries + unit tests
-db:start:         TODO   # local Supabase (F-FOUND-DB)
-db:generate:      TODO   # create a migration (F-FOUND-DB)
-db:migrate:       TODO   # apply migrations (F-FOUND-DB)
+check:            pnpm check             # lint + typecheck + boundaries + all tests
+db:start:         pnpm db:start          # local Supabase stack (Docker, default ports 543xx); db:stop to stop
+db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL
+db:migrate:       pnpm db:migrate        # apply migrations (local stack unless MIGRATIONS_DATABASE_URL is set)
+db:reset:         pnpm db:reset          # wipe the local database and re-apply migrations
 ```
-Integration tests (real Postgres with RLS) are added to `test` in F-FOUND-DB.
+Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local stack and roll back each test ([ADR-0012](docs/adr/0012-integration-tests-on-supabase-local-stack.md)). Migrations are forward-only; never edit one that has been applied to staging.
 
 ## Conventions that apply to every change
 - **Tenant isolation.**
