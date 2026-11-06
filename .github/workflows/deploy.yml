@@ -34,12 +34,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.DEPLOY_SHA }}
-      # Until F-FOUND-DB adds `pnpm db:migrate`, this only proves the secret
-      # and the network path to the session pooler.
-      - name: Check database connectivity
+      - uses: ./.github/actions/setup
+      # Session pooler URL of this environment's Supabase project (ADR-0013).
+      - name: Apply migrations
         env:
           MIGRATIONS_DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
-        run: psql "$MIGRATIONS_DATABASE_URL" -v ON_ERROR_STOP=1 -tAc 'select 1'
+        run: pnpm db:migrate
 
   migrate-production:
     name: Migrate production
@@ -52,10 +52,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.DEPLOY_SHA }}
-      - name: Check database connectivity
+      - uses: ./.github/actions/setup
+      # Session pooler URL of this environment's Supabase project (ADR-0013).
+      - name: Apply migrations
         env:
           MIGRATIONS_DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
-        run: psql "$MIGRATIONS_DATABASE_URL" -v ON_ERROR_STOP=1 -tAc 'select 1'
+        run: pnpm db:migrate
 
   deploy-production:
     name: Deploy production
