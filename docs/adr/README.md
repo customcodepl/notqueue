@@ -17,3 +17,5 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0011](0011-database-access-and-pooling.md) | Database access: Drizzle and postgres.js over the Supavisor transaction pooler | superseded by 0013 | 2026-11-04 |
 | [0012](0012-integration-tests-on-supabase-local-stack.md) | Integration tests on the Supabase local stack | accepted | 2026-11-04 |
 | [0013](0013-database-access-with-node-postgres.md) | Database access: Drizzle and node-postgres over the Supavisor transaction pooler | accepted | 2026-11-04 |
+| [0014](0014-api-conventions.md) | API conventions: problem+json with stable codes, no-store, `serverTime` field | accepted | 2026-11-09 |
+| [0015](0015-composition-root.md) | Composition root in `src/server/` | accepted | 2026-11-09 |
