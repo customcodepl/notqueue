@@ -31,9 +31,11 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@hono/zod-openapi": "1.6.3",
     "@sentry/nextjs": "11.8.0",
     "@vercel/functions": "3.10.6",
     "drizzle-orm": "0.45.4",
+    "hono": "4.13.16",
     "next": "16.4.4",
     "pg": "8.23.1",
     "react": "19.3.0",
