@@ -1,16 +1,18 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { createApi } from "./app";
 import { ApiProblem } from "./problems";
 import { Problem } from "./schemas/problem";
 import { LocalDate } from "./schemas/time";
+import { fakeApiDeps } from "./testing";
 
 const REQUEST_ID = "3f0c9a2e-6a53-4c5e-9d43-5b1f0a7e2c11";
 
 function setup() {
-  const reportError = vi.fn();
-  const app = createApi({ reportError });
+  const deps = fakeApiDeps();
+  const reportError = deps.reportError;
+  const app = createApi(deps);
 
   app.openapi(
     createRoute({

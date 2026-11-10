@@ -2,20 +2,23 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 
+import type { CheckHealth } from "@/application/health/check-health";
 import type { ErrorReporter } from "@/application/ports/error-reporter";
 
+import type { ApiEnv } from "./context";
 import { noStore } from "./middleware/no-store";
 import { requestId, requestIdOf } from "./middleware/request-id";
 import { ApiProblem, PROBLEM_CONTENT_TYPE, toProblemBody } from "./problems";
+import { type BuildInfo, healthHandler, healthRoute } from "./routes/health";
 
 export const API_BASE_PATH = "/api/v1";
 
 /** Everything the API needs from outside; wired in `src/server/` (ADR-0015). */
 export interface ApiDeps {
   reportError: ErrorReporter;
+  checkHealth: CheckHealth;
+  build: BuildInfo;
 }
-
-export type ApiEnv = { Variables: { requestId: string } };
 
 const VALIDATION_TARGETS: Record<string, string> = {
   json: "body",
@@ -68,6 +71,8 @@ export function createApi(deps: ApiDeps) {
     }
     return problemResponse(c, problem);
   });
+
+  app.openapi(healthRoute, healthHandler(deps));
 
   return app;
 }
