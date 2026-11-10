@@ -1,0 +1,142 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "notqueue API",
+    "version": "1",
+    "description": "Errors are RFC 9457 problems (`application/problem+json`) with a stable `code`. Instants are ISO 8601 UTC with `Z`; durations are integer seconds."
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "Short commit SHA of the deployment, `dev` locally.",
+            "example": "1ad8b76"
+          },
+          "region": {
+            "type": "string",
+            "description": "Vercel region that served the request, `local` locally.",
+            "example": "fra1"
+          },
+          "serverTime": {
+            "$ref": "#/components/schemas/Instant"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "region",
+          "serverTime"
+        ]
+      },
+      "Instant": {
+        "type": "string",
+        "format": "date-time",
+        "description": "An instant in ISO 8601, UTC, with a `Z` suffix. Offsets such as `+01:00` are rejected.",
+        "example": "2026-03-29T01:30:00.000Z"
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "urn:notqueue:problem:not_found"
+          },
+          "title": {
+            "type": "string",
+            "description": "English, for developers. Never shown to end users."
+          },
+          "status": {
+            "type": "integer"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "validation_failed",
+              "not_found",
+              "internal_error",
+              "service_unavailable"
+            ],
+            "description": "Stable machine code. Clients translate messages by it."
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string",
+            "description": "The request ID, also sent as `x-request-id`.",
+            "example": "urn:uuid:3f0c9a2e-6a53-4c5e-9d43-5b1f0a7e2c11"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "example": "query.date"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "invalid_format"
+                }
+              },
+              "required": [
+                "path",
+                "code"
+              ]
+            },
+            "description": "Failed fields of a validation error."
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "instance"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health check",
+        "description": "Public. Healthy when the function runs and the database answers within 2 seconds.",
+        "responses": {
+          "200": {
+            "description": "Healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The database didn't answer (`service_unavailable`)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

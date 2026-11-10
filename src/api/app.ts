@@ -10,6 +10,7 @@ import { noStore } from "./middleware/no-store";
 import { requestId, requestIdOf } from "./middleware/request-id";
 import { ApiProblem, PROBLEM_CONTENT_TYPE, toProblemBody } from "./problems";
 import { type BuildInfo, healthHandler, healthRoute } from "./routes/health";
+import { OPENAPI_DOCUMENT } from "./routes/openapi";
 
 export const API_BASE_PATH = "/api/v1";
 
@@ -73,6 +74,7 @@ export function createApi(deps: ApiDeps) {
   });
 
   app.openapi(healthRoute, healthHandler(deps));
+  app.doc31("/openapi.json", OPENAPI_DOCUMENT);
 
   return app;
 }
