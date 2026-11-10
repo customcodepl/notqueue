@@ -70,6 +70,7 @@ db:start:         pnpm db:start          # local Supabase stack (Docker, default
 db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL
 db:migrate:       pnpm db:migrate        # apply migrations (local stack unless MIGRATIONS_DATABASE_URL is set)
 db:reset:         pnpm db:reset          # wipe the local database and re-apply migrations
+api:spec:         pnpm api:spec          # rewrite docs/api/openapi.json after a contract change (a test compares it)
 ```
 Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local stack and roll back each test ([ADR-0012](docs/adr/0012-integration-tests-on-supabase-local-stack.md)). Migrations are forward-only; never edit one that has been applied to staging.
 
@@ -84,9 +85,10 @@ Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local s
   - Clients never query Supabase directly. All client mutations go through `/api/v1`.
   - Server Components may call `application/` with the same auth context.
 - **API contracts.**
-  - Zod schemas drive validation and OpenAPI.
-  - Errors are problem+json.
-  - Breaking changes need a new API version.
+  - Zod schemas drive validation and OpenAPI. Routes are declared with `createRoute` and get their use cases through `createApi(deps)`; only the composition root in `src/server/` wires `infra` in ([ADR-0015](docs/adr/0015-composition-root.md)).
+  - Errors are problem+json with a stable `code` from the registry in `src/api/problems.ts`; clients translate by `code`, `title` and `detail` are for developers ([ADR-0014](docs/adr/0014-api-conventions.md)).
+  - Responses are `Cache-Control: no-store` by default and carry `x-request-id`.
+  - Every contract change updates the committed `docs/api/openapi.json` (`pnpm api:spec`). Breaking changes need a new API version.
 - **i18n.**
   - No hardcoded user-facing strings; everything goes through next-intl, in every enabled locale.
   - Venue content uses `LocalizedText`.

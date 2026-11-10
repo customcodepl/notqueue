@@ -1,7 +1,7 @@
 # F-FOUND-API: API skeleton
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-11-09)
+- **Status:** done (2026-11-10); plan approved 2026-11-09
 - **Depends on:** F-FOUND-REPO (done)
 - **Unblocks:** F-AUTH-LOGIN, F-PUBLIC-VENUE (and, through them, every endpoint)
 - **ADRs:** [ADR-0004](../../adr/0004-business-logic-in-own-api.md), [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md); [ADR-0014](../../adr/0014-api-conventions.md) (decision 1), [ADR-0015](../../adr/0015-composition-root.md) (decision 2)
@@ -154,4 +154,17 @@ All recommendations accepted as proposed. Decision 1 is recorded in [ADR-0014](.
 7. **Request ID:** recommended: accept a client `x-request-id` only if it's a UUID, otherwise generate one; echo it in the response, the problem `instance` and Sentry tags. Alternative: always generate (loses correlation with client logs).
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-11-09/10). Versions: `hono` 4.13.16, `@hono/zod-openapi` 1.6.3, `zod` 4.6.7.
+
+1. **`hono` and `@hono/zod-openapi` came in step 1**, not step 2: the time schemas use `z` from `@hono/zod-openapi` for `.openapi()`. `hono` is pinned to 4.13.16 because 4.13.17 was still inside pnpm's minimum release age.
+2. **`IanaTimeZone` accepts canonical names only** (`Intl.supportedValuesOf("timeZone")`), stricter than "a name `Intl` accepts": `Intl` also accepts `+01:00`, `Etc/GMT-1` and lowercase names. Node's ICU list has `Europe/Kiev` but not `Europe/Kyiv`, and excludes `UTC`; F-VENUE-SETTINGS offers the zones from the same list.
+3. **Sentry through a port.** `api` doesn't import Sentry: `createApi` gets an `ErrorReporter` (port in `application`, Sentry adapter in `infra/observability`). Every 5xx is reported; for an `ApiProblem` with a `cause` (the 503 from `/health`) the cause is reported.
+4. **Malformed request bodies** (Hono's 400 `HTTPException`, before the schema runs) become `validation_failed` with an empty `errors` list.
+5. **The route handler exports every method** (including `HEAD` and `OPTIONS`), so an unsupported method gets the problem+json 404 instead of Next.js's empty 405.
+6. **Supporting files not listed in the plan:** `src/api/context.ts` (`ApiEnv`, keeps routes from importing `app.ts`, which would be a cycle), `src/api/testing.ts` (`fakeApiDeps`, excluded from coverage), `src/api/spec.ts` (generator behind `pnpm api:spec`), `src/server/build-info.ts`. `drizzleDatabaseHealth` takes a `getDb` getter, so nothing touches `DATABASE_URL` at import or during `next build`.
+7. **E2E checks `/health` as a 503, not a 200** (approved 2026-11-10). The E2E job runs in the Playwright container without a database, and a Postgres service container would be reachable only under a non-local hostname, which the client requires TLS with the pinned CA for. Playwright starts the server with `DATABASE_URL` on a closed local port; the 200 path is covered by the unit and integration tests and by the deploy smoke check.
+8. **`version` is inlined at build**, not read at runtime: production is built with `vercel build` and deployed with `--prebuilt`, where `VERCEL_GIT_COMMIT_SHA` isn't guaranteed at runtime. `next.config.ts` inlines `NOTQUEUE_COMMIT_SHA` (set to `DEPLOY_SHA` by the deploy workflow) or, for Vercel's Git builds (previews), `VERCEL_GIT_COMMIT_SHA`. `region` stays a runtime read of `VERCEL_REGION`.
+9. **Smoke check** asserts `region` `fra1` from the `/health` body instead of the `x-vercel-id` header, plus `version` = the deployed commit. It closes deviation 8 of F-FOUND-PIPELINE.
+10. **Local dev:** `/api/v1/health` answers 200 in `pnpm dev` only with `DATABASE_URL` set to the local stack in `.env.local` (no runtime fallback, so a missing variable on Vercel shows up as a 503); `.env.example` says so.
+11. **Stage 0 demo:** the API has steps 12–14 instead of one step 12; the i18n step is now 15.
+12. **Uptime monitor** is switched to `/api/v1/health` after merge, once production serves it (a setting, recorded in the PR).
