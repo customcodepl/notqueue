@@ -1,11 +1,15 @@
 // Layer boundaries from CLAUDE.md:
 // core → application → infra → api / app. i18n is presentation-side.
+// src/server/ is the composition root that wires them together (ADR-0015).
 // Paths are relative to the working directory, so the same rules also run
 // against tools/depcruise-fixtures (see its test).
 
 // Matches both plain and pnpm (.pnpm/<pkg>@<ver>/node_modules/<pkg>/) paths.
 const FRAMEWORK_AND_IO_PACKAGES =
-  "node_modules/(next|react|react-dom|drizzle-orm|pg|@types/pg|@vercel/functions|hono|@supabase/[a-z-]+)/";
+  "node_modules/(next|react|react-dom|drizzle-orm|pg|@types/pg|@vercel/functions|hono|@hono/[a-z-]+|@supabase/[a-z-]+)/";
+
+// The HTTP framework: only api (and the composition root) use it.
+const HTTP_PACKAGES = "node_modules/(hono|@hono/[a-z-]+)/";
 
 // Database and Supabase clients: only infra talks to them (ADR-0013).
 const DB_PACKAGES =
@@ -44,6 +48,14 @@ module.exports = {
       to: { path: DB_PACKAGES },
     },
     {
+      name: "application-or-infra-imports-hono",
+      comment:
+        "HTTP stays in api: use cases and adapters don't know about Hono.",
+      severity: "error",
+      from: { path: "^src/(application|infra)/" },
+      to: { path: HTTP_PACKAGES },
+    },
+    {
       name: "infra-imports-outer-layer",
       comment: "infra may import only core and application.",
       severity: "error",
@@ -53,10 +65,18 @@ module.exports = {
     {
       name: "presentation-imports-infra",
       comment:
-        "api and app may import only application and core (plus i18n). Composition-root access to infra is decided in F-FOUND-API.",
+        "api and app may import only application and core (plus i18n). infra is wired in by the composition root in src/server/ (ADR-0015).",
       severity: "error",
       from: { path: "^src/(api|app)/" },
       to: { path: "^src/infra/" },
+    },
+    {
+      name: "server-imported-outside-entry-points",
+      comment:
+        "The composition root (ADR-0015) may import every layer; only Next.js entry points in src/app/ and src/instrumentation.ts import it.",
+      severity: "error",
+      from: { pathNot: "^src/(app/|server/|instrumentation\\.ts$)" },
+      to: { path: "^src/server/" },
     },
     {
       name: "i18n-imports-non-core",

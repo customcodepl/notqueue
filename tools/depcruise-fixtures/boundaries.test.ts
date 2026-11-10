@@ -36,12 +36,14 @@ describe("layer boundary rules", () => {
     expect(violations).toEqual([
       "application-imports-db-client: src/application/imports-drizzle.ts",
       "application-imports-outer-layer: src/application/imports-infra.ts",
+      "application-or-infra-imports-hono: src/infra/imports-hono.ts",
       "core-imports-framework-or-io: src/core/imports-react.ts",
       "core-imports-other-layer: src/core/imports-infra.ts",
       "i18n-imports-non-core: src/i18n/imports-application.ts",
       "infra-imports-outer-layer: src/infra/imports-app.ts",
       "no-circular: src/core/cycle-a.ts",
       "presentation-imports-infra: src/api/imports-infra.ts",
+      "server-imported-outside-entry-points: src/api/imports-server.ts",
     ]);
   });
 });
