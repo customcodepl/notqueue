@@ -1,9 +1,15 @@
 import type { BuildInfo } from "@/api/routes/health";
 
-/** Which deployment answers: Vercel system env, with local defaults. */
-export function buildInfo(env: Record<string, string | undefined>): BuildInfo {
+/**
+ * Which deployment answers. NOTQUEUE_COMMIT_SHA is inlined at build
+ * (next.config.ts), VERCEL_REGION exists at runtime only.
+ */
+export function buildInfo(env: {
+  NOTQUEUE_COMMIT_SHA?: string;
+  VERCEL_REGION?: string;
+}): BuildInfo {
   return {
-    version: env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || "dev",
+    version: env.NOTQUEUE_COMMIT_SHA?.slice(0, 7) || "dev",
     region: env.VERCEL_REGION || "local",
   };
 }

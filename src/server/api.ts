@@ -15,5 +15,9 @@ export const api = createApi({
     database: drizzleDatabaseHealth(getDb),
     clock: systemClock,
   }),
-  build: buildInfo(process.env),
+  // Literal process.env reads, so Next.js can inline NOTQUEUE_COMMIT_SHA.
+  build: buildInfo({
+    NOTQUEUE_COMMIT_SHA: process.env.NOTQUEUE_COMMIT_SHA,
+    VERCEL_REGION: process.env.VERCEL_REGION,
+  }),
 });

@@ -82,6 +82,8 @@ jobs:
           # Sensitive Vercel variables are not returned by `vercel pull`.
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: production
+          # Reported by /api/v1/health and checked by the smoke check.
+          NOTQUEUE_COMMIT_SHA: ${{ env.DEPLOY_SHA }}
         run: pnpm dlx vercel@64.7.0 build --prod --token="$VERCEL_TOKEN"
 
       - name: Deploy
