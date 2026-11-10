@@ -36,8 +36,13 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
 11. On a fresh clone with Docker running: `pnpm install && pnpm db:start && pnpm db:migrate && pnpm check`.
     - **Expected:** all checks pass, including the integration tests.
 
-### API skeleton (F-FOUND-API) — _pending_
-12. `/api/v1/health` and the OpenAPI spec respond; `x-vercel-id` on `/api/v1/health` contains `fra1`.
+### API skeleton (F-FOUND-API)
+12. Open https://notqueue.vercel.app/api/v1/health.
+    - **Expected:** 200 JSON `{ "status": "ok", "serverTime": "…Z", "version": "<short SHA of main>", "region": "fra1" }`; headers `cache-control: no-store` and an `x-request-id` UUID.
+13. Open https://notqueue.vercel.app/api/v1/openapi.json and https://notqueue.vercel.app/api/v1/nope.
+    - **Expected:** the OpenAPI 3.1 document, equal to `docs/api/openapi.json` on `main`; the unknown path answers 404 `application/problem+json` with `code` `not_found` and `instance` = `urn:uuid:<x-request-id>`.
+14. In the "Deploy" run from step 5, open the "Smoke check" log; then open the uptime monitor in Sentry.
+    - **Expected:** the smoke check prints 200 with the deployed version and `fra1`; the monitor watches `/api/v1/health` and shows it as up.
 
 ### i18n (F-FOUND-I18N) — _pending_
-13. The deployed app switches between PL and EN.
+15. The deployed app switches between PL and EN.

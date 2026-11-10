@@ -104,7 +104,7 @@ corepack enable
 pnpm install                                  # also installs the commit-msg hook
 pnpm exec playwright install chromium webkit  # once, for E2E
 pnpm db:start && pnpm db:migrate              # local Supabase stack with the app schema
-pnpm dev                                      # http://localhost:3000
+pnpm dev                                      # http://localhost:3000, API at /api/v1 (health: /api/v1/health)
 pnpm check                                    # lint, typecheck, layer boundaries, unit and integration tests
 pnpm e2e                                      # Playwright on desktop, phone and tablet profiles
 ```
@@ -115,7 +115,7 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 
 - **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, and check that the PR title is a Conventional Commit. The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
 - **Merge to `main`:** the deploy workflow migrates the staging database (`pnpm db:migrate` over TLS with the pinned Supabase CA), waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
-- **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches production.
+- **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches `/api/v1/health` in production, which also checks the database. The post-deploy smoke check requires `/api/v1/health` to answer 200 from `fra1` with the deployed commit.
 - Secrets and variables are listed in the [F-FOUND-PIPELINE plan](docs/features/F-FOUND-PIPELINE/plan.md#secrets-and-variables).
 
 ## Documentation
@@ -124,4 +124,5 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 - [docs/FEATURES.md](docs/FEATURES.md): progress per stage, feature IDs and status, dependency graph, happy paths.
 - `docs/features/<feature-id>/plan.md`: the approved plan of each feature, including its deviations.
 - [docs/DESIGN.md](docs/DESIGN.md): surface principles, branding, design system, accessibility, the "you're called" moment, mockup process (decisions pending).
+- [docs/api/openapi.json](docs/api/openapi.json): the `/api/v1` contract (OpenAPI 3.1), generated from the routes and checked in CI; also served at `/api/v1/openapi.json`.
 - [docs/adr/](docs/adr/README.md): architecture decision records: the rationale and rejected alternatives behind system-wide choices.

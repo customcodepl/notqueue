@@ -26,6 +26,12 @@ export default defineConfig({
       ? `pnpm start --port ${PORT}`
       : `pnpm build && pnpm start --port ${PORT}`,
     url: `http://localhost:${PORT}`,
+    // No database in E2E: a closed local port makes /api/v1/health answer
+    // 503 deterministically. The 200 path is covered by unit and integration
+    // tests and by the deploy smoke check.
+    env: {
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:1/postgres",
+    },
     reuseExistingServer: !isCI,
     timeout: 180_000,
   },

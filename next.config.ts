@@ -2,8 +2,16 @@ import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
+  // Inlined at build, so /api/v1/health reports the commit it was built from
+  // also for prebuilt deploys: the deploy workflow sets NOTQUEUE_COMMIT_SHA,
+  // Vercel's Git builds (previews) provide VERCEL_GIT_COMMIT_SHA.
+  env: {
+    NOTQUEUE_COMMIT_SHA:
+      process.env.NOTQUEUE_COMMIT_SHA ||
+      process.env.VERCEL_GIT_COMMIT_SHA ||
+      "",
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {
