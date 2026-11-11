@@ -1,6 +1,6 @@
 # ADR-0016: Documentation checks per pull request
 
-- **Status:** accepted
+- **Status:** superseded by [ADR-0017](0017-documentation-review-before-opening-a-pull-request.md)
 - **Date:** 2026-11-11
 - **Related:** [ADR-0001](0001-record-architecture-decisions.md), F-FOUND-DOCS, every feature (baseline definition of done)
 
