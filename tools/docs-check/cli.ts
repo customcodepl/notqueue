@@ -1,5 +1,6 @@
 import { checkAdrIndex } from "./checks/adr-index";
 import { checkCommands } from "./checks/commands";
+import { checkLayerReadmes } from "./checks/layer-readmes";
 import { checkLinks } from "./checks/links";
 import { checkPaths } from "./checks/paths";
 import { checkProgress } from "./checks/progress";
@@ -11,6 +12,7 @@ const CHECKS: Record<string, (repo: Repo) => Finding[]> = {
   commands: checkCommands,
   adrIndex: checkAdrIndex,
   progress: checkProgress,
+  layerReadmes: checkLayerReadmes,
 };
 
 export function runChecks(repo: Repo): Finding[] {
