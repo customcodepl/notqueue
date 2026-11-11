@@ -12,5 +12,6 @@
   "vercel.json": ["README.md"],
   "supabase/**": ["CLAUDE.md"],
   ".dependency-cruiser.cjs": ["CLAUDE.md"],
-  "tools/docs-check/**": ["tools/docs-check/README.md"]
+  "tools/docs-check/**": ["tools/docs-check/README.md"],
+  "tools/i18n-check/**": ["tools/i18n-check/README.md"]
 }

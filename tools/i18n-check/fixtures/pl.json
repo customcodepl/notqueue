@@ -1,0 +1,12 @@
+{
+  "ok": {
+    "plural": "{count, plural, =0 {nikt} one {# osoba} few {# osoby} many {# osób} other {# osoby}}",
+    "rich": "Cześć <b>{name}</b>"
+  },
+  "onlyInPl": "Tylko tutaj",
+  "invalid": "Zepsute {name}",
+  "renamed": "Bilet {ticket}",
+  "empty": "  ",
+  "nested": { "notAString": 1 },
+  "pluralGap": "{count, plural, one {# osoba} other {# osoby}}"
+}
