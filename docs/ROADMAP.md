@@ -37,6 +37,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 - Supabase staging and production projects (`eu-central-1`), plus a local Supabase stack.
 - Drizzle schema `app` with the first migration, including the outbox table and a helper that writes a domain event in the caller's transaction (the dispatcher comes in Stage 4).
 - Hono API at `/api/v1` with `/health` and the OpenAPI spec.
+- Documentation checks in CI: links, paths, commands, ADR index and progress counts, layer READMEs, and a doc map that requires mapped docs to change with the code or be declared unchanged.
 - next-intl with PL/EN, a missing-translation-key CI gate, and the `LocalizedText` type with its fallback resolver.
 - Sentry (EU).
 
