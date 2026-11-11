@@ -10,6 +10,8 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   reporter: isCI ? [["list"], ["html", { open: "never" }]] : "list",
+  // @preview tests need a deployment (playwright.preview.config.ts).
+  grepInvert: /@preview/,
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
