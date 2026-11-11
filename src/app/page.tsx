@@ -1,8 +1,13 @@
-// Placeholder page. Exempt from the i18n rule until F-FOUND-I18N replaces it.
-export default function Home() {
+import { getTranslations } from "next-intl/server";
+
+// Placeholder page, replaced by the first real screen.
+export default async function Home() {
+  const t = await getTranslations("home");
+
   return (
     <main>
-      <h1>notqueue</h1>
+      <h1>{t("heading")}</h1>
+      <p>{t("tagline")}</p>
     </main>
   );
 }

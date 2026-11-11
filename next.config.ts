@@ -1,8 +1,11 @@
 import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,
+  // Off: the locale is read from the request in the root layout, and with
+  // Cache Components on, switching the language rendered both pages (ADR-0018).
+  cacheComponents: false,
   // Inlined at build, so /api/v1/health reports the commit it was built from
   // also for prebuilt deploys: the deploy workflow sets NOTQUEUE_COMMIT_SHA,
   // Vercel's Git builds (previews) provide VERCEL_GIT_COMMIT_SHA.
@@ -12,7 +15,8 @@ const nextConfig: NextConfig = {
       process.env.VERCEL_GIT_COMMIT_SHA ||
       "",
   },
-  partialPrefetching: true,
+  // Requires Cache Components.
+  partialPrefetching: false,
   turbopack: {
     rules: {
       "*.css": {
@@ -23,7 +27,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+// Loads src/i18n/request.ts for every request.
+const withNextIntl = createNextIntlPlugin();
+
+export default withSentryConfig(withNextIntl(nextConfig), {
   // EU data residency (ADR-0003). The auth token comes from SENTRY_AUTH_TOKEN;
   // without it (local builds, CI) source maps are not uploaded.
   sentryUrl: "https://de.sentry.io/",
