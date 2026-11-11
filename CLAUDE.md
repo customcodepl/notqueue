@@ -132,4 +132,10 @@ Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local s
 - **Body** (when useful): what and why, not how.
 - **Footer:** `Refs: <feature-id>` (from FEATURES.md). Use `BREAKING CHANGE:` for breaking changes.
 - One logical change per commit, made only after lint, typecheck and tests pass. Never commit secrets.
-- Commit only when I ask or the approved plan says so. **Never push without my explicit approval.**
+- Commit each step of an approved plan without asking once its checks pass, and mention the commit briefly. Ask before any other commit.
+- **Never push, open a PR or merge without my explicit approval.** `.claude/settings.json` makes the harness ask for `git push` and `gh pr create`/`merge`, and denies force-pushes.
+
+## Secrets
+- I set secrets and credential env vars (Vercel, GitHub environments, Supabase) myself. Give me exact click-by-click steps and a non-secret way to verify; never ask me to paste a value into the chat.
+- For credential checks, give a command that prompts for the password locally (e.g. `docker exec -it supabase_db_notqueue psql "...?sslmode=require"`; there is no local `psql`).
+- Never read `.env` files other than `.env.example` (denied in `.claude/settings.json`).
