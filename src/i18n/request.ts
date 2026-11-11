@@ -13,6 +13,9 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
+    // Formatting goes through format.ts with the venue's timezone; UTC here
+    // makes a path that skips it visibly wrong instead of plausibly local.
+    timeZone: "UTC",
     messages: (await import(`./messages/${locale}.json`)).default,
   };
 });
