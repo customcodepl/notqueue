@@ -9,7 +9,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 
 | Stage | Features done | Status |
 |---|---|---|
-| 0: Foundations | 4 / 5 | in progress |
+| 0: Foundations | 5 / 6 | in progress |
 | 1: Tenancy, auth & operator console | 0 / 6 | not started |
 | 2: Design foundations | 0 / 3 | not started |
 | 3: Queue core & customer journey | 0 / 6 | not started |
@@ -17,7 +17,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 | 5: Venue admin | 0 / 5 | not started |
 | 6: Notifications & i18n completeness | 0 / 3 | not started |
 | 7: Hardening, GDPR & handover | 0 / 6 | not started |
-| **v1.0** | **4 / 40** | in progress |
+| **v1.0** | **5 / 41** | in progress |
 
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
@@ -42,6 +42,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-FOUND-PIPELINE | CI/CD & environments | done | F-FOUND-REPO | GitHub Actions (including PR-title validation against Conventional Commits), Vercel `fra1` previews, Supabase staging/prod, gated migration job ([ADR-0010](adr/0010-deploy-pipeline-without-staging-deployment.md)), `CRON_SECRET` (cron entry in F-EVENTS-OUTBOX), Sentry EU, uptime check (Sentry Uptime) |
 | F-FOUND-DB | Database layer | done | F-FOUND-REPO | Drizzle, schema `app`, migrations, local Supabase stack, pooler config; outbox table and a helper that writes a domain event in the caller's transaction |
 | F-FOUND-API | API skeleton | done | F-FOUND-REPO | Hono at `/api/v1`, problem+json errors, OpenAPI, `/health`; `Clock` port and shared Zod schemas for time formats (ISO 8601 UTC, dates, `HH:mm`, durations), `serverTime` in responses |
+| F-FOUND-DOCS | Documentation checks | done | F-FOUND-REPO, F-FOUND-PIPELINE | `pnpm docs:check` in CI (links, paths, commands, ADR index, progress counts, layer READMEs), doc map with a `Docs-unchanged:` opt-out per PR, Claude Code reminder hook |
 | F-FOUND-I18N | i18n foundation | planned | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
 
 ### Stage 1: Tenancy, auth & operator console
@@ -107,7 +108,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-VENUE-STATS | Venue statistics | planned | F-STAFF-ACTIONS, F-DESIGN-SYSTEM | Served count, average wait, no-show rate |
 | F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
 
-**Total: 40 features.**
+**Total: 41 features.**
 
 ---
 
@@ -120,6 +121,7 @@ flowchart LR
     FOUND_PIPELINE[F-FOUND-PIPELINE]
     FOUND_DB[F-FOUND-DB]
     FOUND_API[F-FOUND-API]
+    FOUND_DOCS[F-FOUND-DOCS]
     FOUND_I18N[F-FOUND-I18N]
   end
   subgraph S1[Stage 1 Tenancy & auth]
@@ -187,6 +189,7 @@ flowchart LR
   DESIGN_DECISIONS --> DESIGN_MOCKUPS --> DESIGN_SYSTEM
   FOUND_I18N --> DESIGN_SYSTEM
   FOUND_PIPELINE --> DESIGN_SYSTEM
+  FOUND_PIPELINE --> FOUND_DOCS
   PLATFORM_CONSOLE --> DESIGN_SYSTEM
 
   TENANT_CORE --> QUEUE_MODEL
@@ -373,7 +376,7 @@ The one place a cycle could appear is **F-REALTIME ↔ F-NOTIF-CORE**. The statu
 
 ## Keeping this file updated
 
-- **Before writing a plan.md**, find the feature here (or add one) and save its plan as `docs/features/<feature-id>/plan.md` (from [`features/TEMPLATE.md`](features/TEMPLATE.md)), e.g. `docs/features/F-QUEUE-JOIN/plan.md`.
+- **Before writing a plan.md**, find the feature here (or add one) and save its plan as `docs/features/<feature-id>/plan.md` (from [`features/TEMPLATE.md`](features/TEMPLATE.md)).
 - **Update "Next up"** whenever a feature is closed or its plan changes state (`not started` → `drafted` → `approved` → `in implementation`). Keep at most one code-track item, plus the active product-track items.
 - **Change the status** when work starts (`in progress`) and when the feature merges and meets the definition of done (`done`). Do it in the same PR.
 - **Update "Progress"** in the same PR whenever a feature becomes `done` or `dropped` (a dropped feature leaves the count), and when a stage starts or is closed.

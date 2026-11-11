@@ -1,0 +1,36 @@
+name: PR docs
+
+# ADR-0016: mapped docs (docs/doc-map.json) change with the code, or the PR
+# description declares them unchanged. Runs on description edits too, so a
+# `Docs-unchanged:` line takes effect without a new push.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-docs-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  HUSKY: "0"
+
+jobs:
+  doc-map:
+    name: Docs map
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The merge base with the target branch is needed for the diff.
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: Check mapped docs
+        env:
+          # Passed through env, never interpolated into the script.
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: pnpm docs:map --base "origin/$BASE_REF"

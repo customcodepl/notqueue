@@ -5,6 +5,13 @@ The versioned HTTP API at `/api/v1` (Hono): routing, Zod contracts, OpenAPI, pro
 - **May import:** `application`, `core`, `i18n`.
 - **Must not import:** `infra` or `src/server/`. Dependencies arrive through `createApi(deps)`, wired in the composition root ([ADR-0015](../../docs/adr/0015-composition-root.md)).
 
+## Layout
+- `app.ts`: `createApi(deps)`, middleware order, error handling; `problems.ts`: the problem code registry; `context.ts`: `ApiEnv`.
+- `middleware/`: request ID and `Cache-Control: no-store`.
+- `routes/`: one file per route group: `createRoute` declaration and handler factory.
+- `schemas/`: shared Zod schemas (`Problem`, time formats).
+- `spec.ts`: `pnpm api:spec`; `testing.ts`: `fakeApiDeps` for tests.
+
 ## Conventions ([ADR-0014](../../docs/adr/0014-api-conventions.md))
 - Errors are `application/problem+json`: throw `ApiProblem(code)` with a code from the registry in `problems.ts`. Schema failures, unknown routes and unexpected errors are turned into problems by `app.ts`; every 5xx is reported through `ErrorReporter`.
 - `detail` and `errors` reach the client: never put PII in them.
