@@ -19,7 +19,7 @@ The baseline definition of done has two levels. A check applies once the tool it
   - It works with the longest supported language (and the pseudo-locale) without clipped or overlapping text.
 
 **Every stage** (checked when the stage's last feature is closed):
-- The demo script `docs/demos/stage-<n>.md` (steps, test data, expected results) has been run on the deployed preview.
+- The demo script `docs/demos/stage-<n>.md` (steps, test data, expected results) has been run on the deployed preview: its _automated_ steps by a green "Preview E2E" status on the preview of the stage's last PR, the other steps by hand ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)).
 - **Design** (from Stage 2 onward)
   - Key flows get a manual screen-reader pass.
   - The UI has been checked on real phone and tablet sizes (at least iOS Safari and Android Chrome, plus one tablet in portrait and landscape).

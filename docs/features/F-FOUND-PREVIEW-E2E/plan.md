@@ -72,7 +72,7 @@ None.
 4. `docs(demos): mark automated demo steps`: stage-0 demo, ROADMAP, CLAUDE.md, README, PR template.
 
 ## Done when
-- "Preview E2E" is green on this PR's preview in all three projects, and the negative checks failed as expected.
+- "Preview E2E" is green on the preview of the first PR after merge, in all three projects, and the negative checks failed as expected (deviation 1).
 - Demo steps 17–19 are marked automated, the manual phone step stays.
 - Baseline definition of done: lint, typecheck, unit, integration and E2E pass in CI; docs current (`pnpm docs:check`, doc-map review). No UI strings.
 
@@ -94,4 +94,12 @@ All six approved as recommended.
 6. **Placement:** recommended: a new Stage 0 feature, F-FOUND-PREVIEW-E2E, before F-TENANT-CORE, because the Stage 1 demo is the first long one. Stage 0 progress becomes 6/7 and v1.0 6/42. Alternative: fold it into F-TENANT-CORE (mixes a process change into a data feature).
 
 ## Deviations
-_To be filled in after implementation._
+1. **Trigger is `repository_dispatch`, not `deployment_status`** (decision 2 changed, approved 2026-11-11). The project sends no `deployment_status` events: GitHub has no Vercel Preview deployments, only a `Vercel` commit status that links to the Vercel dashboard. Vercel now recommends `repository_dispatch`; `vercel.deployment.success` carries `url` and `git.sha`. Consequences:
+   - The workflow always runs from `main`, so it is verified on the first PR after merge (as in F-FOUND-PIPELINE, deviation 2); a failure is fixed in a `fix` PR before any other feature.
+   - The run belongs to `main`, so it doesn't show on the PR by itself: the workflow writes a "Preview E2E" commit status on the deployed commit (`pending`, then the result; `statuses: write`).
+   - It fires only on success, so there is no skipped `pending` run; the risk under decision 4 no longer applies, the "not required for now" reason that remains is stability.
+   - Production deployments (`environment` `production`) are skipped; `workflow_dispatch` (URL + SHA) reruns it, and is how the wrong-version negative check is run (URL of one preview, SHA of another commit).
+   - [ADR-0020](../../adr/0020-stage-demos-partly-automated-on-previews.md) was corrected on this branch before reaching `main` instead of being superseded (approved 2026-11-11).
+2. **A separate `playwright.preview.config.ts`** instead of an environment switch in `playwright.config.ts`: `pnpm e2e:preview` fails at once without `PLAYWRIGHT_BASE_URL`, instead of quietly building and testing locally.
+3. **Without the secret Vercel redirects to its login page, which answers 200**, not 401. The global setup checks that the final host is still the preview. Verified locally against the PR #16 preview without the secret: the run stops in setup with "redirected to https://vercel.com: VERCEL_AUTOMATION_BYPASS_SECRET is missing or wrong."
+4. **Demo:** step 17 stays manual (real phone, Polish, one switch), steps 18–19 are automated, and a new step 20 checks the "Preview E2E" status itself.

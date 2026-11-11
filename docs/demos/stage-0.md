@@ -2,6 +2,8 @@
 
 Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](../ROADMAP.md#stage-0-foundations)). Each feature adds its steps; steps marked _pending_ belong to features that are not done yet.
 
+Steps marked _automated_ are checked by Playwright specs that run against every PR preview; they count as run when the "Preview E2E" status is green on the preview of the stage's last PR ([ADR-0020](../adr/0020-stage-demos-partly-automated-on-previews.md)). Run every other step by hand.
+
 ## Setup
 - A GitHub account with access to `customcodepl/notqueue`, logged in to Vercel (team NotQueue) and Sentry (`customcode-tv`).
 - A phone for the device checks.
@@ -51,9 +53,13 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
     - **Expected:** "Checks" fails at `pnpm docs:check` with the file, line and target.
 
 ### i18n (F-FOUND-I18N)
-17. Open the preview home page on the phone with the phone's language set to Polish.
-    - **Expected:** the tagline reads "Wirtualna kolejka dla Twojego lokalu"; the URL has no language in it.
-18. Tap "English" in the language switcher, then reload the page.
-    - **Expected:** the page switches to English ("A virtual queue for your venue") without a full page load, and stays English after the reload. Only one language is on screen at any time.
-19. Open the same URL in a private window of a browser set to English, then to German.
-    - **Expected:** English for the English browser, Polish (the default) for the German one.
+17. Open the preview home page on the phone with the phone's language set to Polish, then tap "English".
+    - **Expected:** the tagline reads "Wirtualna kolejka dla Twojego lokalu" and the URL has no language in it; after the tap the page is English ("A virtual queue for your venue") without a full page load.
+18. _Automated: Preview E2E_ (`e2e/i18n.spec.ts`, "switches the language and keeps the choice"): switch to English, reload, switch back.
+    - **Expected:** only one language on screen at any time; the choice survives the reload.
+19. _Automated: Preview E2E_ (`e2e/i18n.spec.ts`, "shows English", "shows Polish", "falls back to Polish for other languages"): English, Polish and German browsers.
+    - **Expected:** English for the English browser, Polish for the Polish one and Polish (the default) for the German one.
+
+### Preview E2E (F-FOUND-PREVIEW-E2E)
+20. On the stage's last PR, open the "Preview E2E" status.
+    - **Expected:** success; the run tested the PR's head commit and its health test (`e2e/api.spec.ts`, "health answers 200 from fra1 with the deployed version") passed with that commit's short SHA and `fra1`.

@@ -44,7 +44,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-FOUND-API | API skeleton | done | F-FOUND-REPO | Hono at `/api/v1`, problem+json errors, OpenAPI, `/health`; `Clock` port and shared Zod schemas for time formats (ISO 8601 UTC, dates, `HH:mm`, durations), `serverTime` in responses |
 | F-FOUND-DOCS | Documentation checks | done | F-FOUND-REPO, F-FOUND-PIPELINE | `pnpm docs:check` in CI (links, paths, commands, ADR index, progress counts, layer READMEs), doc map reviewed by Claude Code before every PR (a hook stops the first `gh pr create` with the list; [ADR-0017](adr/0017-documentation-review-before-opening-a-pull-request.md)) |
 | F-FOUND-I18N | i18n foundation | done | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
-| F-FOUND-PREVIEW-E2E | Preview E2E and automated demo steps | in progress | F-FOUND-PIPELINE, F-FOUND-I18N | Playwright suite against every PR preview (`deployment_status`, Vercel protection bypass), `@local`/`@preview` tags, demo steps marked automated in `docs/demos/` ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)) |
+| F-FOUND-PREVIEW-E2E | Preview E2E and automated demo steps | in progress | F-FOUND-PIPELINE, F-FOUND-I18N | Playwright suite against every PR preview (`repository_dispatch`, Vercel protection bypass), `@local`/`@preview` tags, demo steps marked automated in `docs/demos/` ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)) |
 
 ### Stage 1: Tenancy, auth & operator console
 | ID | Name | Status | Depends on | Description |
