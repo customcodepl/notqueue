@@ -1,10 +1,16 @@
+import { checkAdrIndex } from "./checks/adr-index";
+import { checkCommands } from "./checks/commands";
 import { checkLinks } from "./checks/links";
 import { checkPaths } from "./checks/paths";
+import { checkProgress } from "./checks/progress";
 import { type Finding, gitRepo, type Repo } from "./repo";
 
 const CHECKS: Record<string, (repo: Repo) => Finding[]> = {
   links: checkLinks,
   paths: checkPaths,
+  commands: checkCommands,
+  adrIndex: checkAdrIndex,
+  progress: checkProgress,
 };
 
 export function runChecks(repo: Repo): Finding[] {

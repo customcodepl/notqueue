@@ -63,9 +63,10 @@ lint:             pnpm lint              # --max-warnings=0; pnpm lint:fix to au
 format:           pnpm format            # pnpm format:check to verify; *.md is not formatted
 typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
-test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage
+docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts (ADR-0016)
+test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
-check:            pnpm check             # lint + typecheck + boundaries + all tests
+check:            pnpm check             # lint + typecheck + boundaries + docs + all tests
 db:start:         pnpm db:start          # local Supabase stack (Docker, default ports 543xx); db:stop to stop
 db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL
 db:migrate:       pnpm db:migrate        # apply migrations (local stack unless MIGRATIONS_DATABASE_URL is set)
