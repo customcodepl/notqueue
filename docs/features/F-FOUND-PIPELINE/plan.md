@@ -164,3 +164,4 @@ Resolved during implementation (2026-10-22/23). Versions: `@sentry/nextjs` 11.8,
 9. **Vercel import deployed `main` once** with default settings, before `vercel.json` existed. It served only the placeholder page; production is replaced by the first workflow deploy.
 10. **Sentry organization slug** is `customcode-tv` (organization in the EU region).
 11. **Unplanned small changes:** `.claude/` added to `.prettierignore` (local Claude Code settings).
+12. **The Sentry uptime monitor was not created** with this feature, although it was listed in the PR as a setting to apply and "the uptime monitor is up" was marked as met. Only error monitoring was in place. Found and fixed on 2026-11-11: the monitor was created directly on `/api/v1/health` (see F-FOUND-API, deviation 12).

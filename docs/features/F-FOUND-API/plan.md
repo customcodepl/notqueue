@@ -167,4 +167,4 @@ Resolved during implementation (2026-11-09/10). Versions: `hono` 4.13.16, `@hono
 9. **Smoke check** asserts `region` `fra1` from the `/health` body instead of the `x-vercel-id` header, plus `version` = the deployed commit. It closes deviation 8 of F-FOUND-PIPELINE.
 10. **Local dev:** `/api/v1/health` answers 200 in `pnpm dev` only with `DATABASE_URL` set to the local stack in `.env.local` (no runtime fallback, so a missing variable on Vercel shows up as a 503); `.env.example` says so.
 11. **Stage 0 demo:** the API has steps 12–14 instead of one step 12; the i18n step is now 15.
-12. **Uptime monitor** is switched to `/api/v1/health` after merge, once production serves it (a setting, recorded in the PR).
+12. **Uptime monitor created, not switched** (2026-11-11): no monitor existed (F-FOUND-PIPELINE, deviation 12), so a Sentry Uptime monitor was created on `https://notqueue.vercel.app/api/v1/health` (production, 1-minute interval, email alerts to the product owner). It shows production as up.
