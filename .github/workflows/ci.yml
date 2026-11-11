@@ -29,6 +29,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm check:boundaries
+      - run: pnpm docs:check
       - run: pnpm test:unit
 
   integration:

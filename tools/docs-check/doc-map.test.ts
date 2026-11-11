@@ -52,6 +52,14 @@ describe("parseOptOuts", () => {
       { doc: "src/infra/README.md", reason: "", line: 4 },
     ]);
   });
+
+  it("skips the PR template's hint in an HTML comment", () => {
+    expect(
+      parseOptOuts(
+        "## Docs\n<!-- hint:\nDocs-unchanged: <doc> — <reason>\n-->\nDocs-unchanged: README.md — none",
+      ),
+    ).toEqual([{ doc: "README.md", reason: "none", line: 5 }]);
+  });
 });
 
 describe("evaluateDocMap", () => {

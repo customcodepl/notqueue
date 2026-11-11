@@ -46,9 +46,13 @@ export interface OptOut {
 
 const OPT_OUT = /^\s*Docs-unchanged:\s*(\S+)\s*(?:[—–-]+\s*(.*))?$/;
 
-/** `Docs-unchanged: <doc> — <reason>` lines of a PR description. */
+/**
+ * `Docs-unchanged: <doc> — <reason>` lines of a PR description. HTML
+ * comments (the PR template's hint) are skipped; line numbers are kept.
+ */
 export function parseOptOuts(description: string): OptOut[] {
   return description
+    .replace(/<!--[\s\S]*?-->/g, (comment) => comment.replace(/[^\n]/g, ""))
     .split(/\r?\n/)
     .map((text, index) => ({ match: OPT_OUT.exec(text), line: index + 1 }))
     .filter(({ match }) => match !== null)
