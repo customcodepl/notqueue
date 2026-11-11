@@ -9,7 +9,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 **Every feature** (checked when the feature is closed):
 - **Quality**
   - Lint, typecheck, unit, integration (real Postgres with RLS) and E2E tests pass in CI.
-  - Docs are current: `pnpm docs:check` passes and "Docs map" passes (mapped docs updated or declared unchanged with a reason; [ADR-0016](adr/0016-documentation-checks-per-pull-request.md)).
+  - Docs are current: `pnpm docs:check` passes in CI, and every file listed by `pnpm docs:map` was checked against its doc before the PR was opened, as recorded in the PR's "Docs" section ([ADR-0017](adr/0017-documentation-review-before-opening-a-pull-request.md)).
   - Cross-tenant isolation tests cover all new endpoints (harness from F-TENANT-CORE, per-endpoint generation from F-AUTH-RBAC).
 - **i18n**
   - All new UI strings exist in every enabled locale.
@@ -38,7 +38,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 - Supabase staging and production projects (`eu-central-1`), plus a local Supabase stack.
 - Drizzle schema `app` with the first migration, including the outbox table and a helper that writes a domain event in the caller's transaction (the dispatcher comes in Stage 4).
 - Hono API at `/api/v1` with `/health` and the OpenAPI spec.
-- Documentation checks in CI: links, paths, commands, ADR index and progress counts, layer READMEs, and a doc map that requires mapped docs to change with the code or be declared unchanged.
+- Documentation checks: in CI, links, paths, commands, ADR index and progress counts, and layer READMEs; before each PR, a review by Claude Code of every changed file against the docs a doc map assigns to it.
 - next-intl with PL/EN, a missing-translation-key CI gate, and the `LocalizedText` type with its fallback resolver.
 - Sentry (EU).
 

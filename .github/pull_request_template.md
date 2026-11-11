@@ -10,8 +10,7 @@ Implements **<feature-id>** ([plan](docs/features/<feature-id>/plan.md)).
 - [ ] `pnpm check` and `pnpm e2e` locally
 
 ## Docs
-<!-- "Docs map" (ADR-0016) requires the docs mapped in docs/doc-map.json to change with the code. For each mapped doc that needs no change, add a line (re-checked when you edit this description):
-Docs-unchanged: <doc> — <reason>
--->
+<!-- Before opening the PR, Claude Code reviews every file that docs/doc-map.json maps to a doc (ADR-0017). List the docs updated, and the docs checked and still current with the reason. -->
+-
 
 Refs: <feature-id>

@@ -3,10 +3,10 @@ import type { Finding, Repo } from "./repo";
 
 export const DOC_MAP_FILE = "docs/doc-map.json";
 
-/** Code glob → the docs that describe that code (ADR-0016). */
+/** Code glob → the docs that describe that code (ADR-0017). */
 export type DocMap = Record<string, string[]>;
 
-// Changes that never require a doc update.
+// Changes that never require a doc review.
 const NEVER_TRIGGERS = [
   "**/*.md",
   "**/*.test.ts",
@@ -38,64 +38,29 @@ export function requiredDocs(
   return required;
 }
 
-export interface OptOut {
+export interface DocReviewItem {
   doc: string;
-  reason: string;
-  line: number;
+  /** Every changed file that requires this doc, not only the first few. */
+  files: string[];
+  /** Whether the change touches the doc itself. */
+  docChanged: boolean;
 }
 
-const OPT_OUT = /^\s*Docs-unchanged:\s*(\S+)\s*(?:[—–-]+\s*(.*))?$/;
-
-/**
- * `Docs-unchanged: <doc> — <reason>` lines of a PR description. HTML
- * comments (the PR template's hint) are skipped; line numbers are kept.
- */
-export function parseOptOuts(description: string): OptOut[] {
-  return description
-    .replace(/<!--[\s\S]*?-->/g, (comment) => comment.replace(/[^\n]/g, ""))
-    .split(/\r?\n/)
-    .map((text, index) => ({ match: OPT_OUT.exec(text), line: index + 1 }))
-    .filter(({ match }) => match !== null)
-    .map(({ match, line }) => ({
-      doc: match?.[1]?.replace(/^`|`$/g, "") ?? "",
-      reason: match?.[2]?.trim() ?? "",
-      line,
-    }));
+/** What to check before opening a PR: each mapped doc with all its changed files. */
+export function docReview(changed: string[], map: DocMap): DocReviewItem[] {
+  const touched = new Set(changed);
+  return [...requiredDocs(changed, map)].map(([doc, files]) => ({
+    doc,
+    files,
+    docChanged: touched.has(doc),
+  }));
 }
 
-export interface MapResult {
-  /** Required docs neither changed nor declared unchanged. */
-  missing: { doc: string; files: string[] }[];
-  /** Problems with the `Docs-unchanged:` lines themselves. */
-  invalidOptOuts: string[];
-}
-
-export function evaluateDocMap(input: {
-  changed: string[];
-  map: DocMap;
-  optOuts: OptOut[];
-  exists: (file: string) => boolean;
-}): MapResult {
-  const changed = new Set(input.changed);
-  const declared = new Set<string>();
-  const invalidOptOuts: string[] = [];
-  for (const optOut of input.optOuts) {
-    if (!input.exists(optOut.doc)) {
-      invalidOptOuts.push(
-        `Docs-unchanged names ${optOut.doc}, which doesn't exist`,
-      );
-    } else if (!optOut.reason) {
-      invalidOptOuts.push(
-        `Docs-unchanged: ${optOut.doc} needs a reason: "Docs-unchanged: ${optOut.doc} — <reason>"`,
-      );
-    } else {
-      declared.add(optOut.doc);
-    }
-  }
-  const missing = [...requiredDocs(input.changed, input.map)]
-    .filter(([doc]) => !changed.has(doc) && !declared.has(doc))
-    .map(([doc, files]) => ({ doc, files }));
-  return { missing, invalidOptOuts };
+export function formatDocReview(items: DocReviewItem[]): string[] {
+  return items.map(
+    ({ doc, files, docChanged }) =>
+      `${doc} (${docChanged ? "changed" : "not changed"} in this branch): ${files.join(", ")}`,
+  );
 }
 
 /** For docs:check: the map itself is valid, its docs exist and its globs match files. */

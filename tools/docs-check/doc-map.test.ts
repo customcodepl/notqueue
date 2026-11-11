@@ -2,18 +2,17 @@ import { describe, expect, it } from "vitest";
 
 import {
   checkDocMap,
-  evaluateDocMap,
-  parseOptOuts,
+  docReview,
+  formatDocReview,
   requiredDocs,
 } from "./doc-map";
+import { prHookDecision } from "./pr-hook";
 import { memoryRepo } from "./repo";
 
 const map = {
   "src/infra/**": ["src/infra/README.md"],
   ".github/workflows/**": ["README.md", "CLAUDE.md"],
 };
-const existing = new Set(["src/infra/README.md", "README.md", "CLAUDE.md"]);
-const exists = (file: string) => existing.has(file);
 
 describe("requiredDocs", () => {
   it("maps changed code to docs and ignores tests, docs and the lockfile", () => {
@@ -34,73 +33,65 @@ describe("requiredDocs", () => {
   });
 });
 
-describe("parseOptOuts", () => {
-  it("reads doc and reason, with any dash and optional backticks", () => {
-    expect(
-      parseOptOuts(
-        [
-          "## Docs",
-          "Docs-unchanged: README.md — only a comment changed",
-          "Docs-unchanged: `CLAUDE.md` - no command changed",
-          "Docs-unchanged: src/infra/README.md",
-          "Not: Docs-unchanged: x.md — inline mention",
-        ].join("\r\n"),
-      ),
-    ).toEqual([
-      { doc: "README.md", reason: "only a comment changed", line: 2 },
-      { doc: "CLAUDE.md", reason: "no command changed", line: 3 },
-      { doc: "src/infra/README.md", reason: "", line: 4 },
+describe("docReview", () => {
+  it("lists every file per doc and whether the doc changed", () => {
+    const items = docReview(
+      [
+        "src/infra/db/client.ts",
+        "src/infra/db/outbox.ts",
+        "src/infra/README.md",
+        ".github/workflows/ci.yml",
+      ],
+      map,
+    );
+    expect(formatDocReview(items)).toEqual([
+      "src/infra/README.md (changed in this branch): src/infra/db/client.ts, src/infra/db/outbox.ts",
+      "README.md (not changed in this branch): .github/workflows/ci.yml",
+      "CLAUDE.md (not changed in this branch): .github/workflows/ci.yml",
     ]);
-  });
-
-  it("skips the PR template's hint in an HTML comment", () => {
-    expect(
-      parseOptOuts(
-        "## Docs\n<!-- hint:\nDocs-unchanged: <doc> — <reason>\n-->\nDocs-unchanged: README.md — none",
-      ),
-    ).toEqual([{ doc: "README.md", reason: "none", line: 5 }]);
   });
 });
 
-describe("evaluateDocMap", () => {
-  const changed = [".github/workflows/ci.yml", "src/infra/db/client.ts"];
+describe("prHookDecision", () => {
+  const review = docReview(["src/infra/db/client.ts"], map);
+  const base = { head: "abc", stamp: undefined, review };
 
-  it("reports every required doc that wasn't touched", () => {
+  it("ignores commands other than gh pr create", () => {
+    for (const command of [
+      "git commit -m 'gh pr'",
+      "python3 - <<'EOF'\ntext = 'run `gh pr create` later'\nEOF",
+      "echo gh pr create",
+    ]) {
+      expect(prHookDecision({ ...base, command })).toEqual({
+        action: "ignore",
+      });
+    }
+  });
+
+  it("denies the first attempt per HEAD with the full list", () => {
+    const decision = prHookDecision({
+      ...base,
+      command: "git push && gh pr create --title x",
+    });
+    expect(decision).toMatchObject({ action: "deny", stamp: "abc" });
+    expect(decision.action === "deny" && decision.reason).toContain(
+      "- src/infra/README.md (not changed in this branch): src/infra/db/client.ts",
+    );
+  });
+
+  it("allows the retry for the same HEAD and asks again after a new commit", () => {
     expect(
-      evaluateDocMap({ changed, map, optOuts: [], exists }).missing,
-    ).toEqual([
-      { doc: "README.md", files: [".github/workflows/ci.yml"] },
-      { doc: "CLAUDE.md", files: [".github/workflows/ci.yml"] },
-      { doc: "src/infra/README.md", files: ["src/infra/db/client.ts"] },
-    ]);
+      prHookDecision({ ...base, stamp: "abc", command: "gh pr create" }),
+    ).toEqual({ action: "allow" });
+    expect(
+      prHookDecision({ ...base, stamp: "old", command: "gh pr create" }),
+    ).toMatchObject({ action: "deny", stamp: "abc" });
   });
 
-  it("accepts a changed doc or a Docs-unchanged line with a reason", () => {
-    const result = evaluateDocMap({
-      changed: [...changed, "README.md"],
-      map,
-      optOuts: parseOptOuts(
-        "Docs-unchanged: CLAUDE.md — no command changed\nDocs-unchanged: src/infra/README.md — a bug fix",
-      ),
-      exists,
-    });
-    expect(result).toEqual({ missing: [], invalidOptOuts: [] });
-  });
-
-  it("rejects opt-outs without a reason or for a doc that doesn't exist", () => {
-    const result = evaluateDocMap({
-      changed: ["src/infra/db/client.ts"],
-      map,
-      optOuts: parseOptOuts(
-        "Docs-unchanged: src/infra/README.md\nDocs-unchanged: src/infra/READ.md — typo",
-      ),
-      exists,
-    });
-    expect(result.missing.map((m) => m.doc)).toEqual(["src/infra/README.md"]);
-    expect(result.invalidOptOuts).toEqual([
-      'Docs-unchanged: src/infra/README.md needs a reason: "Docs-unchanged: src/infra/README.md — <reason>"',
-      "Docs-unchanged names src/infra/READ.md, which doesn't exist",
-    ]);
+  it("allows right away when no mapped code changed", () => {
+    expect(
+      prHookDecision({ ...base, review: [], command: "gh pr create" }),
+    ).toEqual({ action: "allow", stamp: "abc" });
   });
 });
 

@@ -1,6 +1,6 @@
 # docs-check
 
-Documentation checks ([ADR-0016](../../docs/adr/0016-documentation-checks-per-pull-request.md)). TypeScript run with `tsx`, no dependencies; unit tests in the Vitest `unit` project.
+Documentation checks ([ADR-0017](../../docs/adr/0017-documentation-review-before-opening-a-pull-request.md)). TypeScript run with `tsx`, no dependencies; unit tests in the Vitest `unit` project.
 
 ## `pnpm docs:check`
 Part of `pnpm check` and of the CI "Checks" job. Prints `file:line: message` per finding and fails if there are any.
@@ -16,12 +16,9 @@ Part of `pnpm check` and of the CI "Checks" job. Prints `file:line: message` per
 | `doc-map.ts` (`checkDocMap`) | Every doc in `docs/doc-map.json` exists and every glob matches a file. |
 
 ## `pnpm docs:map`
-The docs that `docs/doc-map.json` maps to changed code and that the change didn't touch. Tests, Markdown, e2e, fixtures and the lockfile never trigger it.
+A review aid, not a gate: every doc that `docs/doc-map.json` maps to the branch's changes (against `origin/main`, plus uncommitted and new files), with all the changed files that require it and whether the doc itself changed. Tests, Markdown, e2e, fixtures and the lockfile never trigger it.
 
-- No flag: the branch against `origin/main`, plus uncommitted and new files. Fails if a doc is missing.
-- `--base <ref>`: the "Docs map" job in `.github/workflows/pr-docs.yml`. Reads `Docs-unchanged: <doc> — <reason>` lines from the PR description (`PR_BODY`); HTML comments are skipped.
-- `--staged`: staged files only; a reminder that never fails.
-- `--hook`: the Claude Code `PreToolUse` hook in `.claude/settings.json`. Before a `git commit` it tells Claude which mapped docs the branch hasn't updated; it never blocks.
+- `--hook`: the Claude Code `PreToolUse` hook in `.claude/settings.json`. The first `gh pr create` for a branch state (HEAD) is denied with the full list; the retry for the same HEAD goes through, and a new commit asks again. Only a command that starts with it (or follows `;`, `&&`, `||` or `|`) counts, not the text inside another command. The last reviewed HEAD is kept in `.git/docs-review` (per clone, never committed). Decision logic: `pr-hook.ts`.
 
 ## Changing the rules
 - A new doc that describes a folder: add the glob and the doc to `docs/doc-map.json`.
