@@ -66,9 +66,10 @@ typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
 docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts, layer READMEs (ADR-0017)
 docs:map:         pnpm docs:map          # docs that docs/doc-map.json maps to this branch's changes, with every file
+i18n:check:       pnpm i18n:check        # every key in every locale, valid ICU, same arguments, complete plurals
 test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
-check:            pnpm check             # lint + typecheck + boundaries + docs + all tests
+check:            pnpm check             # lint + typecheck + boundaries + docs + i18n + all tests
 db:start:         pnpm db:start          # local Supabase stack (Docker, default ports 543xx); db:stop to stop
 db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL
 db:migrate:       pnpm db:migrate        # apply migrations (local stack unless MIGRATIONS_DATABASE_URL is set)

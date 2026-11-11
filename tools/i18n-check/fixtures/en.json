@@ -1,0 +1,12 @@
+{
+  "ok": {
+    "plural": "{count, plural, one {# person} other {# people}}",
+    "rich": "Hello <b>{name}</b>"
+  },
+  "onlyInEn": "Only here",
+  "invalid": "Broken {name",
+  "renamed": "Ticket {number}",
+  "empty": "Fine",
+  "nested": { "notAString": "Fine" },
+  "pluralGap": "{count, plural, one {# person} other {# people}}"
+}

@@ -30,6 +30,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm check:boundaries
       - run: pnpm docs:check
+      - run: pnpm i18n:check
       - run: pnpm test:unit
 
   integration:

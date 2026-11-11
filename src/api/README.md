@@ -9,11 +9,11 @@ The versioned HTTP API at `/api/v1` (Hono): routing, Zod contracts, OpenAPI, pro
 - `app.ts`: `createApi(deps)`, middleware order, error handling; `problems.ts`: the problem code registry; `context.ts`: `ApiEnv`.
 - `middleware/`: request ID and `Cache-Control: no-store`.
 - `routes/`: one file per route group: `createRoute` declaration and handler factory.
-- `schemas/`: shared Zod schemas (`Problem`, time formats).
+- `schemas/`: shared Zod schemas (`Problem`, time formats, `Locale` and `LocalizedText`).
 - `spec.ts`: `pnpm api:spec`; `testing.ts`: `fakeApiDeps` for tests.
 
 ## Conventions ([ADR-0014](../../docs/adr/0014-api-conventions.md))
-- Errors are `application/problem+json`: throw `ApiProblem(code)` with a code from the registry in `problems.ts`. Schema failures, unknown routes and unexpected errors are turned into problems by `app.ts`; every 5xx is reported through `ErrorReporter`.
+- Errors are `application/problem+json`: throw `ApiProblem(code)` with a code from the registry in `problems.ts`. A new code also needs a message under `errors.<code>` in every catalog in `src/i18n/messages/` (a test checks it). Schema failures, unknown routes and unexpected errors are turned into problems by `app.ts`; every 5xx is reported through `ErrorReporter`.
 - `detail` and `errors` reach the client: never put PII in them.
 - Every response is `Cache-Control: no-store` and carries `x-request-id`.
 - Time formats come from `schemas/time.ts`; responses that drive countdowns use `withServerTime`.

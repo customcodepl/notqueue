@@ -9,7 +9,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 
 | Stage | Features done | Status |
 |---|---|---|
-| 0: Foundations | 5 / 6 | in progress |
+| 0: Foundations | 6 / 6 | in progress |
 | 1: Tenancy, auth & operator console | 0 / 6 | not started |
 | 2: Design foundations | 0 / 3 | not started |
 | 3: Queue core & customer journey | 0 / 6 | not started |
@@ -17,7 +17,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 | 5: Venue admin | 0 / 5 | not started |
 | 6: Notifications & i18n completeness | 0 / 3 | not started |
 | 7: Hardening, GDPR & handover | 0 / 6 | not started |
-| **v1.0** | **5 / 41** | in progress |
+| **v1.0** | **6 / 41** | in progress |
 
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
@@ -29,7 +29,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
-| Code | F-FOUND-I18N | not started | – |
+| Code | F-TENANT-CORE | not started | – |
 | Product | F-DESIGN-DECISIONS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
@@ -43,7 +43,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-FOUND-DB | Database layer | done | F-FOUND-REPO | Drizzle, schema `app`, migrations, local Supabase stack, pooler config; outbox table and a helper that writes a domain event in the caller's transaction |
 | F-FOUND-API | API skeleton | done | F-FOUND-REPO | Hono at `/api/v1`, problem+json errors, OpenAPI, `/health`; `Clock` port and shared Zod schemas for time formats (ISO 8601 UTC, dates, `HH:mm`, durations), `serverTime` in responses |
 | F-FOUND-DOCS | Documentation checks | done | F-FOUND-REPO, F-FOUND-PIPELINE | `pnpm docs:check` in CI (links, paths, commands, ADR index, progress counts, layer READMEs), doc map reviewed by Claude Code before every PR (a hook stops the first `gh pr create` with the list; [ADR-0017](adr/0017-documentation-review-before-opening-a-pull-request.md)) |
-| F-FOUND-I18N | i18n foundation | planned | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
+| F-FOUND-I18N | i18n foundation | done | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
 
 ### Stage 1: Tenancy, auth & operator console
 | ID | Name | Status | Depends on | Description |
