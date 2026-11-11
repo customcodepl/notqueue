@@ -64,6 +64,8 @@ jobs:
           ref: ${{ env.DEPLOY_SHA }}
       - uses: ./.github/actions/setup
       - name: Run E2E against the deployment
+        # Container steps default to sh, which has no ${var:offset:length}.
+        shell: bash
         env:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: |
