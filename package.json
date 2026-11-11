@@ -22,6 +22,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
+    "e2e:preview": "playwright test --config playwright.preview.config.ts",
     "check": "pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm docs:check && pnpm i18n:check && pnpm test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",

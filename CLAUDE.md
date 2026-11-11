@@ -35,7 +35,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    **No code until I approve the plan.**
 4. **Small steps.** Implement in small increments. After each one, run lint, typecheck and tests, and fix any failures before moving on.
 5. **Close out the feature.**
-   - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo.
+   - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo. Steps with a deterministic result in a browser or over HTTP become Playwright specs that run on the preview, and the script marks them _automated_ ([ADR-0020](docs/adr/0020-stage-demos-partly-automated-on-previews.md)).
    - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
    - Keep `pnpm docs:check` green. Before `gh pr create`, check every file that `pnpm docs:map` lists against its doc (a hook stops the first attempt with that list), update the docs or confirm they're current, and say which in the PR's "Docs" section ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)).
@@ -69,6 +69,7 @@ docs:map:         pnpm docs:map          # docs that docs/doc-map.json maps to t
 i18n:check:       pnpm i18n:check        # every key in every locale, valid ICU, same arguments, complete plurals
 test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
+e2e:preview:      pnpm e2e:preview       # same suite against a deployment: PLAYWRIGHT_BASE_URL, VERCEL_AUTOMATION_BYPASS_SECRET, EXPECTED_VERSION
 check:            pnpm check             # lint + typecheck + boundaries + docs + i18n + all tests
 db:start:         pnpm db:start          # local Supabase stack (Docker, default ports 543xx); db:stop to stop
 db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL

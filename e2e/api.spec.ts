@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // The production build serves /api/v1 through the Next.js route handler.
-// E2E runs without a database (see playwright.config.ts), so /health is 503.
+// Locally E2E runs without a database (see playwright.config.ts), so /health
+// is 503; on a preview it reaches Supabase staging and answers 200.
 
 test("serves the OpenAPI document", async ({ request }) => {
   const response = await request.get("/api/v1/openapi.json");
@@ -16,21 +17,48 @@ test("serves the OpenAPI document", async ({ request }) => {
   expect(document.paths).toHaveProperty("/api/v1/health");
 });
 
-test("health answers 503 problem+json without a database", async ({
-  request,
-}) => {
-  const response = await request.get("/api/v1/health");
+test(
+  "health answers 503 problem+json without a database",
+  { tag: "@local" },
+  async ({ request }) => {
+    const response = await request.get("/api/v1/health");
 
-  expect(response.status()).toBe(503);
-  const headers = response.headers();
-  expect(headers["content-type"]).toBe("application/problem+json");
-  expect(headers["cache-control"]).toBe("no-store");
-  expect(await response.json()).toMatchObject({
-    code: "service_unavailable",
-    status: 503,
-    instance: `urn:uuid:${headers["x-request-id"]}`,
-  });
-});
+    expect(response.status()).toBe(503);
+    const headers = response.headers();
+    expect(headers["content-type"]).toBe("application/problem+json");
+    expect(headers["cache-control"]).toBe("no-store");
+    expect(await response.json()).toMatchObject({
+      code: "service_unavailable",
+      status: 503,
+      instance: `urn:uuid:${headers["x-request-id"]}`,
+    });
+  },
+);
+
+test(
+  "health answers 200 from fra1 with the deployed version",
+  { tag: "@preview" },
+  async ({ request }) => {
+    const expectedVersion = process.env.EXPECTED_VERSION;
+    if (!expectedVersion) throw new Error("Set EXPECTED_VERSION (short SHA).");
+
+    // The first function call on a fresh preview is a cold start.
+    const response = await request.get("/api/v1/health", { timeout: 30_000 });
+
+    expect(response.status()).toBe(200);
+    const headers = response.headers();
+    expect(headers["cache-control"]).toBe("no-store");
+    expect(headers["x-request-id"]).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+    );
+    expect(await response.json()).toMatchObject({
+      status: "ok",
+      serverTime: expect.stringMatching(/Z$/),
+      version: expectedVersion,
+      region: "fra1",
+    });
+  },
+);
 
 test("unknown API paths answer 404 problem+json", async ({ request }) => {
   const response = await request.get("/api/v1/nope");
