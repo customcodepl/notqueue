@@ -376,7 +376,7 @@ The one place a cycle could appear is **F-REALTIME ↔ F-NOTIF-CORE**. The statu
 
 ## Keeping this file updated
 
-- **Before writing a plan.md**, find the feature here (or add one) and save its plan as `docs/features/<feature-id>/plan.md` (from [`features/TEMPLATE.md`](features/TEMPLATE.md)), e.g. `docs/features/F-QUEUE-JOIN/plan.md`.
+- **Before writing a plan.md**, find the feature here (or add one) and save its plan as `docs/features/<feature-id>/plan.md` (from [`features/TEMPLATE.md`](features/TEMPLATE.md)).
 - **Update "Next up"** whenever a feature is closed or its plan changes state (`not started` → `drafted` → `approved` → `in implementation`). Keep at most one code-track item, plus the active product-track items.
 - **Change the status** when work starts (`in progress`) and when the feature merges and meets the definition of done (`done`). Do it in the same PR.
 - **Update "Progress"** in the same PR whenever a feature becomes `done` or `dropped` (a dropped feature leaves the count), and when a stage starts or is closed.

@@ -22,14 +22,15 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
-    "check": "pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm test",
+    "check": "pnpm lint && pnpm typecheck && pnpm check:boundaries && pnpm docs:check && pnpm test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/infra/db/migrate.ts",
     "db:reset": "supabase db reset && pnpm db:migrate",
     "prepare": "husky",
-    "api:spec": "tsx src/api/spec.ts"
+    "api:spec": "tsx src/api/spec.ts",
+    "docs:check": "tsx tools/docs-check/cli.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "1.6.3",
