@@ -50,5 +50,10 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
 16. On any PR, add a broken relative link to a doc.
     - **Expected:** "Checks" fails at `pnpm docs:check` with the file, line and target.
 
-### i18n (F-FOUND-I18N) — _pending_
-17. The deployed app switches between PL and EN.
+### i18n (F-FOUND-I18N)
+17. Open the preview home page on the phone with the phone's language set to Polish.
+    - **Expected:** the tagline reads "Wirtualna kolejka dla Twojego lokalu"; the URL has no language in it.
+18. Tap "English" in the language switcher, then reload the page.
+    - **Expected:** the page switches to English ("A virtual queue for your venue") without a full page load, and stays English after the reload. Only one language is on screen at any time.
+19. Open the same URL in a private window of a browser set to English, then to German.
+    - **Expected:** English for the English browser, Polish (the default) for the German one.

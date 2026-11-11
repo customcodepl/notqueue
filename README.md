@@ -66,6 +66,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
   - UI strings: per-locale message catalogs.
   - Venue content: `LocalizedText` JSON (`{"pl": "...", "en": "..."}`) that falls back to the venue default.
   - Customer locale resolution: explicit choice → browser language (if the venue enables it) → venue default. The locale is stored on the entry so future notifications use it.
+  - The locale is never in the URL; it's resolved per request, so pages render per request ([ADR-0018](docs/adr/0018-locale-resolved-per-request-without-locale-in-url.md)).
   - Times are shown in the venue's timezone.
 - **Notification layer.** Domain events (joined, called, near front, served…) go to the outbox, then a notification policy, then pluggable `NotificationChannel` adapters, and every delivery is logged.
   - v1 channels: status page (realtime), plus `log` and `fake_sms` for tests.
@@ -115,7 +116,7 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 
 ### CI/CD
 
-- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, check the docs (`pnpm docs:check`), and check that the PR title is a Conventional Commit. Before opening a PR, Claude Code reviews every changed file against the docs that `docs/doc-map.json` maps to it; a hook stops the first `gh pr create` with that list, and the PR's "Docs" section records the result ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)). The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
+- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, check the docs (`pnpm docs:check`) and the translation catalogs (`pnpm i18n:check`), and check that the PR title is a Conventional Commit. Before opening a PR, Claude Code reviews every changed file against the docs that `docs/doc-map.json` maps to it; a hook stops the first `gh pr create` with that list, and the PR's "Docs" section records the result ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)). The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project.
 - **Merge to `main`:** the deploy workflow migrates the staging database (`pnpm db:migrate` over TLS with the pinned Supabase CA), waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
 - **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches `/api/v1/health` in production, which also checks the database. The post-deploy smoke check requires `/api/v1/health` to answer 200 from `fra1` with the deployed commit.
 - Secrets and variables are listed in the [F-FOUND-PIPELINE plan](docs/features/F-FOUND-PIPELINE/plan.md#secrets-and-variables).

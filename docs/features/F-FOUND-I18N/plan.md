@@ -1,7 +1,7 @@
 # F-FOUND-I18N: i18n foundation
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-11-11)
+- **Status:** done (2026-11-11); plan approved 2026-11-11
 - **Depends on:** F-FOUND-REPO
 - **Unblocks:** F-TENANT-CORE, F-DESIGN-SYSTEM, F-QUEUE-MODEL, F-NOTIF-CORE
 - **ADRs:** [ADR-0014](../../adr/0014-api-conventions.md) (clients translate problems by `code`), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0018](../../adr/0018-locale-resolved-per-request-without-locale-in-url.md) (decision 1), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md) (decision 2)
@@ -167,4 +167,13 @@ All recommendations accepted as written. Decision 1 was changed after a spike (s
 8. **How the switcher saves the choice:** recommended **set the `NEXT_LOCALE` cookie on the client and refresh**: a UI preference, not domain data, so it doesn't go through `/api/v1`. Alternative: a `PUT /api/v1/preferences/locale` endpoint that sets the cookie, or a Server Action.
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-11-11). Versions: `next-intl` 4.14.10, `@formatjs/icu-messageformat-parser` 3.5.23.
+
+1. **`formatWallClock` and `formatRelative` take no `timeZone`.** A wall-clock time is already in the venue's timezone and isn't converted, and a relative time depends only on the two instants. `formatInstant` and `formatTime` require it. The parameter is a `string`: IANA names are validated where they enter the system (`IanaTimeZone` in `src/api/schemas/time.ts`), because `src/i18n` may not import `api`.
+2. **The lint rule covers more than next-intl's formatters:** `new Intl.DateTimeFormat`, `new Intl.RelativeTimeFormat` and `toLocaleString` / `toLocaleDateString` / `toLocaleTimeString` outside `src/i18n/` too. `useNow` and `getNow` are also blocked, because `now` must come from `serverTime` or the `Clock`. The proof is `src/i18n/format-lint.test.ts`, which lints a snippet through the real ESLint config.
+3. **The global error page is translated** (not listed in the plan; F-FOUND-REPO had exempted it until this feature). It renders without the root layout and so without a next-intl provider. It resolves the locale again from the cookie and `navigator.languages`, and loads its catalog with a dynamic import when it's shown: it ships with every page, and the bundler doesn't tree-shake JSON, so a static import put both full catalogs into every page's JS. It has no E2E test, because a root-layout failure can't be triggered without test-only code.
+4. **`Locale` is also registered in next-intl's `AppConfig`**, so `useLocale()` returns `pl | en`. In addition, assigning `pl.json` to the `Messages` type in `translator.ts` makes a key missing in PL a type error, besides the `i18n:check` finding.
+5. **The language names in the switcher** ("Polski", "English") are in the catalogs with the same values in both locales: each button shows its language in that language, with a `lang` attribute.
+6. **Customer JS budget:** the home page loads 221 KB gzip of JS, against 207 KB in F-FOUND-PIPELINE (deviation 7). The +14 KB is next-intl's client runtime and the switcher. The catalogs aren't in the page's JS; only the switcher's namespace is in the RSC payload.
+7. **`pnpm-workspace.yaml`:** `@parcel/watcher` and `@swc/core` (dependencies of next-intl) are added to `allowBuilds` as `false`, as planned.
+8. **Stage 0 demo:** steps 17–19 instead of one step 17. Stage 0 stays `in progress` until its demo has been run on the deployed preview.
