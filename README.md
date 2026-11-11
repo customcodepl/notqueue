@@ -57,6 +57,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
   - Tables live in a schema (`app`) that is not exposed through Supabase's Data API.
 - **API layer.** All business logic lives in our own versioned REST API (`/api/v1`). Clients never query Supabase directly. See [ADR-0004](docs/adr/0004-business-logic-in-own-api.md).
   - The layering is `core` (pure domain) → `application` (use cases) → `infra` (DB, realtime, channels) → `api` / `app` (HTTP, UI).
+  - A composition root (`src/server/`) creates the `infra` adapters and hands them to the use cases and the API, so `api` and `app` never import `infra` ([ADR-0015](docs/adr/0015-composition-root.md)).
   - The web UI uses the same API that native apps and integrations will use.
 - **Real-time.** State changes write domain events to an **outbox** in the same transaction. See [ADR-0006](docs/adr/0006-transactional-outbox.md) and [ADR-0007](docs/adr/0007-realtime-changed-signal.md).
   - A dispatcher sends a small "changed" broadcast to Supabase Realtime: a private channel per venue for staff and a public channel per queue for customers.

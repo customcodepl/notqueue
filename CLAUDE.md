@@ -82,6 +82,7 @@ Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local s
   - Never query across tenants outside the `platform` module.
 - **Business logic lives in the API layer.**
   - Layers: `core` (pure domain) → `application` (use cases) → `infra` → `api` / `app`.
+  - `src/server/` is the composition root: the only place that wires `infra` into use cases and the API; only Next.js entry points import it ([ADR-0015](docs/adr/0015-composition-root.md)).
   - Clients never query Supabase directly. All client mutations go through `/api/v1`.
   - Server Components may call `application/` with the same auth context.
 - **API contracts.**
