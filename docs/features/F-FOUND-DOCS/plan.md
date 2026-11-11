@@ -1,7 +1,7 @@
 # F-FOUND-DOCS: Documentation checks
 
 - **Stage:** 0 (Foundations)
-- **Status:** plan approved (2026-11-11)
+- **Status:** done (2026-11-11); plan approved 2026-11-11
 - **Depends on:** F-FOUND-REPO (done), F-FOUND-PIPELINE (done)
 - **Unblocks:** none directly; every later feature is checked by it
 - **ADRs:** [ADR-0001](../../adr/0001-record-architecture-decisions.md); [ADR-0016](../../adr/0016-documentation-checks-per-pull-request.md) (decision 1)
@@ -118,4 +118,14 @@ All recommendations accepted as proposed. Decision 1 is recorded in [ADR-0016](.
 7. **Feature placement:** recommended: F-FOUND-DOCS in Stage 0 before F-FOUND-I18N, so i18n and every later feature are checked; the ROADMAP baseline definition of done gains the two checks. Alternative: a chore outside the feature list (no plan, no Progress entry).
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-11-11).
+
+1. **No `package.json` entry in the doc map.** Every dependency bump would require a CLAUDE.md change or an opt-out; scripts are covered mechanically by the commands check instead.
+2. **The map also covers** `.github/scripts/**`, `.github/actions/**`, `next.config.ts`, `vercel.json` (→ README), `.dependency-cruiser.cjs` (→ CLAUDE.md) and `tools/docs-check/**` (→ its README). `src/app/` isn't mapped: its README is general, and UI changes would mostly produce opt-outs.
+3. **`docs:check` validates the map itself** (docs exist, globs match a file), so a moved folder can't leave the map silently stale. Not in the plan.
+4. **The hook checks the whole branch, not `--staged`.** Claude Code usually runs `git add … && git commit` as one command, and the `PreToolUse` hook runs before it, when nothing is staged yet. A new `--hook` mode reads the command from stdin, reacts only to `git commit` and returns `additionalContext`; `--staged` stays for manual use. A shell pre-filter keeps other Bash calls from starting `pnpm`.
+5. **`Docs-unchanged:` lines inside HTML comments are ignored,** so the hint in the new PR template doesn't count as an opt-out (it would have failed every PR).
+6. **First-run findings fixed:** a future plan path in FEATURES.md, `test:watch` missing from CLAUDE.md "Commands" (an old gap), and the folders of the `core`, `application` and `api` READMEs.
+7. **Stage 0 demo:** steps 15–16; the i18n step is now 17.
+8. **`.prettierignore`:** only the comment on `.claude/` changed; the committed `settings.json` stays hand-formatted.
+9. **"Docs map" as a required check** is a ruleset setting, applied after the first run on this PR.

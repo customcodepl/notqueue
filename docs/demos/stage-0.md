@@ -44,5 +44,11 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
 14. In the "Deploy" run from step 5, open the "Smoke check" log; then open the uptime monitor in Sentry.
     - **Expected:** the smoke check prints 200 with the deployed version and `fra1`; the monitor watches `/api/v1/health` and shows it as up.
 
+### Documentation checks (F-FOUND-DOCS)
+15. Open a PR that only adds a comment to a file in `src/infra/` (without changing `src/infra/README.md`).
+    - **Expected:** "Docs map" fails and names `src/infra/README.md` and the changed file.
+16. Add `Docs-unchanged: src/infra/README.md — comment only` to the PR description and save it (no new push).
+    - **Expected:** "Docs map" runs again and passes; close the PR without merging.
+
 ### i18n (F-FOUND-I18N) — _pending_
-15. The deployed app switches between PL and EN.
+17. The deployed app switches between PL and EN.

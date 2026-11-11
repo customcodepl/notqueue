@@ -38,6 +38,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo.
    - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
+   - Keep `pnpm docs:check` green and satisfy the doc map: update every doc that `docs/doc-map.json` maps to the changed code, or add `Docs-unchanged: <doc> — <reason>` to the PR description ([ADR-0016](docs/adr/0016-documentation-checks-per-pull-request.md)).
    - List any deviations from the plan in your summary and in the plan's "Deviations" section.
    - If a deviation changes a decision covered by an ADR, or makes a new decision that meets rule 7, write the ADR (superseding the old one if needed).
    - Check it against the baseline definition of done in ROADMAP.md.
