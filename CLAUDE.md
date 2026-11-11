@@ -64,6 +64,7 @@ format:           pnpm format            # pnpm format:check to verify; *.md is 
 typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
 docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts (ADR-0016)
+docs:map:         pnpm docs:map          # mapped docs (docs/doc-map.json) this branch doesn't touch; --staged, --base <ref>
 test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
 check:            pnpm check             # lint + typecheck + boundaries + docs + all tests

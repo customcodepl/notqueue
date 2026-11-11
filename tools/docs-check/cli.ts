@@ -4,6 +4,7 @@ import { checkLayerReadmes } from "./checks/layer-readmes";
 import { checkLinks } from "./checks/links";
 import { checkPaths } from "./checks/paths";
 import { checkProgress } from "./checks/progress";
+import { checkDocMap } from "./doc-map";
 import { type Finding, gitRepo, type Repo } from "./repo";
 
 const CHECKS: Record<string, (repo: Repo) => Finding[]> = {
@@ -13,6 +14,7 @@ const CHECKS: Record<string, (repo: Repo) => Finding[]> = {
   adrIndex: checkAdrIndex,
   progress: checkProgress,
   layerReadmes: checkLayerReadmes,
+  docMap: checkDocMap,
 };
 
 export function runChecks(repo: Repo): Finding[] {

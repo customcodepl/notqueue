@@ -1,0 +1,16 @@
+{
+  "src/core/**": ["src/core/README.md"],
+  "src/application/**": ["src/application/README.md"],
+  "src/infra/**": ["src/infra/README.md"],
+  "src/api/**": ["src/api/README.md"],
+  "src/server/**": ["src/server/README.md"],
+  "src/i18n/**": ["src/i18n/README.md"],
+  ".github/workflows/**": ["README.md"],
+  ".github/scripts/**": ["README.md"],
+  ".github/actions/**": ["README.md"],
+  "next.config.ts": ["README.md"],
+  "vercel.json": ["README.md"],
+  "supabase/**": ["CLAUDE.md"],
+  ".dependency-cruiser.cjs": ["CLAUDE.md"],
+  "tools/docs-check/**": ["tools/docs-check/README.md"]
+}
