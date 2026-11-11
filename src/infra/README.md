@@ -11,6 +11,15 @@ Adapters for the outside world: database (Drizzle, tenant-scoped transactions, R
 - `client.ts`: the `pg` pool (transaction pooler at runtime, TLS with the pinned Supabase CA for hosted databases) and `getDb()` ([ADR-0013](../../docs/adr/0013-database-access-with-node-postgres.md)).
 - `env.ts`: reads and validates the database URLs; never prints them.
 - `transaction.ts`: `withTransaction` and the `Tx` type. Internal: application code uses the tenant-scoped helper (F-TENANT-CORE).
+- `database-health.ts`: `drizzleDatabaseHealth`, the `DatabaseHealth` port behind `/api/v1/health` (`select 1` with a timeout).
 - `outbox.ts`: `drizzleEventOutbox(tx)`, the `EventOutbox` port bound to the caller's transaction ([ADR-0006](../../docs/adr/0006-transactional-outbox.md)).
 - `migrate.ts`: `pnpm db:migrate`.
 - `testing/`: helpers for integration tests (`*.int.test.ts`): owner connection, rolled-back transactions, global setup ([ADR-0012](../../docs/adr/0012-integration-tests-on-supabase-local-stack.md)).
+
+## `observability/`
+- `sentry.ts`: options shared by the server, edge and browser Sentry SDKs (errors only, EU host, no PII collected).
+- `scrub.ts`: `beforeSend` and `beforeBreadcrumb` scrubbers, the second line of defence against PII.
+- `report-error.ts`: `reportErrorToSentry`, the `ErrorReporter` port used by the API for 5xx errors.
+
+## `time/`
+- `system-clock.ts`: `systemClock`, the real `Clock`. Wired only in the composition root (`src/server/`); tests use `FakeClock`.
