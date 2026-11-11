@@ -21,7 +21,7 @@ export function runChecks(repo: Repo): Finding[] {
   return Object.values(CHECKS).flatMap((check) => check(repo));
 }
 
-// `pnpm docs:check` (ADR-0016): run from the repo root.
+// `pnpm docs:check` (ADR-0017): run from the repo root.
 if (import.meta.url === `file://${process.argv[1]}`) {
   const findings = runChecks(gitRepo(process.cwd()));
   for (const { file, line, message } of findings) {
