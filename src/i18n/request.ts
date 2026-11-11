@@ -1,11 +1,15 @@
 import { getRequestConfig } from "next-intl/server";
+import { cookies, headers } from "next/headers";
 
-import { DEFAULT_LOCALE } from "@/core/i18n/locale";
+import { LOCALE_COOKIE, resolveRequestLocale } from "./locale";
 
 // Loaded by the next-intl plugin (next.config.ts) for every request
 // (ADR-0018): no locale in the URL, so the locale comes from the request.
 export default getRequestConfig(async () => {
-  const locale = DEFAULT_LOCALE;
+  const locale = resolveRequestLocale({
+    cookie: (await cookies()).get(LOCALE_COOKIE)?.value,
+    acceptLanguage: (await headers()).get("accept-language"),
+  });
 
   return {
     locale,
