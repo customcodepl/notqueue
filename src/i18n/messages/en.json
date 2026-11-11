@@ -5,5 +5,11 @@
   "home": {
     "heading": "notqueue",
     "tagline": "A virtual queue for your venue"
+  },
+  "errors": {
+    "validation_failed": "Check what you entered and try again.",
+    "not_found": "We couldn't find what you were looking for.",
+    "internal_error": "Something went wrong. Please try again in a moment.",
+    "service_unavailable": "The service is temporarily unavailable. Please try again in a moment."
   }
 }

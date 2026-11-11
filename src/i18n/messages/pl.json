@@ -5,5 +5,11 @@
   "home": {
     "heading": "notqueue",
     "tagline": "Wirtualna kolejka dla Twojego lokalu"
+  },
+  "errors": {
+    "validation_failed": "Sprawdź wprowadzone dane i spróbuj ponownie.",
+    "not_found": "Nie znaleźliśmy tego, czego szukasz.",
+    "internal_error": "Coś poszło nie tak. Spróbuj ponownie za chwilę.",
+    "service_unavailable": "Usługa jest chwilowo niedostępna. Spróbuj ponownie za chwilę."
   }
 }
