@@ -1,7 +1,7 @@
 # F-FOUND-PREVIEW-E2E: Preview E2E and automated demo steps
 
 - **Stage:** 0 (Foundations)
-- **Status:** in implementation; plan approved 2026-11-11
+- **Status:** done (2026-11-11); plan approved 2026-11-11
 - **Depends on:** F-FOUND-PIPELINE, F-FOUND-I18N
 - **Unblocks:** none directly; every later stage demo writes its automatable steps as preview specs
 - **ADRs:** [ADR-0010](../../adr/0010-deploy-pipeline-without-staging-deployment.md) (previews serve as staging); [ADR-0020](../../adr/0020-stage-demos-partly-automated-on-previews.md) (decision 1)
