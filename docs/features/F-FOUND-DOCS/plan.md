@@ -4,7 +4,7 @@
 - **Status:** done (2026-11-11); plan approved 2026-11-11
 - **Depends on:** F-FOUND-REPO (done), F-FOUND-PIPELINE (done)
 - **Unblocks:** none directly; every later feature is checked by it
-- **ADRs:** [ADR-0001](../../adr/0001-record-architecture-decisions.md); [ADR-0016](../../adr/0016-documentation-checks-per-pull-request.md) (decision 1)
+- **ADRs:** [ADR-0001](../../adr/0001-record-architecture-decisions.md); [ADR-0016](../../adr/0016-documentation-checks-per-pull-request.md) (decision 1), superseded by [ADR-0017](../../adr/0017-documentation-review-before-opening-a-pull-request.md) (deviation 10)
 
 ## Goal
 A PR can't merge while the docs it should have updated are stale: CI fails on broken links and paths, on commands, ADR index or progress counts that don't match the repo, on layer READMEs that miss a folder, and on code changes whose mapped docs weren't touched unless the PR states why they need no change.
@@ -129,3 +129,4 @@ Resolved during implementation (2026-11-11).
 7. **Stage 0 demo:** steps 15–16; the i18n step is now 17.
 8. **`.prettierignore`:** only the comment on `.claude/` changed; the committed `settings.json` stays hand-formatted.
 9. **"Docs map" as a required check** is a ruleset setting, applied after the first run on this PR.
+10. **The CI "Docs map" check was replaced after merge** ([ADR-0017](../../adr/0017-documentation-review-before-opening-a-pull-request.md) supersedes ADR-0016; follow-up PR, 2026-11-11). Per-doc matching proved coarse (a README updated for one file covers every other file) and would have failed every Dependabot action bump. Now a Claude Code hook stops the first `gh pr create` per HEAD with every mapped doc and all files that require it, and the PR's "Docs" section records the review. Removed: `pr-docs.yml`, the `Docs-unchanged:` opt-outs, `--base` and `--staged`; the commit-time reminder became the PR-time review. `docs:check` stays in CI. Stage 0 demo steps 15–16 were rewritten accordingly.

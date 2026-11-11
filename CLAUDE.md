@@ -38,7 +38,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo.
    - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
-   - Keep `pnpm docs:check` green and satisfy the doc map: update every doc that `docs/doc-map.json` maps to the changed code, or add `Docs-unchanged: <doc> — <reason>` to the PR description ([ADR-0016](docs/adr/0016-documentation-checks-per-pull-request.md)).
+   - Keep `pnpm docs:check` green. Before `gh pr create`, check every file that `pnpm docs:map` lists against its doc (a hook stops the first attempt with that list), update the docs or confirm they're current, and say which in the PR's "Docs" section ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)).
    - List any deviations from the plan in your summary and in the plan's "Deviations" section.
    - If a deviation changes a decision covered by an ADR, or makes a new decision that meets rule 7, write the ADR (superseding the old one if needed).
    - Check it against the baseline definition of done in ROADMAP.md.
@@ -64,8 +64,8 @@ lint:             pnpm lint              # --max-warnings=0; pnpm lint:fix to au
 format:           pnpm format            # pnpm format:check to verify; *.md is not formatted
 typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
-docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts (ADR-0016)
-docs:map:         pnpm docs:map          # mapped docs (docs/doc-map.json) this branch doesn't touch; --staged, --base <ref>
+docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts, layer READMEs (ADR-0017)
+docs:map:         pnpm docs:map          # docs that docs/doc-map.json maps to this branch's changes, with every file
 test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
 check:            pnpm check             # lint + typecheck + boundaries + docs + all tests

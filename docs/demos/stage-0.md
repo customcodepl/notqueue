@@ -45,10 +45,10 @@ Run on the deployed app at the end of Stage 0 (see "Done when" in [ROADMAP.md](.
     - **Expected:** the smoke check prints 200 with the deployed version and `fra1`; the monitor watches `/api/v1/health` and shows it as up.
 
 ### Documentation checks (F-FOUND-DOCS)
-15. Open a PR that only adds a comment to a file in `src/infra/` (without changing `src/infra/README.md`).
-    - **Expected:** "Docs map" fails and names `src/infra/README.md` and the changed file.
-16. Add `Docs-unchanged: src/infra/README.md — comment only` to the PR description and save it (no new push).
-    - **Expected:** "Docs map" runs again and passes; close the PR without merging.
+15. In Claude Code, on a branch that only adds a comment to a file in `src/infra/`, ask Claude to open a PR.
+    - **Expected:** the first `gh pr create` is stopped by the hook with `src/infra/README.md (not changed in this branch)` and the changed file; Claude checks the README, writes in the PR's "Docs" section that it's still current, and the retry opens the PR. Close it without merging.
+16. On any PR, add a broken relative link to a doc.
+    - **Expected:** "Checks" fails at `pnpm docs:check` with the file, line and target.
 
 ### i18n (F-FOUND-I18N) — _pending_
 17. The deployed app switches between PL and EN.
