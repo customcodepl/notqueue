@@ -21,3 +21,5 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0015](0015-composition-root.md) | Composition root in `src/server/` | accepted | 2026-11-09 |
 | [0016](0016-documentation-checks-per-pull-request.md) | Documentation checks per pull request | superseded by 0017 | 2026-11-11 |
 | [0017](0017-documentation-review-before-opening-a-pull-request.md) | Documentation review before opening a pull request | accepted | 2026-11-11 |
+| [0018](0018-locale-resolved-per-request-without-locale-in-url.md) | Locale resolved per request, without the locale in the URL | accepted | 2026-11-11 |
+| [0019](0019-locales-and-localized-text-in-core.md) | Supported locales and `LocalizedText` in `core` | accepted | 2026-11-11 |
