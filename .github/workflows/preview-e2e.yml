@@ -1,0 +1,103 @@
+name: Preview E2E
+
+# ADR-0020: the Playwright suite against every Vercel deployment. Vercel sends
+# repository_dispatch, which always runs this file from main, so the suite
+# runs at the deployed commit and reports a "Preview E2E" commit status there
+# (it shows on the PR). workflow_dispatch reruns it for a given deployment.
+on:
+  repository_dispatch:
+    types: [vercel.deployment.success]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Deployment URL
+        required: true
+      sha:
+        description: Full SHA of the deployed commit
+        required: true
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  HUSKY: "0"
+  NEXT_TELEMETRY_DISABLED: "1"
+  DEPLOY_URL: ${{ github.event.client_payload.url || inputs.url }}
+  DEPLOY_SHA: ${{ github.event.client_payload.git.sha || inputs.sha }}
+
+concurrency:
+  group: preview-e2e-${{ github.event.client_payload.git.sha || inputs.sha }}
+  cancel-in-progress: true
+
+jobs:
+  pending:
+    name: Report pending
+    # Production is checked by the deploy workflow's smoke check.
+    if: github.event.client_payload.environment != 'production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: >-
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$DEPLOY_SHA"
+          -f state=pending -f context="Preview E2E"
+          -f description="Running on $DEPLOY_URL" -f target_url="$RUN_URL"
+
+  e2e:
+    name: Run E2E
+    needs: pending
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Same image as CI; the tag must match @playwright/test in pnpm-lock.yaml.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+      options: --ipc=host
+    env:
+      HOME: /root
+      CI: "true"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+      - uses: ./.github/actions/setup
+      - name: Run E2E against the deployment
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          case "$DEPLOY_URL" in
+            http*) url="$DEPLOY_URL" ;;
+            *) url="https://$DEPLOY_URL" ;;
+          esac
+          PLAYWRIGHT_BASE_URL="$url" EXPECTED_VERSION="${DEPLOY_SHA:0:7}" pnpm e2e:preview
+
+      # Screenshots only: traces are off on deployments (playwright.preview.config.ts).
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: playwright-report-preview
+          path: playwright-report/
+          retention-days: 7
+
+  report:
+    name: Report result
+    needs: [pending, e2e]
+    if: always() && needs.pending.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ needs.e2e.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          case "$RESULT" in
+            success) state=success ;;
+            cancelled) state=error ;;
+            *) state=failure ;;
+          esac
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$DEPLOY_SHA" \
+            -f state="$state" -f context="Preview E2E" \
+            -f description="E2E $RESULT on $DEPLOY_URL" -f target_url="$RUN_URL"
