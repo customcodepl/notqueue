@@ -103,3 +103,9 @@ All six approved as recommended.
 2. **A separate `playwright.preview.config.ts`** instead of an environment switch in `playwright.config.ts`: `pnpm e2e:preview` fails at once without `PLAYWRIGHT_BASE_URL`, instead of quietly building and testing locally.
 3. **Without the secret Vercel redirects to its login page, which answers 200**, not 401. The global setup checks that the final host is still the preview. Verified locally against the PR #16 preview without the secret: the run stops in setup with "redirected to https://vercel.com: VERCEL_AUTOMATION_BYPASS_SECRET is missing or wrong."
 4. **Demo:** step 17 stays manual (real phone, Polish, one switch), steps 18–19 are automated, and a new step 20 checks the "Preview E2E" status itself.
+5. **First run failed in the shell, fixed in PR #19.** Steps inside a container default to `sh`, which stopped at `${DEPLOY_SHA:0:7}` ("Bad substitution") before Playwright started. The step now runs with `shell: bash`. Rerun via `workflow_dispatch` on the PR #18 preview: 24/24 passed in all three projects.
+6. **Negative checks done (2026-11-11):**
+   - The PR #16 preview without the secret stops in setup with the redirect message (deviation 3).
+   - The PR #18 preview with the SHA of another commit fails only the health test, on `version`, in all three projects.
+   - The uploaded report holds no trace and no `_vercel_jwt` or bypass header.
+   - `workflow_dispatch` writes the "Preview E2E" status on the SHA it is given, so the negative run left a failure status on `main`'s head commit (`993791a`). It blocks nothing, but run future negative checks with the SHA of a commit no one reviews.
