@@ -86,6 +86,42 @@ module.exports = {
       to: { path: "^src/(application|infra|api|app)/" },
     },
     {
+      name: "raw-transaction-outside-scoped-helpers",
+      comment:
+        "Database access goes through withTenantTransaction or withPlatformTransaction (ADR-0022); the raw withTransaction is for them and for tests. Importing the Tx type is fine.",
+      severity: "error",
+      from: {
+        pathNot:
+          "^src/infra/db/((tenant|platform)-transaction\\.ts$|testing/)|\\.int\\.test\\.ts$",
+      },
+      to: {
+        path: "^src/infra/db/transaction\\.ts$",
+        dependencyTypesNot: ["type-only"],
+      },
+    },
+    {
+      name: "platform-transaction-outside-its-unit-of-work",
+      comment:
+        "Cross-tenant access only through PlatformUnitOfWork (ADR-0022); tests may use the helper directly.",
+      severity: "error",
+      from: {
+        pathNot:
+          "^src/infra/db/(unit-of-work\\.ts$|testing/)|\\.int\\.test\\.ts$",
+      },
+      to: { path: "^src/infra/db/platform-transaction\\.ts$" },
+    },
+    {
+      name: "platform-port-outside-platform-module",
+      comment:
+        "Cross-tenant queries only in the platform module (src/application/platform/), wired by the composition root (ADR-0005, ADR-0022).",
+      severity: "error",
+      from: {
+        pathNot:
+          "^src/(application/platform/|server/|infra/db/unit-of-work\\.ts$)",
+      },
+      to: { path: "^src/application/ports/platform-unit-of-work\\.ts$" },
+    },
+    {
       name: "no-circular",
       severity: "error",
       from: {},
