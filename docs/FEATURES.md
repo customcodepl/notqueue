@@ -9,7 +9,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 
 | Stage | Features done | Status |
 |---|---|---|
-| 0: Foundations | 8 / 8 | in progress |
+| 0: Foundations | 8 / 8 | done |
 | 1: Tenancy, auth & operator console | 0 / 6 | not started |
 | 2: Design foundations | 0 / 3 | not started |
 | 3: Queue core & customer journey | 0 / 6 | not started |
