@@ -13,6 +13,7 @@ Part of `pnpm check` and of the CI "Checks" job. Prints `file:line: message` per
 | `checks/adr-index.ts` | Every ADR file has one row in `docs/adr/README.md` with the same title and status. |
 | `checks/progress.ts` | FEATURES.md "Progress" and "Total" match the feature tables; `dropped` features don't count. |
 | `checks/layer-readmes.ts` | Every folder directly under a `src/` layer is named as `` `folder/` `` in that layer's README (`src/app/` is exempt). |
+| `checks/secrets.ts` | Every `secrets.X` and `vars.X` in `.github/workflows/` and every variable in `.env.example` is named in the README's "Secrets and variables" section (`GITHUB_TOKEN` is exempt). Names only, never values. |
 | `doc-map.ts` (`checkDocMap`) | Every doc in `docs/doc-map.json` exists and every glob matches a file. |
 
 ## `pnpm docs:map`
