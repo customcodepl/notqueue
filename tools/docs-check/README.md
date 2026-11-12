@@ -25,3 +25,19 @@ A review aid, not a gate: every doc that `docs/doc-map.json` maps to the branch'
 - A new doc that describes a folder: add the glob and the doc to `docs/doc-map.json`.
 - A new living doc: add it to `LIVING_DOCS` in `checks/paths.ts`.
 - A new `src/` layer: add it to `LAYERS` in `checks/layer-readmes.ts`.
+
+## Docs reviewer
+`.claude/agents/docs-reviewer.md` is the read-only agent that the `gh pr create` hook asks for ([ADR-0021](../../docs/adr/0021-documentation-review-by-a-reviewer-agent.md)). Its model is pinned by full ID. Changing the model or the prompt means rerunning the replay below and recording the result here.
+
+**Replay.** Run the agent on the merged PRs below, each in a detached worktree at its merge commit, with the previous `main` commit as the base. Paste the agent's instructions into the prompt instead of pointing at this checkout: the checkout's newer commits and plans give the answers away. The run passes when every expected finding is reported, and the docs-only PR gets no false finding (true findings are fine).
+
+| PR | Expected findings |
+|---|---|
+| #16 | The README `pnpm check` comment doesn't list `i18n:check` |
+| #17 | `VERCEL_AUTOMATION_BYPASS_SECRET` is missing from the secrets table; the Stage 0 scope in ROADMAP doesn't name the new feature |
+| #24 | The README status line still says Stage 0 is in progress |
+| #25 | None (docs-only) |
+
+**Last result (2026-11-12): `claude-opus-5-5` pinned.**
+- `claude-opus-5-5` passed all four runs. It also found true issues outside the list: `src/i18n/README.md` still placing `LocalizedText` there, the CLAUDE.md "Time" rule naming next-intl formatters instead of `src/i18n/format.ts`, and the Vercel Pro timing for Cron.
+- `claude-sonnet-5-5` reported every expected finding. Twice it read the newer checkout despite an explicit rule not to, so its #17 result doesn't count.
