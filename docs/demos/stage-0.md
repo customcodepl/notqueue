@@ -64,3 +64,8 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 ### Preview E2E (F-FOUND-PREVIEW-E2E)
 20. On the stage's last PR, open the "Preview E2E" status.
     - **Expected:** success; the run tested the PR's head commit and its health test (`e2e/api.spec.ts`, "health answers 200 from fra1 with the deployed version") passed with that commit's short SHA and `fra1`.
+
+## Runs
+| Date | Result | Notes |
+|---|---|---|
+| 2026-11-12 | All steps pass | Steps 1, 2, 16 and 20 on PR #20, deployed to production with approval (steps 5–14). Step 15 passed on PR #22 with `gh pr create` run on its own; the first try (PR #21) chained a commit before it and bypassed the hook, fixed in #23 ([F-FOUND-DOCS](../features/F-FOUND-DOCS/plan.md), deviation 11). |
