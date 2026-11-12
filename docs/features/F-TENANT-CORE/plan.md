@@ -1,10 +1,10 @@
 # F-TENANT-CORE: Tenant model & RLS
 
 - **Stage:** 1 (Tenancy, auth & operator console)
-- **Status:** plan drafted (2026-11-12)
+- **Status:** in implementation; plan approved 2026-11-12
 - **Depends on:** F-FOUND-DB (done), F-FOUND-I18N (done)
 - **Unblocks:** F-AUTH-RBAC, F-AUDIT-LOG, F-QUEUE-MODEL, F-PUBLIC-VENUE (and, through the venue columns, F-VENUE-LOCALES and F-VENUE-SETTINGS)
-- **ADRs:** [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md); new: ADR-0022 (decisions 1 and 3, written on approval)
+- **ADRs:** [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md); [ADR-0022](../../adr/0022-database-roles-and-tenant-scoped-transactions.md) (decisions 1 and 3)
 
 ## Goal
 Organizations and venues exist in schema `app` with every venue setting column and its default. The API reaches tenant data only through a tenant-scoped transaction that runs as a non-owner role with the tenant set transaction-locally, and RLS returns nothing for another tenant or for a missing context. A two-tenant integration harness proves this for every tenant table, and fails when a new table in `app` has no RLS.
@@ -207,7 +207,9 @@ After merge: the product owner sets the role password and `DATABASE_URL` (steps 
 - **A slug can't be changed cheaply once printed on QR posters.** Changing it is an F-PUBLIC-VENUE / F-PLATFORM-CONSOLE concern; here it's only unique and well-formed.
 - **ROADMAP Q4 (required contact fields):** answered by the product owner on 2026-11-12: phone is optional by default. Recorded in ROADMAP; the defaults for name and email are decision 4.
 
-## Decisions to confirm
+## Decisions (approved 2026-11-12)
+All recommendations were accepted as proposed. Decisions 1 and 3 are recorded in [ADR-0022](../../adr/0022-database-roles-and-tenant-scoped-transactions.md).
+
 1. **DB roles and tenant context (ADR):** recommended: the runtime connects as a login role `notqueue_api` that has no privileges of its own (`noinherit`) and switches per transaction with `set local role` to `app_tenant` or `app_platform`; the tenant is `app.org_id`, set with `set_config(..., true)`. A query that bypasses the helpers fails with `permission denied` instead of running as owner, which is what ADR-0005 asks for ("connects as a non-owner role"). Costs: one password per hosted project set by you, and `DATABASE_URL` switched in Vercel. Alternative: keep connecting as `postgres` and only `set local role` in the helpers (no ops change, but anything that skips the helpers runs with `bypassrls`).
 2. **Platform role in this feature:** recommended: create `app_platform` and `withPlatformTransaction` now, since the harness must prove the boundary between the two roles and F-PLATFORM-CONSOLE and F-AUDIT-LOG build on it. Alternative: add both in F-PLATFORM-CONSOLE (the harness would cover only one role until then).
 3. **Ports for use cases (ADR):** recommended: `TenantUnitOfWork.run(orgId, fn)` and `PlatformUnitOfWork.run(fn)`, which hand `fn` the adapters bound to the transaction (outbox now, repositories later), so `application` never sees Drizzle; the `platform` module is `src/application/platform/`, the only use-case folder allowed the platform port. Recorded in ADR-0022 with decision 1. Alternative: pass a raw `Tx` through an opaque type (simpler, but leaks infra into use cases).
