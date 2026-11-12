@@ -82,8 +82,8 @@ Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local s
 
 ## Conventions that apply to every change
 - **Tenant isolation.**
-  - Every tenant table has `org_id` and an RLS policy, and is in the isolation harness registry (`src/infra/db/testing/tenant-tables.ts`).
-  - All DB access goes through `withTenantTransaction` (use cases: `TenantUnitOfWork`); the runtime role `notqueue_api` has no privileges of its own ([ADR-0022](docs/adr/0022-database-roles-and-tenant-scoped-transactions.md)).
+  - Every tenant table has `org_id` (the tenant root `organizations` is scoped by `id`) and an RLS policy, and is in the isolation harness registry (`src/infra/db/testing/tenant-tables.ts`).
+  - All DB access goes through `withTenantTransaction` (use cases: `TenantUnitOfWork`), or for operator work `withPlatformTransaction` (`PlatformUnitOfWork`); the runtime role `notqueue_api` has no privileges of its own ([ADR-0022](docs/adr/0022-database-roles-and-tenant-scoped-transactions.md)).
   - Every new endpoint must be covered by the cross-tenant isolation suite.
   - Never query across tenants outside the `platform` module (the `platform/` use cases in `application`, through `PlatformUnitOfWork`).
 - **Business logic lives in the API layer.**

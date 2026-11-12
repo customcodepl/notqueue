@@ -33,7 +33,9 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
    - **Expected:** `permission denied for schema app`: the runtime role sees nothing without the tenant helper.
 4. Locally: `pnpm db:start && pnpm db:migrate && pnpm test:integration`.
    - **Expected:** the isolation tests pass for `organizations`, `venues` and `outbox_events`, and the catalog test lists every table in `app` as registered with RLS forced.
-5. Open https://notqueue.vercel.app/api/v1/health after `DATABASE_URL` in Vercel was switched to `notqueue_api`.
+5. After `DATABASE_URL` for Preview was switched to `notqueue_api`, redeploy the latest preview and open its `/api/v1/health`.
+   - **Expected:** 200 with `"status": "ok"`. Only then switch Production.
+6. Open https://notqueue.vercel.app/api/v1/health after `DATABASE_URL` for Production was switched to `notqueue_api` and production redeployed.
    - **Expected:** 200 with `"status": "ok"`; in the production SQL editor, `select usename, count(*) from pg_stat_activity where usename = 'notqueue_api' group by 1` shows the role's connections.
 
 ## Runs

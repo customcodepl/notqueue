@@ -228,6 +228,9 @@ Resolved during implementation (2026-11-12).
 5. **`asTenant` and `asPlatform` run in a savepoint that is always rolled back**, so an expected privilege error doesn't abort the test's transaction and the role can't leak into the rest of the test.
 6. **The wiring is in `src/server/units-of-work.ts`**, beside `api.ts`, since no use case or route uses it yet.
 7. **`/api/v1/health` as `notqueue_api` was not checked with `pnpm dev` locally** (running the dev server was blocked in the agent session). The role's login and its lack of privileges are covered by `isolation.int.test.ts`; the health check is Stage 1 demo step 5 after `DATABASE_URL` is switched.
-8. **Stage 0 was closed in this PR** (demo steps 15 and 16 rerun here, hook label renamed), as agreed at the end of F-FOUND-DOCS-REVIEWER.
+8. **Exceptions in the boundary rules, beyond the plan's wording:** `withTransaction` is also allowed in `*.int.test.ts`, and importing only the `Tx` type is allowed anywhere (adapters such as the outbox take the caller's transaction); `withPlatformTransaction` is also allowed in `*.int.test.ts`; `PlatformUnitOfWork` is also imported by its adapter, `src/infra/db/unit-of-work.ts`, which implements it. None of these lets use cases reach across tenants.
+9. **Harness checked against real breakage, locally only:** with `venues_tenant` changed to `using (true)` and a table `app.throwaway` without RLS added by hand, the read, no-context and catalog tests failed (3 of 40); `pnpm db:reset` restored the database. No commit records it, as nothing was changed in the repo.
+10. **Staging before production for the role switch:** the health check on the role moved from the test plan to Stage 1 demo steps 5 (preview, staging database) and 6 (production), in that order.
+11. **Stage 0 was closed in this PR** (demo steps 15 and 16 rerun here, hook label renamed), as agreed at the end of F-FOUND-DOCS-REVIEWER.
 
-**After merge (product owner):** set the `notqueue_api` password in both Supabase projects and switch `DATABASE_URL` in Vercel (steps in the PR), then run Stage 1 demo steps 1–5.
+**After merge (product owner):** set the `notqueue_api` password in both Supabase projects and switch `DATABASE_URL` in Vercel (steps in the PR), Preview first, check its health (demo step 5), then Production, then run Stage 1 demo steps 1–6.

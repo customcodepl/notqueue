@@ -50,7 +50,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 ### Stage 1: Tenancy, auth & operator console
 **Goal:** a secure multi-tenant foundation.
 **Scope:**
-- Organizations, venues (basic), profiles, memberships, invitations, platform admins.
+- Organizations, venues (every settings column with its default; edited in Stages 3 and 5), profiles, memberships, invitations, platform admins.
 - Supabase Auth (email + password and magic link, custom EU SMTP); JWT verification in the API.
 - Tenant-scoped transactions, RLS policies and DB roles; the cross-tenant isolation test harness (two seeded tenants).
 - Operator console: create an organization and venue, invite the first admin. Invitation acceptance.

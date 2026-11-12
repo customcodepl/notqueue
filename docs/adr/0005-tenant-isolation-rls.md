@@ -2,7 +2,7 @@
 
 - **Status:** accepted
 - **Date:** 2026-10-11
-- **Related:** [ADR-0004](0004-business-logic-in-own-api.md), F-FOUND-DB, F-TENANT-CORE, F-PLATFORM-CONSOLE
+- **Related:** [ADR-0004](0004-business-logic-in-own-api.md), [ADR-0022](0022-database-roles-and-tenant-scoped-transactions.md) (roles and helpers), F-FOUND-DB, F-TENANT-CORE, F-PLATFORM-CONSOLE
 
 ## Context
 Many organizations share one deployment. A leak of one venue's customer data to another would be a GDPR breach. Application-level scoping alone fails on a single missing `where` clause.
