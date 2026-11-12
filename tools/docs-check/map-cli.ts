@@ -19,13 +19,24 @@ function branchChanges(): string[] {
   ];
 }
 
+/** Files changed from `stamp` to `head`, or undefined if `stamp` isn't an ancestor. */
+function changesSince(stamp: string, head: string): string[] | undefined {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", stamp, head]);
+    return git("diff", "--name-only", stamp, head);
+  } catch {
+    return undefined;
+  }
+}
+
 function review() {
   return docReview(branchChanges(), readDocMap(gitRepo(process.cwd())));
 }
 
 /**
  * Claude Code PreToolUse hook (.claude/settings.json). Denies the first
- * `gh pr create` per HEAD with the review list; never breaks other commands.
+ * `gh pr create` per HEAD and asks for the docs reviewer; never breaks other
+ * commands.
  */
 function hook() {
   try {
@@ -42,10 +53,12 @@ function hook() {
     } catch {
       stamp = undefined;
     }
+    const head = git("rev-parse", "HEAD")[0] ?? "";
     const decision = prHookDecision({
       command,
-      head: git("rev-parse", "HEAD")[0] ?? "",
+      head,
       stamp,
+      changedSinceStamp: stamp ? changesSince(stamp, head) : undefined,
       review: review(),
     });
     if (decision.action !== "ignore" && decision.stamp) {
@@ -78,7 +91,9 @@ function main(args: string[]) {
     console.log("No mapped docs to review.");
     return;
   }
-  console.log("Check every listed file against its doc (ADR-0017):");
+  console.log(
+    "Docs mapped to this branch (ADR-0021; the docs-reviewer agent checks beyond them):",
+  );
   for (const line of lines) console.log(`- ${line}`);
 }
 

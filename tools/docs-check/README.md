@@ -1,6 +1,6 @@
 # docs-check
 
-Documentation checks ([ADR-0017](../../docs/adr/0017-documentation-review-before-opening-a-pull-request.md)). TypeScript run with `tsx`, no dependencies; unit tests in the Vitest `unit` project.
+Documentation checks ([ADR-0021](../../docs/adr/0021-documentation-review-by-a-reviewer-agent.md)). TypeScript run with `tsx`, no dependencies; unit tests in the Vitest `unit` project.
 
 ## `pnpm docs:check`
 Part of `pnpm check` and of the CI "Checks" job. Prints `file:line: message` per finding and fails if there are any.
@@ -17,9 +17,9 @@ Part of `pnpm check` and of the CI "Checks" job. Prints `file:line: message` per
 | `doc-map.ts` (`checkDocMap`) | Every doc in `docs/doc-map.json` exists and every glob matches a file. |
 
 ## `pnpm docs:map`
-A review aid, not a gate: every doc that `docs/doc-map.json` maps to the branch's changes (against `origin/main`, plus uncommitted and new files), with all the changed files that require it and whether the doc itself changed. Tests, Markdown, e2e, fixtures and the lockfile never trigger it.
+A hint for the docs reviewer, not a gate: every doc that `docs/doc-map.json` maps to the branch's changes (against `origin/main`, plus uncommitted and new files), with all the changed files that require it and whether the doc itself changed. Tests, Markdown, e2e, fixtures and the lockfile never trigger it.
 
-- `--hook`: the Claude Code `PreToolUse` hook in `.claude/settings.json`. The first `gh pr create` for a branch state (HEAD) is denied with the full list; the retry for the same HEAD goes through, and a new commit asks again. Only a command that starts with it (or follows `;`, `&&`, `||` or `|`) counts, not the text inside another command. A command that also commits, merges, reverts, rebases, pulls or cherry-picks before it is always denied: the hook runs before the whole command, so it would review the branch without those commits. The last reviewed HEAD is kept in `.git/docs-review` (per clone, never committed). Decision logic: `pr-hook.ts`.
+- `--hook`: the Claude Code `PreToolUse` hook in `.claude/settings.json` ([ADR-0021](../../docs/adr/0021-documentation-review-by-a-reviewer-agent.md)). The first `gh pr create` for a branch state (HEAD) is denied and asks for the docs-reviewer agent (see "Docs reviewer" below), with this list as a hint; it is denied even when nothing is mapped, because docs also depend on other docs. The retry for the same HEAD goes through. A later HEAD goes through too if everything changed since the reviewed HEAD is Markdown (the review's own fixes) and the reviewed HEAD is its ancestor; any other new commit asks again. Only a command that starts with it (or follows `;`, `&&`, `||` or `|`) counts; text inside a heredoc can still match, which only costs a review. A command that also commits, merges, reverts, rebases, pulls or cherry-picks before it is always denied: the hook runs before the whole command, so it would review the branch without those commits. The last reviewed HEAD is kept in `.git/docs-review` (per clone, never committed). Decision logic: `pr-hook.ts`.
 
 ## Changing the rules
 - A new doc that describes a folder: add the glob and the doc to `docs/doc-map.json`.

@@ -54,7 +54,12 @@ describe("docReview", () => {
 
 describe("prHookDecision", () => {
   const review = docReview(["src/infra/db/client.ts"], map);
-  const base = { head: "abc", stamp: undefined, review };
+  const base = {
+    head: "abc",
+    stamp: undefined,
+    changedSinceStamp: undefined,
+    review,
+  };
 
   it("ignores commands other than gh pr create", () => {
     for (const command of [
@@ -68,13 +73,15 @@ describe("prHookDecision", () => {
     }
   });
 
-  it("denies the first attempt per HEAD with the full list", () => {
+  it("denies the first attempt per HEAD, asks for the reviewer and lists the map as a hint", () => {
     const decision = prHookDecision({
       ...base,
       command: "git push && gh pr create --title x",
     });
     expect(decision).toMatchObject({ action: "deny", stamp: "abc" });
-    expect(decision.action === "deny" && decision.reason).toContain(
+    const reason = decision.action === "deny" ? decision.reason : "";
+    expect(reason).toContain("run the docs-reviewer agent");
+    expect(reason).toContain(
       "- src/infra/README.md (not changed in this branch): src/infra/db/client.ts",
     );
   });
@@ -103,10 +110,35 @@ describe("prHookDecision", () => {
     }
   });
 
-  it("allows right away when no mapped code changed", () => {
-    expect(
-      prHookDecision({ ...base, review: [], command: "gh pr create" }),
-    ).toEqual({ action: "allow", stamp: "abc" });
+  it("asks for the reviewer even when no mapped code changed", () => {
+    const decision = prHookDecision({
+      ...base,
+      review: [],
+      command: "gh pr create",
+    });
+    expect(decision).toMatchObject({ action: "deny", stamp: "abc" });
+    expect(decision.action === "deny" && decision.reason).not.toContain(
+      "a hint",
+    );
+  });
+
+  it("lets the review's Markdown-only fixes through, but not code", () => {
+    const after = (changedSinceStamp: string[] | undefined) =>
+      prHookDecision({
+        ...base,
+        stamp: "old",
+        changedSinceStamp,
+        command: "gh pr create",
+      });
+    expect(after(["README.md", "docs/ROADMAP.md"])).toEqual({
+      action: "allow",
+      stamp: "abc",
+    });
+    expect(after(["README.md", "src/infra/db/client.ts"])).toMatchObject({
+      action: "deny",
+    });
+    // The stamp isn't an ancestor of HEAD (another branch, a rebase).
+    expect(after(undefined)).toMatchObject({ action: "deny" });
   });
 });
 
