@@ -4,7 +4,7 @@
 - **Status:** plan drafted (2026-11-12)
 - **Depends on:** F-FOUND-DB (done), F-FOUND-I18N (done)
 - **Unblocks:** F-AUTH-RBAC, F-AUDIT-LOG, F-QUEUE-MODEL, F-PUBLIC-VENUE (and, through the venue columns, F-VENUE-LOCALES and F-VENUE-SETTINGS)
-- **ADRs:** [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md); new: ADR-0022 (decision 1, written on approval)
+- **ADRs:** [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md); new: ADR-0022 (decisions 1 and 3, written on approval)
 
 ## Goal
 Organizations and venues exist in schema `app` with every venue setting column and its default. The API reaches tenant data only through a tenant-scoped transaction that runs as a non-owner role with the tenant set transaction-locally, and RLS returns nothing for another tenant or for a missing context. A two-tenant integration harness proves this for every tenant table, and fails when a new table in `app` has no RLS.
@@ -16,9 +16,11 @@ Organizations and venues exist in schema `app` with every venue setting column a
 - **Tenant context:** `set_config('app.org_id', <uuid>, true)` and `set local role`, both transaction-local (ADR-0013); SQL function `app.current_org_id()` reads it for the policies.
 - **Transaction helpers** in `src/infra/db/`:
   - `withTenantTransaction(db, orgId, fn)`: opens a transaction, sets role `app_tenant` and the context, then runs `fn(tx)`.
-  - `withPlatformTransaction(db, fn)`: same with role `app_platform` and no tenant context. Only the `platform` module and the composition root may import it (boundary rule).
-  - `withTransaction` stays internal: a boundary rule allows it only in these two helpers and in `testing/`.
-- **Application port** (decision 3): `TenantUnitOfWork` in `src/application/ports/`, so use cases run in a tenant transaction without importing Drizzle. `run(orgId, fn)` gives `fn` the transaction's adapters (the outbox now; repositories as features add them). Implemented in `infra`, wired in `src/server/`. No use case uses it yet; F-AUTH-RBAC is the first.
+  - `withPlatformTransaction(db, fn)`: same with role `app_platform` and no tenant context.
+  - Boundary rules: `withTransaction` only in these two helpers and `testing/`; `withPlatformTransaction` only in its unit-of-work adapter and `testing/`.
+- **Application ports** (decision 3): `TenantUnitOfWork` and `PlatformUnitOfWork` in `src/application/ports/`, so use cases run in a transaction without importing Drizzle. `run(orgId, fn)` / `run(fn)` give `fn` the transaction's adapters (the outbox now; repositories as features add them). Implemented in `infra`, wired in `src/server/` (ADR-0015).
+  - The `platform` module is `src/application/platform/` (its first use cases come with F-PLATFORM-CONSOLE). A boundary rule lets only that folder and `src/server/` import `PlatformUnitOfWork`, which is how "cross-tenant queries only in the `platform` module" is enforced.
+  - No use case uses either port yet; F-AUTH-RBAC and F-PLATFORM-CONSOLE are the first.
 - **Domain types** in `src/core/tenancy/`: branded `OrgId` and `VenueId`, `VenueSlug` (format rule), `ContactFieldPolicy` (`required` | `optional` | `hidden`) and the platform defaults, `VenueSettings`, and a `TimeOfDay` (`HH:mm`) value for `business_day_start`. Pure, unit-tested.
 - **Local role password:** `pnpm db:migrate` sets the password of `notqueue_api` to a fixed local value, only when the URL points at the local stack. `.env.example` uses `notqueue_api` in the local `DATABASE_URL`, so `pnpm dev` runs with the same role as production.
 - **Isolation harness** in `src/infra/db/testing/`:
@@ -30,7 +32,7 @@ Organizations and venues exist in schema `app` with every venue setting column a
   F-AUTH-RBAC builds the per-endpoint suite on these helpers.
 - **Local seed** (decision 6): `pnpm db:seed` inserts one demo organization and venue (idempotent), and refuses any non-local URL.
 - **Deploy:** after merge, the product owner sets the `notqueue_api` password in the staging and production projects and switches `DATABASE_URL` in Vercel to that user (click-by-click steps in the PR; non-secret check: `/api/v1/health` answers 200 and `select usename from pg_stat_activity` in the SQL editor shows `notqueue_api`).
-- **Docs:** ADR-0022, `src/infra/README.md`, `src/core/README.md`, `.env.example`, README (architecture: roles; secrets table: `DATABASE_URL` user), CLAUDE.md Commands (`db:seed`), new `docs/demos/stage-1.md`, FEATURES.md.
+- **Docs:** ADR-0022, `src/infra/README.md`, `src/core/README.md`, `.env.example`, `src/application/README.md` (ports), README (architecture: roles; secrets table: `DATABASE_URL` user), CLAUDE.md (Commands: `db:seed`; the "Tenant isolation" rule names both helpers and their ports), new `docs/demos/stage-1.md`, FEATURES.md.
 
 ## Out of scope
 | Item | Feature that delivers it |
@@ -48,9 +50,9 @@ Organizations and venues exist in schema `app` with every venue setting column a
 
 ## Affected modules
 - **core:** `src/core/tenancy/` (types, slug rule, contact-field defaults, `TimeOfDay`).
-- **application:** `src/application/ports/tenant-unit-of-work.ts`.
-- **infra:** `src/infra/db/schema/` (`organizations.ts`, `venues.ts`, roles and policies), migration `0001`, `tenant-transaction.ts`, `platform-transaction.ts`, `tenant-unit-of-work.ts`, `migrate.ts` (local password), `seed.ts`, `testing/` (harness).
-- **server:** `src/server/` wires the `TenantUnitOfWork` (unused until F-AUTH-RBAC, kept so the wiring is reviewed once).
+- **application:** `src/application/ports/tenant-unit-of-work.ts`, `src/application/ports/platform-unit-of-work.ts`.
+- **infra:** `src/infra/db/schema/` (`organizations.ts`, `venues.ts`, roles and policies), migration `0001`, `tenant-transaction.ts`, `platform-transaction.ts`, `unit-of-work.ts` (both adapters), `migrate.ts` (local password), `seed.ts`, `testing/` (harness).
+- **server:** `src/server/` wires both units of work (unused until F-AUTH-RBAC and F-PLATFORM-CONSOLE, kept so the wiring is reviewed once).
 - **Repo config:** `package.json` (`db:seed`), `.dependency-cruiser.cjs` and fixtures, `.env.example`.
 - **Docs:** listed in "Scope".
 
@@ -68,6 +70,10 @@ do $$ begin
     create role notqueue_api login noinherit nobypassrls; end if; -- password set outside migrations
 end $$;
 grant app_tenant, app_platform to notqueue_api with inherit false, set true;
+-- The owner (Supabase `postgres`, not a superuser) needs SET too: the harness
+-- switches roles inside the owner's test transaction, and so does the demo in
+-- the SQL editor. It gains nothing, since it already bypasses RLS.
+grant app_tenant, app_platform to postgres with inherit false, set true;
 grant usage on schema app to app_tenant, app_platform;
 
 create type app.record_status as enum ('active', 'suspended');
@@ -152,7 +158,7 @@ create policy outbox_platform_insert on app.outbox_events for insert to app_plat
 - No endpoints, so `docs/api/openapi.json` doesn't change.
 
 ## Conventions
-- **Tenant isolation:** `venues` and `outbox_events` carry `org_id`; `organizations` is the tenant root and is scoped by `id`. All three have RLS enabled and forced, and the harness covers them. Cross-tenant access exists only through `app_platform`, behind `withPlatformTransaction`, which only the `platform` module may import.
+- **Tenant isolation:** `venues` and `outbox_events` carry `org_id`; `organizations` is the tenant root and is scoped by `id`. All three have RLS enabled and forced, and the harness covers them. Cross-tenant access exists only through `app_platform`, behind `withPlatformTransaction` and the `PlatformUnitOfWork` port, which only `src/application/platform/` and `src/server/` may import.
 - **Layers:** types in `core`, the port in `application`, Drizzle and SQL in `infra`, wiring in `src/server/` (ADR-0015).
 - **State changes / outbox:** no use cases create or change tenants here; the seed is test data, not a domain change. `organization.created` and friends come with F-PLATFORM-CONSOLE.
 - **Time:** `created_at` / `updated_at` set by the database (`now()`, trigger); `timezone` is an IANA name; `business_day_start` is a local wall-clock `time`, never converted.
@@ -178,7 +184,7 @@ None. This feature has no UI.
 ## Implementation steps
 1. `feat(tenant): add tenancy domain types`: `src/core/tenancy/` with tests.
 2. `feat(db): add organizations, venues and db roles`: schema, roles, policies, migration `0001`, outbox FK; local role password in `db:migrate`; `.env.example`.
-3. `feat(db): add tenant-scoped transaction helpers`: `withTenantTransaction`, `withPlatformTransaction`, the `TenantUnitOfWork` port and adapter, wiring in `src/server/`.
+3. `feat(db): add tenant-scoped transaction helpers`: `withTenantTransaction`, `withPlatformTransaction`, the two unit-of-work ports and adapters, wiring in `src/server/`.
 4. `test(db): add two-tenant isolation harness`: seed helpers, `asTenant` / `asPlatform`, table registry, generated and catalog tests.
 5. `build(deps): restrict transaction helpers by layer rules`: dependency-cruiser rules and fixtures.
 6. `feat(db): add local demo seed`: `db:seed`.
@@ -189,7 +195,7 @@ After merge: the product owner sets the role password and `DATABASE_URL` (steps 
 ## Done when
 - `pnpm check` is green locally and in CI, including the harness and the migration drift check.
 - After merge, both migrate jobs apply `0001`; with `DATABASE_URL` on `notqueue_api`, production `/api/v1/health` answers 200.
-- In the staging SQL editor, `set role app_tenant; select * from app.venues;` returns no rows (Stage 1 demo).
+- In the staging SQL editor (Stage 1 demo), inside `begin … rollback`: two organizations with a venue each are inserted; with `set local role app_tenant` and no context `app.venues` returns no rows, and with `app.org_id` set to the first organization only its venue; `set local role notqueue_api` then fails with `permission denied` on the same query.
 - Baseline: lint, typecheck, unit, integration and E2E pass in CI; `docs:check` green and the `docs-reviewer` findings answered in the PR; the isolation harness exists and covers every tenant table (no endpoints yet); no UI strings.
 - FEATURES.md (status, Progress, Next up) and `docs/demos/stage-1.md` updated.
 
@@ -204,7 +210,7 @@ After merge: the product owner sets the role password and `DATABASE_URL` (steps 
 ## Decisions to confirm
 1. **DB roles and tenant context (ADR):** recommended: the runtime connects as a login role `notqueue_api` that has no privileges of its own (`noinherit`) and switches per transaction with `set local role` to `app_tenant` or `app_platform`; the tenant is `app.org_id`, set with `set_config(..., true)`. A query that bypasses the helpers fails with `permission denied` instead of running as owner, which is what ADR-0005 asks for ("connects as a non-owner role"). Costs: one password per hosted project set by you, and `DATABASE_URL` switched in Vercel. Alternative: keep connecting as `postgres` and only `set local role` in the helpers (no ops change, but anything that skips the helpers runs with `bypassrls`).
 2. **Platform role in this feature:** recommended: create `app_platform` and `withPlatformTransaction` now, since the harness must prove the boundary between the two roles and F-PLATFORM-CONSOLE and F-AUDIT-LOG build on it. Alternative: add both in F-PLATFORM-CONSOLE (the harness would cover only one role until then).
-3. **Port for use cases:** recommended: `TenantUnitOfWork.run(orgId, fn)`, which hands `fn` the adapters bound to the transaction (outbox now, repositories later), so `application` never sees Drizzle. Part of ADR-0022 with decision 1. Alternative: pass a raw `Tx` through an opaque type (simpler, but leaks infra into use cases).
+3. **Ports for use cases (ADR):** recommended: `TenantUnitOfWork.run(orgId, fn)` and `PlatformUnitOfWork.run(fn)`, which hand `fn` the adapters bound to the transaction (outbox now, repositories later), so `application` never sees Drizzle; the `platform` module is `src/application/platform/`, the only use-case folder allowed the platform port. Recorded in ADR-0022 with decision 1. Alternative: pass a raw `Tx` through an opaque type (simpler, but leaks infra into use cases).
 4. **Contact-field defaults:** recommended: name `required` (staff call out the name, the fallback for the called moment), phone `optional` (your answer to Q4), email `hidden` (no email channel in v1, minimization). Alternative: name optional too.
 5. **Locale codes not checked in SQL:** recommended, as in "Data model", to keep ADR-0019's "add a locale in one place". Alternative: a check constraint, with a migration per new locale.
 6. **Seed scope:** recommended: `db:seed` for the local stack only; staging gets tenants through the operator console (F-PLATFORM-CONSOLE), which the Stage 1 demo shows. Alternative: also seed staging from the deploy workflow (demo data mixed with real migration runs).
