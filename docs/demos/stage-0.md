@@ -64,3 +64,4 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 ### Preview E2E (F-FOUND-PREVIEW-E2E)
 20. On the stage's last PR, open the "Preview E2E" status.
     - **Expected:** success; the run tested the PR's head commit and its health test (`e2e/api.spec.ts`, "health answers 200 from fra1 with the deployed version") passed with that commit's short SHA and `fra1`.
+- Broken link for demo step 16: [missing](missing-file.md).
