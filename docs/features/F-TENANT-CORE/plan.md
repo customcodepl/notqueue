@@ -1,7 +1,7 @@
 # F-TENANT-CORE: Tenant model & RLS
 
 - **Stage:** 1 (Tenancy, auth & operator console)
-- **Status:** in implementation; plan approved 2026-11-12
+- **Status:** done (2026-11-12); plan approved 2026-11-12
 - **Depends on:** F-FOUND-DB (done), F-FOUND-I18N (done)
 - **Unblocks:** F-AUTH-RBAC, F-AUDIT-LOG, F-QUEUE-MODEL, F-PUBLIC-VENUE (and, through the venue columns, F-VENUE-LOCALES and F-VENUE-SETTINGS)
 - **ADRs:** [ADR-0005](../../adr/0005-tenant-isolation-rls.md), [ADR-0006](../../adr/0006-transactional-outbox.md), [ADR-0012](../../adr/0012-integration-tests-on-supabase-local-stack.md), [ADR-0013](../../adr/0013-database-access-with-node-postgres.md), [ADR-0015](../../adr/0015-composition-root.md), [ADR-0019](../../adr/0019-locales-and-localized-text-in-core.md); [ADR-0022](../../adr/0022-database-roles-and-tenant-scoped-transactions.md) (decisions 1 and 3)
@@ -219,4 +219,15 @@ All recommendations were accepted as proposed. Decisions 1 and 3 are recorded in
 7. **Venue defaults for locales:** recommended: `default_locale` `pl`, `enabled_locales` `{pl,en}`, browser language on. Alternative: only `{pl}` enabled until the admin turns on EN in F-VENUE-LOCALES.
 
 ## Deviations
-_To be filled in after implementation._
+Resolved during implementation (2026-11-12).
+
+1. **The owner also gets SET on `notqueue_api`.** Without it, `postgres` (not a superuser on Supabase) can't `set role notqueue_api`, which demo step 3 and the harness need. It gains nothing: the owner already bypasses RLS.
+2. **Hand-written SQL before and after the generated part of `0001`.** The roles and `app.current_org_id()` must exist before the generated policies, so they are prepended; grants, triggers and `FORCE ROW LEVEL SECURITY` are appended. drizzle-kit doesn't track either part, so the drift check is unaffected. `EXECUTE` on `app.current_org_id()` is granted explicitly.
+3. **Generated constraint names:** the outbox FK is `outbox_events_org_id_organizations_id_fk` (drizzle-kit's name), not `outbox_events_org_id_fkey`; the venue checks have names (`venues_slug_format`, ...).
+4. **An extra step for the venue mapper** (`feat(db): add venue row mapper`). It was in "Scope" and "Test plan" but had no step of its own; it also holds the venue constraint and `updated_at` tests.
+5. **`asTenant` and `asPlatform` run in a savepoint that is always rolled back**, so an expected privilege error doesn't abort the test's transaction and the role can't leak into the rest of the test.
+6. **The wiring is in `src/server/units-of-work.ts`**, beside `api.ts`, since no use case or route uses it yet.
+7. **`/api/v1/health` as `notqueue_api` was not checked with `pnpm dev` locally** (running the dev server was blocked in the agent session). The role's login and its lack of privileges are covered by `isolation.int.test.ts`; the health check is Stage 1 demo step 5 after `DATABASE_URL` is switched.
+8. **Stage 0 was closed in this PR** (demo steps 15 and 16 rerun here, hook label renamed), as agreed at the end of F-FOUND-DOCS-REVIEWER.
+
+**After merge (product owner):** set the `notqueue_api` password in both Supabase projects and switch `DATABASE_URL` in Vercel (steps in the PR), then run Stage 1 demo steps 1–5.
