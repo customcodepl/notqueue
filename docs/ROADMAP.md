@@ -163,7 +163,7 @@ Each question names the features whose plan must not be approved until it's answ
 1. **Team size.** The plan assumes a solo developer (a single app with enforced module boundaries). A team may want stricter conventions or a monorepo. **Blocks:** none in v1 (solo assumed).
 2. **Launch languages.** **Resolved 2026-10-11:** PL + EN in 1.0. More locales can be added later without architecture changes. The longest supported language for design checks is PL, plus the pseudo-locale.
 3. **Queue model.** The plan assumes several queues per venue, with routing by party size or service type. Should a single queue with staff choosing whom to call be supported as well? **Blocks:** F-QUEUE-MODEL.
-4. **Required contact fields.** With no SMS in v1, is phone required, optional or hidden by default? **Blocks:** F-TENANT-CORE (the default), F-QUEUE-JOIN.
+4. **Required contact fields.** With no SMS in v1, is phone required, optional or hidden by default? **Resolved 2026-11-12:** optional by default (no SMS in v1, data minimization); each venue can change it (F-VENUE-SETTINGS). The defaults for name and email are in the [F-TENANT-CORE plan](features/F-TENANT-CORE/plan.md).
 5. **Staff login on shared devices.** Are individual accounts enough for 1.0, or is a host-stand tablet mode needed? **Blocks:** F-AUTH-LOGIN.
 6. **ETA method.** Is the throughput-based estimate with a configured fallback acceptable, or does the first client need per-service durations from day one? **Blocks:** F-QUEUE-MODEL (baseline ETA), F-QUEUE-ETA.
 7. **Retention period.** Is 30 days the right default before PII is anonymized? It should be confirmed with the first client and legal counsel. **Blocks:** F-PLATFORM-CONSOLE (the default), F-GDPR-DATA.
