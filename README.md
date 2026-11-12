@@ -2,7 +2,7 @@
 
 A multi-tenant SaaS for virtual queues and waitlists. Venues such as restaurants, car service shops and other service businesses use it to let customers wait without standing in line.
 
-> Status: pre-1.0. Stage 0 (Foundations) is done; Stage 1 (Tenancy, auth & operator console) is next. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
+> Status: pre-1.0. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md). See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Who it's for
 
@@ -32,7 +32,7 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | Area | Choice | Why |
 |---|---|---|
 | Framework | Next.js (App Router), TypeScript, Tailwind CSS | Decided; one codebase for UI and API |
-| Hosting | Vercel (Hobby now, Pro before the first client), functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
+| Hosting | Vercel (Hobby now, Pro before the first client), functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md); Hobby for now: [ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)) |
 | Database | Supabase Postgres (`eu-central-1`; Free now, Pro before the first client) | Managed Postgres with RLS, same region as compute, self-hostable ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
 | ORM | Drizzle + node-postgres over the Supavisor transaction pooler | SQL-first, light on serverless, RLS policies and roles declared in schema ([ADR-0013](docs/adr/0013-database-access-with-node-postgres.md)) |
 | Auth | Supabase Auth (staff, admins, operator) | Included, EU-hosted, JWTs usable by future native apps |
@@ -107,8 +107,8 @@ pnpm install                                  # also installs the commit-msg hoo
 pnpm exec playwright install chromium webkit  # once, for E2E
 pnpm db:start && pnpm db:migrate              # local Supabase stack with the app schema
 pnpm dev                                      # http://localhost:3000, API at /api/v1 (health: /api/v1/health)
-pnpm check                                    # lint, typecheck, layer boundaries, docs, i18n, unit and integration tests
-pnpm docs:map                                 # docs that docs/doc-map.json maps to this branch's changes
+pnpm check                                    # every check and test (list in CLAUDE.md "Commands")
+pnpm docs:map                                 # docs mapped to this branch's changes (a hint for the docs reviewer)
 pnpm e2e                                      # Playwright on desktop, phone and tablet profiles
 ```
 
@@ -116,7 +116,7 @@ All scripts are listed in [CLAUDE.md](CLAUDE.md#commands).
 
 ### CI/CD
 
-- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, check the docs (`pnpm docs:check`) and the translation catalogs (`pnpm i18n:check`), and check that the PR title is a Conventional Commit. Before opening a PR, Claude Code reviews every changed file against the docs that `docs/doc-map.json` maps to it; a hook stops the first `gh pr create` with that list, and the PR's "Docs" section records the result ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)). The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project; once it is ready, "Preview E2E" runs the Playwright suite against it and reports a commit status on the PR ([ADR-0020](docs/adr/0020-stage-demos-partly-automated-on-previews.md)).
+- **Every PR:** GitHub Actions run format, lint, typecheck, layer boundaries, unit tests, integration tests on the Supabase local stack with a check that migrations match the schema, build and E2E, check the docs (`pnpm docs:check`) and the translation catalogs (`pnpm i18n:check`), and check that the PR title is a Conventional Commit. Before opening a PR, a hook stops the first `gh pr create` and asks for the read-only `docs-reviewer` agent, which compares the branch with the living docs; each finding is fixed or answered in the PR's "Docs" section ([ADR-0021](docs/adr/0021-documentation-review-by-a-reviewer-agent.md)). The Vercel Git integration deploys a preview (`fra1`, behind Vercel Authentication) against the Supabase staging project; once it is ready, "Preview E2E" runs the Playwright suite against it and reports a commit status on the PR ([ADR-0020](docs/adr/0020-stage-demos-partly-automated-on-previews.md)).
 - **Merge to `main`:** the deploy workflow migrates the staging database (`pnpm db:migrate` over TLS with the pinned Supabase CA), waits for approval in the GitHub `production` environment, migrates the production database, then builds and deploys production with the Vercel CLI and runs a smoke check ([ADR-0010](docs/adr/0010-deploy-pipeline-without-staging-deployment.md)). Vercel never deploys `main` on its own (`vercel.json`).
 - **Monitoring:** errors go to Sentry EU without PII; a Sentry uptime monitor watches `/api/v1/health` in production, which also checks the database. The post-deploy smoke check requires `/api/v1/health` to answer 200 from `fra1` with the deployed commit.
 - Secrets and variables: see below.

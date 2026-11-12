@@ -116,4 +116,16 @@ All approved as recommended; decision 5 changed from `inherit` to a pinned model
 6. **De-duplication and the secrets rule:** recommended: do both here (scope above), because they remove the four cases from the background for good. Alternative: the reviewer alone.
 
 ## Deviations
-_To be filled in after implementation._
+1. **Model: `claude-opus-5-5`.** The replay ran on both candidates (results in `tools/docs-check/README.md`, "Docs reviewer"). Sonnet reported every expected finding, but twice it read the newer checkout, where this plan's "Background" names the answers, despite an explicit rule not to. Its #17 result doesn't count, so Opus is the cheaper model with a clean pass. The lesson is in the replay instructions: paste the agent's prompt instead of pointing at the checkout.
+2. **The first attempt is denied even when nothing is mapped.** The plan kept the old "allow at once" for branches with no mapped code. That would let docs-only PRs skip the review, and #24, which left the README status line stale, was one of them.
+3. **A Markdown-only follow-up passes only if the reviewed HEAD is its ancestor.** The stamp is per clone, not per branch, so a stamp from another branch must not let a branch through.
+4. **Fixes from the replay, outside the planned scope.** The replay also found true staleness on `main`, fixed in step 5:
+   - the CLAUDE.md "Time" rule now names `src/i18n/format.ts`;
+   - `src/i18n/README.md` no longer places `LocalizedText` there (ADR-0019);
+   - the Vercel Pro timing for Cron is noted in ROADMAP Stage 4, F-EVENTS-OUTBOX and F-RELEASE-READINESS;
+   - the README hosting row also links ADR-0010 for the Hobby plan;
+   - ROADMAP points to the README for secrets;
+   - the Stage 0 demo run names #24, the stage's last PR, for the automated steps.
+
+   Not fixed, as history: the squash commit of #17 (`b6bb8b8`) carries #16's description and `Refs: F-FOUND-I18N`.
+5. **Text inside a heredoc can trigger the hook.** It happened twice while building this. It only costs a review and is noted in the tool README; not worth a parser.

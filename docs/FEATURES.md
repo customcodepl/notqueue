@@ -79,7 +79,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 |---|---|---|---|---|
 | F-STAFF-DASHBOARD | Staff dashboard (read) | planned | F-QUEUE-MODEL, F-AUTH-RBAC, F-DESIGN-SYSTEM | Active entries per queue, overdue highlighting, tablet layouts |
 | F-STAFF-ACTIONS | Staff queue actions | planned | F-STAFF-DASHBOARD, F-QUEUE-JOIN | Call, call next, recall, serve, no-show, remove, return; walk-ins; optimistic concurrency; undo; idempotent mutations (middleware from F-QUEUE-JOIN) |
-| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE) |
+| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE); Vercel Pro if the Hobby cron limits are too tight |
 | F-REALTIME | Real-time updates | planned | F-EVENTS-OUTBOX, F-AUTH-RBAC, F-STAFF-DASHBOARD, F-QUEUE-STATUS | Publisher interface, Supabase Broadcast, private channel authorization, client invalidation, polling fallback, connection indicator; `NotificationChannel` interface with the `status_page` channel |
 | F-CALLED-EXPERIENCE | "You're called" | planned | F-REALTIME, F-STAFF-ACTIONS | Enable-alerts step, sound and vibration, wake lock, re-alerts, acknowledgement, staff fallback signals |
 | F-QUEUE-ETA | Throughput ETA | planned | F-QUEUE-MODEL, F-STAFF-ACTIONS | Rolling throughput from entry events, ETA ranges, fallback to configured defaults |
@@ -108,7 +108,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-SEC-HARDENING | Security hardening | planned | F-REALTIME, F-ABUSE-PROTECT, F-FOUND-PIPELINE | Security headers, CSP (Supabase wss, Sentry, Turnstile), CSRF and Origin checks, security review |
 | F-LEGAL-DOCS | Legal documents | planned | – | DPA, subprocessor list, privacy notice template, versioned consent text |
 | F-VENUE-STATS | Venue statistics | planned | F-STAFF-ACTIONS, F-DESIGN-SYSTEM | Served count, average wait, no-show rate |
-| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Move Vercel and Supabase to Pro, enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
+| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Move Supabase (and Vercel, if not done in F-EVENTS-OUTBOX) to Pro, enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
 
 **Total: 43 features.**
 

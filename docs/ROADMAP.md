@@ -9,7 +9,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 **Every feature** (checked when the feature is closed):
 - **Quality**
   - Lint, typecheck, unit, integration (real Postgres with RLS) and E2E tests pass in CI.
-  - Docs are current: `pnpm docs:check` passes in CI, and every file listed by `pnpm docs:map` was checked against its doc before the PR was opened, as recorded in the PR's "Docs" section ([ADR-0017](adr/0017-documentation-review-before-opening-a-pull-request.md)).
+  - Docs are current: `pnpm docs:check` passes in CI, and the `docs-reviewer` agent's findings on the branch were fixed or answered before the PR was opened, as recorded in the PR's "Docs" section ([ADR-0021](adr/0021-documentation-review-by-a-reviewer-agent.md)).
   - Cross-tenant isolation tests cover all new endpoints (harness from F-TENANT-CORE, per-endpoint generation from F-AUTH-RBAC).
 - **i18n**
   - All new UI strings exist in every enabled locale.
@@ -43,7 +43,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 - Sentry (EU).
 - The Playwright suite against every PR preview, with deterministic stage demo steps automated as specs ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)).
 
-**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel team (Hobby to start, Pro before the first client and for Vercel Cron); Supabase staging and production projects in `eu-central-1` (Free to start, Pro before the first client); a Sentry organization on the EU host (it also runs the uptime check). The exact list of secrets is in the F-FOUND-PIPELINE plan.
+**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel team (Hobby to start, Pro before the first client and for Vercel Cron); Supabase staging and production projects in `eu-central-1` (Free to start, Pro before the first client); a Sentry organization on the EU host (it also runs the uptime check). The secrets and variables are listed in the [README](../README.md#secrets-and-variables).
 
 **Done when:** the deployed app switches PL/EN, `/api/v1/health` and the OpenAPI spec respond, CI is green, and every PR gets a preview URL.
 
@@ -95,7 +95,7 @@ The operator and login screens here use unstyled default components. They are al
 **Scope:**
 - Staff dashboard: active entries per queue; call, call next, recall, served, no-show, remove, return to queue; walk-in form; highlighting of overdue calls; undo for destructive actions; connection indicator.
 - Optimistic concurrency.
-- Outbox dispatcher (the table exists from Stage 0); Vercel Cron infrastructure and an outbox sweep for undelivered events; Supabase Realtime Broadcast (private venue channel for staff, public queue channel for customers); polling fallback.
+- Outbox dispatcher (the table exists from Stage 0); Vercel Cron infrastructure (Vercel Pro here at the latest, if the Hobby cron limits are too tight for the sweep) and an outbox sweep for undelivered events; Supabase Realtime Broadcast (private venue channel for staff, public queue channel for customers); polling fallback.
 - The `NotificationChannel` interface, with the status page as its first channel.
 - The "you're called" experience as designed in Stage 2: enable-alerts step, sound, vibration where supported, wake lock, re-alerts, acknowledgement.
 - ETA based on observed throughput.

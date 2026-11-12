@@ -3,7 +3,7 @@ import type { Finding, Repo } from "./repo";
 
 export const DOC_MAP_FILE = "docs/doc-map.json";
 
-/** Code glob → the docs that describe that code (ADR-0017). */
+/** Code glob → the docs that describe that code (ADR-0021). */
 export type DocMap = Record<string, string[]>;
 
 // Changes that never require a doc review.

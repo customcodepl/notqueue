@@ -1,6 +1,6 @@
 # i18n
 
-Presentation-side localization: next-intl setup, message catalogs, `LocalizedText` resolution and formatters (always in the venue's timezone). The locale is resolved per request and never appears in the URL ([ADR-0018](../../docs/adr/0018-locale-resolved-per-request-without-locale-in-url.md)).
+Presentation-side localization: next-intl setup, message catalogs, request locale detection, the translator and formatters (always in the venue's timezone). The locales and `LocalizedText` with its resolver live in `src/core/i18n/` ([ADR-0019](../../docs/adr/0019-locales-and-localized-text-in-core.md)). The locale is resolved per request and never appears in the URL ([ADR-0018](../../docs/adr/0018-locale-resolved-per-request-without-locale-in-url.md)).
 
 - **May import:** `core`.
 - **Imported only by:** `api`, `app`. `core`, `application` and `infra` never import `i18n`.
