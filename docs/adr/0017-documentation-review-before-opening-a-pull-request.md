@@ -1,6 +1,6 @@
 # ADR-0017: Documentation review before opening a pull request
 
-- **Status:** accepted
+- **Status:** superseded by [ADR-0021](0021-documentation-review-by-a-reviewer-agent.md)
 - **Date:** 2026-11-11
 - **Related:** supersedes [ADR-0016](0016-documentation-checks-per-pull-request.md); F-FOUND-DOCS, every feature (baseline definition of done)
 
