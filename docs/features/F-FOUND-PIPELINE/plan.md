@@ -48,6 +48,7 @@ Every PR runs the full check suite in GitHub Actions, gets a validated Conventio
 | GitHub repo | `VERCEL_TOKEN` | secret | Vercel CLI in the deploy workflow |
 | GitHub repo | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | variables | Vercel CLI project link |
 | GitHub repo | `PRODUCTION_HOST` | variable | Smoke-check target (`notqueue.vercel.app`) |
+| GitHub repo | `VERCEL_AUTOMATION_BYPASS_SECRET` | secret | Vercel Protection Bypass for Automation, for "Preview E2E" (added in F-FOUND-PREVIEW-E2E; the Vercel project also needs "repository_dispatch Events" on) |
 | GitHub repo | `SENTRY_AUTH_TOKEN` | secret | Source-map upload in `vercel build` (sensitive Vercel variables are not returned by `vercel pull`) |
 | GitHub env `staging` | `MIGRATIONS_DATABASE_URL` | secret | Supabase staging, session pooler URL (IPv4) |
 | GitHub env `production` | `MIGRATIONS_DATABASE_URL` | secret | Supabase production, session pooler URL (IPv4) |

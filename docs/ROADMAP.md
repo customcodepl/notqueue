@@ -41,8 +41,9 @@ The baseline definition of done has two levels. A check applies once the tool it
 - Documentation checks: in CI, links, paths, commands, ADR index and progress counts, and layer READMEs; before each PR, a review by Claude Code of every changed file against the docs a doc map assigns to it.
 - next-intl with PL/EN, a missing-translation-key CI gate, and the `LocalizedText` type with its fallback resolver.
 - Sentry (EU).
+- The Playwright suite against every PR preview, with deterministic stage demo steps automated as specs ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)).
 
-**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel team (Hobby to start, Pro before the first client and for Vercel Cron); Supabase staging and production projects in `eu-central-1`; a Sentry organization on the EU host (it also runs the uptime check). The exact list of secrets is in the F-FOUND-PIPELINE plan.
+**Product owner prerequisites** (before F-FOUND-PIPELINE): a GitHub repository; a Vercel team (Hobby to start, Pro before the first client and for Vercel Cron); Supabase staging and production projects in `eu-central-1` (Free to start, Pro before the first client); a Sentry organization on the EU host (it also runs the uptime check). The exact list of secrets is in the F-FOUND-PIPELINE plan.
 
 **Done when:** the deployed app switches PL/EN, `/api/v1/health` and the OpenAPI spec respond, CI is green, and every PR gets a preview URL.
 
@@ -130,7 +131,7 @@ The operator and login screens here use unstyled default components. They are al
 - Security headers and CSP; a security review.
 - An accessibility audit against the target in DESIGN.md.
 - Load test of a busy evening: about 150 live status pages and 5 staff.
-- Point-in-time recovery enabled on production; backup restore drill, alerting, and a runbook (deploy, rollback, migrations, incidents).
+- Vercel and Supabase on their Pro plans (daily backups); point-in-time recovery enabled on production; backup restore drill, alerting, and a runbook (deploy, rollback, migrations, incidents).
 - DPA, subprocessor list and privacy notice templates.
 - Basic venue stats: served, average wait, no-show rate.
 
@@ -167,7 +168,7 @@ Each question names the features whose plan must not be approved until it's answ
 6. **ETA method.** Is the throughput-based estimate with a configured fallback acceptable, or does the first client need per-service durations from day one? **Blocks:** F-QUEUE-MODEL (baseline ETA), F-QUEUE-ETA.
 7. **Retention period.** Is 30 days the right default before PII is anonymized? It should be confirmed with the first client and legal counsel. **Blocks:** F-PLATFORM-CONSOLE (the default), F-GDPR-DATA.
 8. **Bot protection.** Use Cloudflare Turnstile on the join form, or rely on rate limits only? **Blocks:** F-ABUSE-PROTECT, F-SEC-HARDENING (CSP).
-9. **Backups.** **Resolved 2026-10-11:** daily backups of the Supabase Pro plan until go-live; point-in-time recovery is enabled in F-RELEASE-READINESS, before any real customer data.
+9. **Backups.** **Resolved 2026-10-11:** daily backups of the Supabase Pro plan until go-live; point-in-time recovery is enabled in F-RELEASE-READINESS, before any real customer data. **Updated 2026-11-12:** Vercel and Supabase stay on their free plans until the first client, so there are no daily backups before then (there is no real data). Both move to Pro before the first client, in F-RELEASE-READINESS.
 10. **Domains.** **Resolved 2026-10-11:** one shared domain with venue slugs in the path. Subdomains or custom domains per venue are a possible later (paid) extension.
 11. **Pricing model.** Not needed for 1.0, but it affects usage metering (per venue, per entry, per SMS). **Blocks:** none in v1.
 12. **SMS provider.** Confirm SMSAPI.pl before starting v1.1. **Blocks:** none in v1 (v1.1).
