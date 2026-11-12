@@ -2,7 +2,7 @@
 
 A multi-tenant SaaS for virtual queues and waitlists. Venues such as restaurants, car service shops and other service businesses use it to let customers wait without standing in line.
 
-> Status: pre-1.0, Stage 0 (Foundations) in progress. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
+> Status: pre-1.0. Stage 0 (Foundations) is done; Stage 1 (Tenancy, auth & operator console) is next. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Who it's for
 
@@ -32,8 +32,8 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 | Area | Choice | Why |
 |---|---|---|
 | Framework | Next.js (App Router), TypeScript, Tailwind CSS | Decided; one codebase for UI and API |
-| Hosting | Vercel Pro, functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
-| Database | Supabase Postgres (`eu-central-1`) | Managed Postgres with RLS, same region as compute, self-hostable ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
+| Hosting | Vercel (Hobby now, Pro before the first client), functions in `fra1` | No ops work, preview deploy per PR, EU region ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
+| Database | Supabase Postgres (`eu-central-1`; Free now, Pro before the first client) | Managed Postgres with RLS, same region as compute, self-hostable ([ADR-0002](docs/adr/0002-hosting-and-database.md)) |
 | ORM | Drizzle + node-postgres over the Supavisor transaction pooler | SQL-first, light on serverless, RLS policies and roles declared in schema ([ADR-0013](docs/adr/0013-database-access-with-node-postgres.md)) |
 | Auth | Supabase Auth (staff, admins, operator) | Included, EU-hosted, JWTs usable by future native apps |
 | Roles | Own `memberships` table plus a permission map in code | Portable, testable, independent of the auth vendor |
@@ -107,7 +107,7 @@ pnpm install                                  # also installs the commit-msg hoo
 pnpm exec playwright install chromium webkit  # once, for E2E
 pnpm db:start && pnpm db:migrate              # local Supabase stack with the app schema
 pnpm dev                                      # http://localhost:3000, API at /api/v1 (health: /api/v1/health)
-pnpm check                                    # lint, typecheck, layer boundaries, docs, unit and integration tests
+pnpm check                                    # lint, typecheck, layer boundaries, docs, i18n, unit and integration tests
 pnpm docs:map                                 # docs that docs/doc-map.json maps to this branch's changes
 pnpm e2e                                      # Playwright on desktop, phone and tablet profiles
 ```

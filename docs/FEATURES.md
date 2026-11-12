@@ -107,7 +107,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-SEC-HARDENING | Security hardening | planned | F-REALTIME, F-ABUSE-PROTECT, F-FOUND-PIPELINE | Security headers, CSP (Supabase wss, Sentry, Turnstile), CSRF and Origin checks, security review |
 | F-LEGAL-DOCS | Legal documents | planned | – | DPA, subprocessor list, privacy notice template, versioned consent text |
 | F-VENUE-STATS | Venue statistics | planned | F-STAFF-ACTIONS, F-DESIGN-SYSTEM | Served count, average wait, no-show rate |
-| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
+| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Move Vercel and Supabase to Pro, enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
 
 **Total: 42 features.**
 
