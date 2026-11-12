@@ -22,7 +22,7 @@
             "type": "command",
             "command": "input=$(cat); printf '%s' \"$input\" | grep -q 'gh pr create' || exit 0; cd \"$CLAUDE_PROJECT_DIR\" && printf '%s' \"$input\" | pnpm -s docs:map --hook 2>/dev/null || true",
             "timeout": 30,
-            "statusMessage": "Reviewing the doc map"
+            "statusMessage": "Checking the docs review"
           }
         ]
       }
