@@ -38,7 +38,7 @@ The baseline definition of done has two levels. A check applies once the tool it
 - Supabase staging and production projects (`eu-central-1`), plus a local Supabase stack.
 - Drizzle schema `app` with the first migration, including the outbox table and a helper that writes a domain event in the caller's transaction (the dispatcher comes in Stage 4).
 - Hono API at `/api/v1` with `/health` and the OpenAPI spec.
-- Documentation checks: in CI, links, paths, commands, ADR index and progress counts, and layer READMEs; before each PR, a review by Claude Code of every changed file against the docs a doc map assigns to it.
+- Documentation checks: in CI, links, paths, commands, ADR index and progress counts, layer READMEs and the secrets table; before each PR, a read-only reviewer agent compares the branch with the living docs ([ADR-0021](adr/0021-documentation-review-by-a-reviewer-agent.md)).
 - next-intl with PL/EN, a missing-translation-key CI gate, and the `LocalizedText` type with its fallback resolver.
 - Sentry (EU).
 - The Playwright suite against every PR preview, with deterministic stage demo steps automated as specs ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)).

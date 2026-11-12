@@ -1,7 +1,7 @@
 # F-FOUND-DOCS-REVIEWER: Documentation reviewer agent
 
 - **Stage:** 0 (Foundations)
-- **Status:** in implementation; plan approved 2026-11-12
+- **Status:** done (2026-11-12); plan approved 2026-11-12
 - **Depends on:** F-FOUND-DOCS
 - **Unblocks:** none directly; every later PR is reviewed by it
 - **ADRs:** [ADR-0017](../../adr/0017-documentation-review-before-opening-a-pull-request.md) (superseded by [ADR-0021](../../adr/0021-documentation-review-by-a-reviewer-agent.md), decision 2)
@@ -129,3 +129,13 @@ All approved as recommended; decision 5 changed from `inherit` to a pinned model
 
    Not fixed, as history: the squash commit of #17 (`b6bb8b8`) carries #16's description and `Refs: F-FOUND-I18N`.
 5. **Text inside a heredoc can trigger the hook.** It happened twice while building this. It only costs a review and is noted in the tool README; not worth a parser.
+6. **The #25 criterion was loosened during the replay**, from "No findings" to "no false finding". Both models found true staleness in #25 (deviation 4), so "No findings" would have failed the reviewer for being right. The plan's Test plan and Done when still say "No findings"; the tool README states the criterion now used.
+7. **The agent may run five read-only git commands**, not only `git diff` and `git log`: `git show`, `git merge-base` (step 1 needs it) and `git ls-files` too.
+8. **First real run, on this branch**, as a general-purpose agent with the same prompt and model, because Claude Code loads `.claude/agents/` at session start. It found six issues; five are fixed here:
+   - the README status line repeated its sentence;
+   - the ROADMAP Stage 0 scope still described the doc-map review;
+   - deviations 6 and 7 were missing;
+   - demo step 15 wasn't attributed to this feature, and no step showed the secrets rule.
+
+   The sixth, the hook's `statusMessage` in `.claude/settings.json` still saying "Reviewing the doc map", waits for the product owner, since it is harness configuration.
+9. **Stage 0 stays `in progress`** until demo step 15 (the hook asks for the reviewer) and the new part of step 16 (the secrets rule failing in CI) have been run on a PR after this merge.

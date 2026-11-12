@@ -2,7 +2,7 @@
 
 A multi-tenant SaaS for virtual queues and waitlists. Venues such as restaurants, car service shops and other service businesses use it to let customers wait without standing in line.
 
-> Status: pre-1.0. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md). See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
+> Status: pre-1.0. See [Progress](docs/FEATURES.md#progress) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Who it's for
 
