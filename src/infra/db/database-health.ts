@@ -7,6 +7,7 @@ import type { Db } from "./client";
 /**
  * `select 1` with a timeout. Takes a getter so the database (and
  * DATABASE_URL) is touched only on the first check, not at import.
+ * Used by GET /api/v1/health.
  */
 export function drizzleDatabaseHealth(
   getDb: () => Db,
