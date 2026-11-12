@@ -52,8 +52,8 @@ A queue entry is generic. It is either a **party** (party size, e.g. a restauran
 ## Architecture overview
 
 - **Multi-tenancy.** The tenant is an **Organization**, which owns **Venues**, which own **Queues**. All tables share one schema and every tenant row has an `org_id`. See [ADR-0005](docs/adr/0005-tenant-isolation-rls.md).
-  - Isolation is enforced twice: by application-level scoping and by Postgres **Row-Level Security**. The API runs as a non-owner DB role with a transaction-local tenant context.
-  - Operator access uses a separate, audited role.
+  - Isolation is enforced twice: by application-level scoping and by Postgres **Row-Level Security**. The API connects as `notqueue_api`, a role with no privileges of its own, and each transaction switches to `app_tenant` with a transaction-local tenant context ([ADR-0022](docs/adr/0022-database-roles-and-tenant-scoped-transactions.md)).
+  - Operator access uses a separate role, `app_platform`, reachable only from the `platform` module and audited (F-AUDIT-LOG).
   - Tables live in a schema (`app`) that is not exposed through Supabase's Data API.
 - **API layer.** All business logic lives in our own versioned REST API (`/api/v1`). Clients never query Supabase directly. See [ADR-0004](docs/adr/0004-business-logic-in-own-api.md).
   - The layering is `core` (pure domain) → `application` (use cases) → `infra` (DB, realtime, channels) → `api` / `app` (HTTP, UI).
@@ -106,6 +106,7 @@ corepack enable
 pnpm install                                  # also installs the commit-msg hook
 pnpm exec playwright install chromium webkit  # once, for E2E
 pnpm db:start && pnpm db:migrate              # local Supabase stack with the app schema
+pnpm db:seed                                  # optional: one demo tenant
 pnpm dev                                      # http://localhost:3000, API at /api/v1 (health: /api/v1/health)
 pnpm check                                    # every check and test (list in CLAUDE.md "Commands")
 pnpm docs:map                                 # docs mapped to this branch's changes (a hint for the docs reviewer)
@@ -136,11 +137,11 @@ Set by the product owner, never committed (values never appear here).
 | Vercel (all envs) | `NEXT_PUBLIC_SENTRY_DSN` | variable | Sentry ingest (EU) |
 | Vercel (preview, production) | `SENTRY_AUTH_TOKEN` | secret | Source-map upload during build |
 | Vercel (preview, production) | `CRON_SECRET` | secret | Used from F-EVENTS-OUTBOX; a different value per environment |
-| Vercel (preview) | `DATABASE_URL` | secret | Supabase staging, transaction pooler URL (port 6543); added in F-FOUND-DB |
-| Vercel (production) | `DATABASE_URL` | secret | Supabase production, transaction pooler URL (port 6543); added in F-FOUND-DB |
+| Vercel (preview) | `DATABASE_URL` | secret | Supabase staging, transaction pooler URL (port 6543), user `notqueue_api.<project-ref>` from F-TENANT-CORE; added in F-FOUND-DB |
+| Vercel (production) | `DATABASE_URL` | secret | Supabase production, transaction pooler URL (port 6543), user `notqueue_api.<project-ref>` from F-TENANT-CORE; added in F-FOUND-DB |
 | Vercel (optional) | `DATABASE_POOL_MAX` | variable | Pool size per function instance, default 5 (F-FOUND-DB); not set |
 
-Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app keys (URL, publishable and secret keys) are added by F-AUTH-LOGIN when code uses them. Add a row when a workflow or `.env.example` starts using a new name; `pnpm docs:check` fails until it's here. In the hosted Supabase projects, SSL enforcement is on and the Data API is off (F-FOUND-DB).
+Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app keys (URL, publishable and secret keys) are added by F-AUTH-LOGIN when code uses them. Add a row when a workflow or `.env.example` starts using a new name; `pnpm docs:check` fails until it's here. In the hosted Supabase projects, SSL enforcement is on and the Data API is off (F-FOUND-DB), and the `notqueue_api` role has a password set by the product owner (F-TENANT-CORE; never in migrations).
 
 ## Documentation
 

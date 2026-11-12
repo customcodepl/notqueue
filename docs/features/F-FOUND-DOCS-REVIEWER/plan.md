@@ -137,5 +137,5 @@ All approved as recommended; decision 5 changed from `inherit` to a pinned model
    - deviations 6 and 7 were missing;
    - demo step 15 wasn't attributed to this feature, and no step showed the secrets rule.
 
-   The sixth, the hook's `statusMessage` in `.claude/settings.json` still saying "Reviewing the doc map", waits for the product owner, since it is harness configuration.
+   The sixth, the hook's `statusMessage` in `.claude/settings.json` still saying "Reviewing the doc map", waits for the product owner, since it is harness configuration. The product owner chose "Checking the docs review" on 2026-11-12; renamed in the F-TENANT-CORE PR.
 9. **Stage 0 stays `in progress`** until demo step 15 (the hook asks for the reviewer) and the new part of step 16 (the secrets rule failing in CI) have been run on a PR after this merge.

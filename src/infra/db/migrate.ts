@@ -1,15 +1,27 @@
+import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 
-import { createDb } from "./client";
-import { readDatabaseUrl } from "./env";
+import { createDb, isLocalDatabaseUrl } from "./client";
+import { LOCAL_API_ROLE_PASSWORD, readDatabaseUrl } from "./env";
 
 export const MIGRATIONS_FOLDER = "src/infra/db/migrations";
 
-/** Applies pending migrations; already applied ones are skipped. */
+/**
+ * Applies pending migrations; already applied ones are skipped. On the local
+ * stack it also gives the runtime role `notqueue_api` its fixed local
+ * password; on hosted projects the product owner sets a real one (ADR-0022).
+ */
 export async function runMigrations(url: string): Promise<void> {
   const { db, pool } = createDb(url, 1);
   try {
     await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+    if (isLocalDatabaseUrl(url)) {
+      await db.execute(
+        sql.raw(
+          `alter role notqueue_api password '${LOCAL_API_ROLE_PASSWORD}'`,
+        ),
+      );
+    }
   } finally {
     await pool.end();
   }

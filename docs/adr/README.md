@@ -25,3 +25,4 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0019](0019-locales-and-localized-text-in-core.md) | Supported locales and `LocalizedText` in `core` | accepted | 2026-11-11 |
 | [0020](0020-stage-demos-partly-automated-on-previews.md) | Stage demos partly automated on PR previews | accepted | 2026-11-11 |
 | [0021](0021-documentation-review-by-a-reviewer-agent.md) | Documentation review by a reviewer agent | accepted | 2026-11-12 |
+| [0022](0022-database-roles-and-tenant-scoped-transactions.md) | Database roles and tenant-scoped transactions | accepted | 2026-11-12 |

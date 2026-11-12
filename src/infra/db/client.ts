@@ -9,6 +9,11 @@ import { SUPABASE_ROOT_CA } from "./supabase-ca";
 export type Db = NodePgDatabase<typeof schema>;
 
 const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]);
+
+/** Whether a URL points at a database on this machine (the local stack). */
+export function isLocalDatabaseUrl(url: string): boolean {
+  return LOCAL_HOSTS.has(new URL(url).hostname);
+}
 // pg lets these URL parameters override the `ssl` option, which could
 // silently drop the CA pinning below.
 const SSL_URL_PARAMS = ["sslmode", "sslrootcert", "sslcert", "sslkey", "ssl"];
@@ -25,7 +30,7 @@ export function poolConfig(url: string, max: number): PoolConfig {
     // after the last release, so the pool can close its idle connections.
     idleTimeoutMillis: 5_000,
   };
-  if (LOCAL_HOSTS.has(parsed.hostname)) {
+  if (isLocalDatabaseUrl(url)) {
     return { ...base, connectionString: url };
   }
   for (const param of SSL_URL_PARAMS) parsed.searchParams.delete(param);

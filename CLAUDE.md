@@ -75,16 +75,17 @@ db:start:         pnpm db:start          # local Supabase stack (Docker, default
 db:generate:      pnpm db:generate       # create a migration from src/infra/db/schema; --custom for hand-written SQL
 db:migrate:       pnpm db:migrate        # apply migrations (local stack unless MIGRATIONS_DATABASE_URL is set)
 db:reset:         pnpm db:reset          # wipe the local database and re-apply migrations
+db:seed:          pnpm db:seed           # one demo tenant on the local stack (refuses hosted databases)
 api:spec:         pnpm api:spec          # rewrite docs/api/openapi.json after a contract change (a test compares it)
 ```
 Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local stack and roll back each test ([ADR-0012](docs/adr/0012-integration-tests-on-supabase-local-stack.md)). Migrations are forward-only; never edit one that has been applied to staging.
 
 ## Conventions that apply to every change
 - **Tenant isolation.**
-  - Every tenant table has `org_id` and an RLS policy.
-  - All DB access goes through the tenant-scoped transaction helper.
+  - Every tenant table has `org_id` (the tenant root `organizations` is scoped by `id`) and an RLS policy, and is in the isolation harness registry (`src/infra/db/testing/tenant-tables.ts`).
+  - All DB access goes through `withTenantTransaction` (use cases: `TenantUnitOfWork`), or for operator work `withPlatformTransaction` (`PlatformUnitOfWork`); the runtime role `notqueue_api` has no privileges of its own ([ADR-0022](docs/adr/0022-database-roles-and-tenant-scoped-transactions.md)).
   - Every new endpoint must be covered by the cross-tenant isolation suite.
-  - Never query across tenants outside the `platform` module.
+  - Never query across tenants outside the `platform` module (the `platform/` use cases in `application`, through `PlatformUnitOfWork`).
 - **Business logic lives in the API layer.**
   - Layers: `core` (pure domain) → `application` (use cases) → `infra` → `api` / `app`.
   - `src/server/` is the composition root: the only place that wires `infra` into use cases and the API; only Next.js entry points import it ([ADR-0015](docs/adr/0015-composition-root.md)).

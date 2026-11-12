@@ -42,7 +42,10 @@ describe("layer boundary rules", () => {
       "i18n-imports-non-core: src/i18n/imports-application.ts",
       "infra-imports-outer-layer: src/infra/imports-app.ts",
       "no-circular: src/core/cycle-a.ts",
+      "platform-port-outside-platform-module: src/application/uses-platform-port.ts",
+      "platform-transaction-outside-its-unit-of-work: src/infra/uses-platform-transaction.ts",
       "presentation-imports-infra: src/api/imports-infra.ts",
+      "raw-transaction-outside-scoped-helpers: src/infra/uses-raw-transaction.ts",
       "server-imported-outside-entry-points: src/api/imports-server.ts",
     ]);
   });

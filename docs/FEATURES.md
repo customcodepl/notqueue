@@ -9,15 +9,15 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 
 | Stage | Features done | Status |
 |---|---|---|
-| 0: Foundations | 8 / 8 | in progress |
-| 1: Tenancy, auth & operator console | 0 / 6 | not started |
+| 0: Foundations | 8 / 8 | done |
+| 1: Tenancy, auth & operator console | 1 / 6 | in progress |
 | 2: Design foundations | 0 / 3 | not started |
 | 3: Queue core & customer journey | 0 / 6 | not started |
 | 4: Staff dashboard & real-time | 0 / 6 | not started |
 | 5: Venue admin | 0 / 5 | not started |
 | 6: Notifications & i18n completeness | 0 / 3 | not started |
 | 7: Hardening, GDPR & handover | 0 / 6 | not started |
-| **v1.0** | **8 / 43** | in progress |
+| **v1.0** | **9 / 43** | in progress |
 
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
@@ -29,7 +29,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
-| Code | F-TENANT-CORE | not started | – |
+| Code | F-AUTH-LOGIN | not started | – |
 | Product | F-DESIGN-DECISIONS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
@@ -50,7 +50,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 ### Stage 1: Tenancy, auth & operator console
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
-| F-TENANT-CORE | Tenant model & RLS | planned | F-FOUND-DB, F-FOUND-I18N | Organizations, venues (all columns, with defaults, including IANA `timezone` and `business_day_start`), DB roles, RLS policies, tenant-scoped transaction helper, cross-tenant isolation test harness (two seeded tenants) |
+| F-TENANT-CORE | Tenant model & RLS | done | F-FOUND-DB, F-FOUND-I18N | Organizations, venues (all columns, with defaults, including IANA `timezone` and `business_day_start`), DB roles, RLS policies, tenant-scoped transaction helper, cross-tenant isolation test harness (two seeded tenants) |
 | F-AUTH-LOGIN | Staff authentication | planned | F-FOUND-API, F-FOUND-DB | Supabase Auth (password and magic link, EU SMTP), profiles, JWT verification, cookie and Bearer sessions |
 | F-AUTH-RBAC | Roles & authorization | planned | F-TENANT-CORE, F-AUTH-LOGIN | Memberships, venue scope, permission map, authz middleware; per-endpoint generation of the cross-tenant isolation suite, covering all earlier endpoints too |
 | F-AUDIT-LOG | Audit log | planned | F-TENANT-CORE | Append-only log of admin and operator actions |

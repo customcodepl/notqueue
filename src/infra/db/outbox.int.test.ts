@@ -6,8 +6,8 @@ import { afterAll, describe, expect, it } from "vitest";
 import type { DomainEvent } from "@/core/events/domain-event";
 
 import { drizzleEventOutbox } from "./outbox";
-import { outboxEvents } from "./schema";
-import { createTestDb, inRollback } from "./testing";
+import { organizations, outboxEvents } from "./schema";
+import { createTestDb, inRollback, insertOrganization } from "./testing";
 import { withTransaction } from "./transaction";
 
 const { db, close } = createTestDb();
@@ -26,7 +26,7 @@ function event(orgId: string, payload: DomainEvent["payload"]): DomainEvent {
 describe("drizzleEventOutbox", () => {
   it("inserts a row with database-set id, event_id and created_at", async () => {
     await inRollback(db, async (tx) => {
-      const orgId = randomUUID();
+      const orgId = await insertOrganization(tx);
       const appended = event(orgId, { position: 3 });
       await drizzleEventOutbox(tx).append(appended);
 
@@ -55,7 +55,7 @@ describe("drizzleEventOutbox", () => {
 
   it("keeps the order of events within one transaction", async () => {
     await inRollback(db, async (tx) => {
-      const orgId = randomUUID();
+      const orgId = await insertOrganization(tx);
       const outbox = drizzleEventOutbox(tx);
       for (const step of [1, 2, 3]) await outbox.append(event(orgId, { step }));
 
@@ -73,8 +73,8 @@ describe("drizzleEventOutbox", () => {
   });
 
   it("commits and rolls back with the caller's transaction", async () => {
-    const committedOrg = randomUUID();
-    const rolledBackOrg = randomUUID();
+    const committedOrg = await insertOrganization(db);
+    const rolledBackOrg = await insertOrganization(db);
     try {
       await withTransaction(db, (tx) =>
         drizzleEventOutbox(tx).append(event(committedOrg, {})),
@@ -97,6 +97,9 @@ describe("drizzleEventOutbox", () => {
       expect(await count(rolledBackOrg)).toBe(0);
     } finally {
       await db.delete(outboxEvents).where(eq(outboxEvents.orgId, committedOrg));
+      for (const id of [committedOrg, rolledBackOrg]) {
+        await db.delete(organizations).where(eq(organizations.id, id));
+      }
     }
   });
 });

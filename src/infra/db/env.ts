@@ -18,6 +18,13 @@ const postgresUrl = z
 export const LOCAL_DATABASE_URL =
   "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 
+/**
+ * The runtime role on the local stack (ADR-0022). Its password is a fixed
+ * local value set by `pnpm db:migrate`; hosted projects get a real one.
+ */
+export const LOCAL_API_ROLE_PASSWORD = "notqueue_api";
+export const LOCAL_API_DATABASE_URL = `postgresql://notqueue_api:${LOCAL_API_ROLE_PASSWORD}@127.0.0.1:54322/postgres`;
+
 type Env = Record<string, string | undefined>;
 
 export function readDatabaseUrl(

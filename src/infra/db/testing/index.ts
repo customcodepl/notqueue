@@ -2,8 +2,8 @@ import { createDb, type Db } from "../client";
 import { LOCAL_DATABASE_URL } from "../env";
 import { withTransaction, type Tx } from "../transaction";
 
-// Shared by all integration tests (ADR-0012). F-TENANT-CORE builds the
-// two-tenant isolation harness on top of it.
+// Shared by all integration tests (ADR-0012), including the two-tenant
+// isolation harness in tenants.ts and tenant-tables.ts.
 
 /**
  * Integration tests always run against the local stack, never against a
@@ -36,3 +36,6 @@ export async function inRollback(
     if (!(error instanceof Rollback)) throw error;
   }
 }
+
+export * from "./tenants";
+export * from "./tenant-tables";
