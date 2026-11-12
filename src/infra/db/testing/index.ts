@@ -38,3 +38,4 @@ export async function inRollback(
 }
 
 export * from "./tenants";
+export * from "./tenant-tables";
