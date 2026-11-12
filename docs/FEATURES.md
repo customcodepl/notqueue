@@ -9,7 +9,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 
 | Stage | Features done | Status |
 |---|---|---|
-| 0: Foundations | 7 / 7 | done |
+| 0: Foundations | 8 / 8 | in progress |
 | 1: Tenancy, auth & operator console | 0 / 6 | not started |
 | 2: Design foundations | 0 / 3 | not started |
 | 3: Queue core & customer journey | 0 / 6 | not started |
@@ -17,7 +17,7 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 | 5: Venue admin | 0 / 5 | not started |
 | 6: Notifications & i18n completeness | 0 / 3 | not started |
 | 7: Hardening, GDPR & handover | 0 / 6 | not started |
-| **v1.0** | **7 / 42** | in progress |
+| **v1.0** | **8 / 43** | in progress |
 
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
@@ -45,6 +45,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-FOUND-DOCS | Documentation checks | done | F-FOUND-REPO, F-FOUND-PIPELINE | `pnpm docs:check` in CI (links, paths, commands, ADR index, progress counts, layer READMEs), doc map reviewed by Claude Code before every PR (a hook stops the first `gh pr create` with the list; [ADR-0017](adr/0017-documentation-review-before-opening-a-pull-request.md)) |
 | F-FOUND-I18N | i18n foundation | done | F-FOUND-REPO | next-intl, PL/EN catalogs, ICU plurals, **missing-key CI gate**, `LocalizedText` type and fallback resolver; date, time and relative-time formatters with an explicit `timeZone` |
 | F-FOUND-PREVIEW-E2E | Preview E2E and automated demo steps | done | F-FOUND-PIPELINE, F-FOUND-I18N | Playwright suite against every PR preview (`repository_dispatch`, Vercel protection bypass), `@local`/`@preview` tags, demo steps marked automated in `docs/demos/` ([ADR-0020](adr/0020-stage-demos-partly-automated-on-previews.md)) |
+| F-FOUND-DOCS-REVIEWER | Documentation reviewer agent | done | F-FOUND-DOCS | Read-only Claude Code subagent that checks the branch diff against the living docs before every PR (asked for by the `gh pr create` hook); secrets table in README checked against workflows and `.env.example` ([ADR-0021](adr/0021-documentation-review-by-a-reviewer-agent.md)) |
 
 ### Stage 1: Tenancy, auth & operator console
 | ID | Name | Status | Depends on | Description |
@@ -78,7 +79,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 |---|---|---|---|---|
 | F-STAFF-DASHBOARD | Staff dashboard (read) | planned | F-QUEUE-MODEL, F-AUTH-RBAC, F-DESIGN-SYSTEM | Active entries per queue, overdue highlighting, tablet layouts |
 | F-STAFF-ACTIONS | Staff queue actions | planned | F-STAFF-DASHBOARD, F-QUEUE-JOIN | Call, call next, recall, serve, no-show, remove, return; walk-ins; optimistic concurrency; undo; idempotent mutations (middleware from F-QUEUE-JOIN) |
-| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE) |
+| F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE); Vercel Pro if the Hobby cron limits are too tight |
 | F-REALTIME | Real-time updates | planned | F-EVENTS-OUTBOX, F-AUTH-RBAC, F-STAFF-DASHBOARD, F-QUEUE-STATUS | Publisher interface, Supabase Broadcast, private channel authorization, client invalidation, polling fallback, connection indicator; `NotificationChannel` interface with the `status_page` channel |
 | F-CALLED-EXPERIENCE | "You're called" | planned | F-REALTIME, F-STAFF-ACTIONS | Enable-alerts step, sound and vibration, wake lock, re-alerts, acknowledgement, staff fallback signals |
 | F-QUEUE-ETA | Throughput ETA | planned | F-QUEUE-MODEL, F-STAFF-ACTIONS | Rolling throughput from entry events, ETA ranges, fallback to configured defaults |
@@ -107,9 +108,9 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-SEC-HARDENING | Security hardening | planned | F-REALTIME, F-ABUSE-PROTECT, F-FOUND-PIPELINE | Security headers, CSP (Supabase wss, Sentry, Turnstile), CSRF and Origin checks, security review |
 | F-LEGAL-DOCS | Legal documents | planned | – | DPA, subprocessor list, privacy notice template, versioned consent text |
 | F-VENUE-STATS | Venue statistics | planned | F-STAFF-ACTIONS, F-DESIGN-SYSTEM | Served count, average wait, no-show rate |
-| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Move Vercel and Supabase to Pro, enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
+| F-RELEASE-READINESS | v1.0 release readiness | planned | F-I18N-COMPLETE, F-NOTIF-CORE, F-QUEUE-ETA, F-GDPR-DATA, F-SEC-HARDENING, F-LEGAL-DOCS, F-VENUE-STATS | Move Supabase (and Vercel, if not done in F-EVENTS-OUTBOX) to Pro, enable point-in-time recovery, load test, restore drill, accessibility audit, alerting, runbook, go-live, tag `v1.0.0` |
 
-**Total: 42 features.**
+**Total: 43 features.**
 
 ---
 
@@ -125,6 +126,7 @@ flowchart LR
     FOUND_DOCS[F-FOUND-DOCS]
     FOUND_I18N[F-FOUND-I18N]
     FOUND_PREVIEW_E2E[F-FOUND-PREVIEW-E2E]
+    FOUND_DOCS_REVIEWER[F-FOUND-DOCS-REVIEWER]
   end
   subgraph S1[Stage 1 Tenancy & auth]
     TENANT_CORE[F-TENANT-CORE]
@@ -193,6 +195,7 @@ flowchart LR
   FOUND_PIPELINE --> DESIGN_SYSTEM
   FOUND_PIPELINE --> FOUND_DOCS
   FOUND_PIPELINE & FOUND_I18N --> FOUND_PREVIEW_E2E
+  FOUND_DOCS --> FOUND_DOCS_REVIEWER
   PLATFORM_CONSOLE --> DESIGN_SYSTEM
 
   TENANT_CORE --> QUEUE_MODEL

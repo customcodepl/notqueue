@@ -4,7 +4,7 @@ import { type Finding, markdownFiles, type Repo } from "../repo";
 
 /**
  * Docs that describe the repo as it is now. Plans and ADRs record history
- * and may name planned, renamed or rejected files (ADR-0017).
+ * and may name planned, renamed or rejected files (ADR-0021).
  */
 export const LIVING_DOCS = [
   "README.md",

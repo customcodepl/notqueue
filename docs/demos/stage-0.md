@@ -47,11 +47,12 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 14. In the "Deploy" run from step 5, open the "Smoke check" log; then open the uptime monitor in Sentry.
     - **Expected:** the smoke check prints 200 with the deployed version and `fra1`; the monitor watches `/api/v1/health` and shows it as up.
 
-### Documentation checks (F-FOUND-DOCS)
+### Documentation checks (F-FOUND-DOCS, F-FOUND-DOCS-REVIEWER)
 15. In Claude Code, on a branch that only adds a comment to a file in `src/infra/`, ask Claude to open a PR.
-    - **Expected:** the first `gh pr create` is stopped by the hook with `src/infra/README.md (not changed in this branch)` and the changed file; Claude checks the README, writes in the PR's "Docs" section that it's still current, and the retry opens the PR. Close it without merging.
+    - **Expected:** the first `gh pr create` is stopped by the hook, which asks for the `docs-reviewer` agent and lists `src/infra/README.md (not changed in this branch)` as a hint; Claude runs the reviewer, writes its findings (or none) in the PR's "Docs" section, and the retry opens the PR. Close it without merging.
 16. On any PR, add a broken relative link to a doc.
     - **Expected:** "Checks" fails at `pnpm docs:check` with the file, line and target.
+    - Then remove a row from the README's "Secrets and variables" table instead. **Expected:** `pnpm docs:check` fails with the name and the workflow that uses it.
 
 ### i18n (F-FOUND-I18N)
 17. Open the preview home page on the phone with the phone's language set to Polish, then tap "English".
@@ -68,4 +69,4 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 ## Runs
 | Date | Result | Notes |
 |---|---|---|
-| 2026-11-12 | All steps pass | Steps 1, 2, 16 and 20 on PR #20, deployed to production with approval (steps 5–14). Step 15 passed on PR #22 with `gh pr create` run on its own; the first try (PR #21) chained a commit before it and bypassed the hook, fixed in #23 ([F-FOUND-DOCS](../features/F-FOUND-DOCS/plan.md), deviation 11). |
+| 2026-11-12 | All steps pass | Automated steps: "Preview E2E" green on #24, the stage's last PR. Steps 1, 2, 16 and 20 on PR #20, deployed to production with approval (steps 5–14). Step 15 passed on PR #22 with `gh pr create` run on its own; the first try (PR #21) chained a commit before it and bypassed the hook, fixed in #23 ([F-FOUND-DOCS](../features/F-FOUND-DOCS/plan.md), deviation 11). |

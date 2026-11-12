@@ -43,23 +43,7 @@ Every PR runs the full check suite in GitHub Actions, gets a validated Conventio
 - **Docs:** this plan's secrets list (below); `docs/demos/stage-0.md`; README "Development" gains a CI/CD paragraph; CLAUDE.md Commands unchanged (no new scripts expected).
 
 ### Secrets and variables
-| Where | Name | Kind | Purpose |
-|---|---|---|---|
-| GitHub repo | `VERCEL_TOKEN` | secret | Vercel CLI in the deploy workflow |
-| GitHub repo | `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` | variables | Vercel CLI project link |
-| GitHub repo | `PRODUCTION_HOST` | variable | Smoke-check target (`notqueue.vercel.app`) |
-| GitHub repo | `VERCEL_AUTOMATION_BYPASS_SECRET` | secret | Vercel Protection Bypass for Automation, for "Preview E2E" (added in F-FOUND-PREVIEW-E2E; the Vercel project also needs "repository_dispatch Events" on) |
-| GitHub repo | `SENTRY_AUTH_TOKEN` | secret | Source-map upload in `vercel build` (sensitive Vercel variables are not returned by `vercel pull`) |
-| GitHub env `staging` | `MIGRATIONS_DATABASE_URL` | secret | Supabase staging, session pooler URL (IPv4) |
-| GitHub env `production` | `MIGRATIONS_DATABASE_URL` | secret | Supabase production, session pooler URL (IPv4) |
-| Vercel (all envs) | `NEXT_PUBLIC_SENTRY_DSN` | variable | Sentry ingest (EU) |
-| Vercel (preview, production) | `SENTRY_AUTH_TOKEN` | secret | Source-map upload during build |
-| Vercel (preview, production) | `CRON_SECRET` | secret | Used from F-EVENTS-OUTBOX; a different value per environment |
-| Vercel (preview) | `DATABASE_URL` | secret | Supabase staging, transaction pooler URL (port 6543); added in F-FOUND-DB |
-| Vercel (production) | `DATABASE_URL` | secret | Supabase production, transaction pooler URL (port 6543); added in F-FOUND-DB |
-| Vercel (optional) | `DATABASE_POOL_MAX` | variable | Pool size per function instance, default 5 (F-FOUND-DB); not set |
-
-Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app keys (URL, publishable and secret keys) are added by F-AUTH-LOGIN when code uses them. Later features add their rows to this table. In the hosted Supabase projects, SSL enforcement is on and the Data API is off (F-FOUND-DB).
+Moved to the README, ["Secrets and variables"](../../../README.md#secrets-and-variables), on 2026-11-12 (F-FOUND-DOCS-REVIEWER), where `docs:check` keeps it in step with the workflows and `.env.example`.
 
 ### Product owner prerequisites (before step 4)
 - Vercel Pro team, project imported from `customcodepl/notqueue`, custom environment `staging` created.

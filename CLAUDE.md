@@ -38,7 +38,7 @@ notqueue is a multi-tenant SaaS for virtual queues and waitlists at venues (rest
    - Update the stage's demo script `docs/demos/stage-<n>.md` if the feature adds to the stage demo. Steps with a deterministic result in a browser or over HTTP become Playwright specs that run on the preview, and the script marks them _automated_ ([ADR-0020](docs/adr/0020-stage-demos-partly-automated-on-previews.md)).
    - Set its status in `docs/FEATURES.md`, and update the "Progress" and "Next up" sections there.
    - Update ROADMAP or README if anything changed.
-   - Keep `pnpm docs:check` green. Before `gh pr create`, check every file that `pnpm docs:map` lists against its doc (a hook stops the first attempt with that list), update the docs or confirm they're current, and say which in the PR's "Docs" section ([ADR-0017](docs/adr/0017-documentation-review-before-opening-a-pull-request.md)).
+   - Keep `pnpm docs:check` green. Before `gh pr create`, run the `docs-reviewer` agent on the branch (a hook stops the first attempt and asks for it; this is a standing request to spawn it), fix each finding or say in the PR's "Docs" section why it needs no change ([ADR-0021](docs/adr/0021-documentation-review-by-a-reviewer-agent.md)). Run `gh pr create` as a command of its own.
    - List any deviations from the plan in your summary and in the plan's "Deviations" section.
    - If a deviation changes a decision covered by an ADR, or makes a new decision that meets rule 7, write the ADR (superseding the old one if needed).
    - Check it against the baseline definition of done in ROADMAP.md.
@@ -64,8 +64,8 @@ lint:             pnpm lint              # --max-warnings=0; pnpm lint:fix to au
 format:           pnpm format            # pnpm format:check to verify; *.md is not formatted
 typecheck:        pnpm typecheck
 check:boundaries: pnpm check:boundaries  # layer rules (dependency-cruiser)
-docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts, layer READMEs (ADR-0017)
-docs:map:         pnpm docs:map          # docs that docs/doc-map.json maps to this branch's changes, with every file
+docs:check:       pnpm docs:check        # links, paths, commands, ADR index, progress counts, layer READMEs, secrets table
+docs:map:         pnpm docs:map          # docs mapped to this branch's changes, a hint for the docs reviewer (ADR-0021)
 i18n:check:       pnpm i18n:check        # every key in every locale, valid ICU, same arguments, complete plurals
 test:             pnpm test              # unit + integration; test:unit (no Docker), test:integration, test:coverage, test:watch
 e2e:              pnpm e2e               # Playwright: builds and serves on port 3100
@@ -105,7 +105,7 @@ Integration tests (`*.int.test.ts`) run on real Postgres with RLS in the local s
   - Opening hours are stored as local wall-clock times plus the venue timezone, never converted to UTC.
   - "Today" means the venue's **business day**, which starts at the venue's `business_day_start` (default 04:00 local), not at midnight. Ticket numbering and daily stats use it.
   - `core` never reads the system clock; time comes from an injected `Clock` or a parameter.
-  - Arithmetic in timezones uses `date-fns` + `@date-fns/tz`. Display goes only through next-intl formatters, always in the venue's timezone; 12h/24h follows the locale.
+  - Arithmetic in timezones uses `date-fns` + `@date-fns/tz`. Display goes only through the formatters in `src/i18n/format.ts` (next-intl underneath; lint blocks other date formatting), always in the venue's timezone; 12h/24h follows the locale.
   - Customer-facing ETAs are ranges rounded to 5 minutes.
   - Tests use a fake clock and cover the DST switches (last Sunday of March and October) and hours that cross midnight.
 - **UI.**
