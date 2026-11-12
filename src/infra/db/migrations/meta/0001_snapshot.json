@@ -1,0 +1,463 @@
+{
+  "id": "6d07f813-9cdb-49fa-a1a0-0f1813db8ee0",
+  "prevId": "81f19b3c-3e34-401a-b4df-2b10c2566e34",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "app.organizations": {
+      "name": "organizations",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "record_status",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {
+        "organizations_tenant": {
+          "name": "organizations_tenant",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "app_tenant"
+          ],
+          "using": "\"app\".\"organizations\".\"id\" = app.current_org_id()"
+        },
+        "organizations_platform": {
+          "name": "organizations_platform",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "app_platform"
+          ],
+          "using": "true",
+          "withCheck": "true"
+        }
+      },
+      "checkConstraints": {
+        "organizations_name_not_blank": {
+          "name": "organizations_name_not_blank",
+          "value": "btrim(\"app\".\"organizations\".\"name\") <> ''"
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "app.outbox_events": {
+      "name": "outbox_events",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "outbox_events_id_seq",
+            "schema": "app",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aggregate_type": {
+          "name": "aggregate_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aggregate_id": {
+          "name": "aggregate_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "dispatched_at": {
+          "name": "dispatched_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "attempts": {
+          "name": "attempts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "outbox_events_pending_idx": {
+          "name": "outbox_events_pending_idx",
+          "columns": [
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"app\".\"outbox_events\".\"dispatched_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "outbox_events_org_id_organizations_id_fk": {
+          "name": "outbox_events_org_id_organizations_id_fk",
+          "tableFrom": "outbox_events",
+          "tableTo": "organizations",
+          "schemaTo": "app",
+          "columnsFrom": [
+            "org_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "outbox_events_event_id_unique": {
+          "name": "outbox_events_event_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "event_id"
+          ]
+        }
+      },
+      "policies": {
+        "outbox_tenant_insert": {
+          "name": "outbox_tenant_insert",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "app_tenant"
+          ],
+          "withCheck": "\"app\".\"outbox_events\".\"org_id\" = app.current_org_id()"
+        },
+        "outbox_platform_insert": {
+          "name": "outbox_platform_insert",
+          "as": "PERMISSIVE",
+          "for": "INSERT",
+          "to": [
+            "app_platform"
+          ],
+          "withCheck": "true"
+        }
+      },
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.venues": {
+      "name": "venues",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "record_status",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "business_day_start": {
+          "name": "business_day_start",
+          "type": "time(0)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'04:00'"
+        },
+        "default_locale": {
+          "name": "default_locale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pl'"
+        },
+        "enabled_locales": {
+          "name": "enabled_locales",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{pl,en}'::text[]"
+        },
+        "browser_locale_enabled": {
+          "name": "browser_locale_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "contact_name_policy": {
+          "name": "contact_name_policy",
+          "type": "contact_field_policy",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'required'"
+        },
+        "contact_phone_policy": {
+          "name": "contact_phone_policy",
+          "type": "contact_field_policy",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'optional'"
+        },
+        "contact_email_policy": {
+          "name": "contact_email_policy",
+          "type": "contact_field_policy",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'hidden'"
+        },
+        "privacy_notice_url": {
+          "name": "privacy_notice_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "venues_org_id_idx": {
+          "name": "venues_org_id_idx",
+          "columns": [
+            {
+              "expression": "org_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "venues_org_id_organizations_id_fk": {
+          "name": "venues_org_id_organizations_id_fk",
+          "tableFrom": "venues",
+          "tableTo": "organizations",
+          "schemaTo": "app",
+          "columnsFrom": [
+            "org_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "venues_slug_unique": {
+          "name": "venues_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {
+        "venues_tenant": {
+          "name": "venues_tenant",
+          "as": "PERMISSIVE",
+          "for": "SELECT",
+          "to": [
+            "app_tenant"
+          ],
+          "using": "\"app\".\"venues\".\"org_id\" = app.current_org_id()"
+        },
+        "venues_platform": {
+          "name": "venues_platform",
+          "as": "PERMISSIVE",
+          "for": "ALL",
+          "to": [
+            "app_platform"
+          ],
+          "using": "true",
+          "withCheck": "true"
+        }
+      },
+      "checkConstraints": {
+        "venues_slug_format": {
+          "name": "venues_slug_format",
+          "value": "\"app\".\"venues\".\"slug\" ~ '^[a-z0-9](?:[a-z0-9-]{1,48}[a-z0-9])$'"
+        },
+        "venues_name_object": {
+          "name": "venues_name_object",
+          "value": "jsonb_typeof(\"app\".\"venues\".\"name\") = 'object'"
+        },
+        "venues_name_has_default_locale": {
+          "name": "venues_name_has_default_locale",
+          "value": "btrim(coalesce(\"app\".\"venues\".\"name\" ->> \"app\".\"venues\".\"default_locale\", '')) <> ''"
+        },
+        "venues_default_locale_enabled": {
+          "name": "venues_default_locale_enabled",
+          "value": "cardinality(\"app\".\"venues\".\"enabled_locales\") > 0 and \"app\".\"venues\".\"default_locale\" = any (\"app\".\"venues\".\"enabled_locales\")"
+        },
+        "venues_privacy_notice_https": {
+          "name": "venues_privacy_notice_https",
+          "value": "\"app\".\"venues\".\"privacy_notice_url\" ~ '^https://'"
+        }
+      },
+      "isRLSEnabled": true
+    }
+  },
+  "enums": {
+    "app.contact_field_policy": {
+      "name": "contact_field_policy",
+      "schema": "app",
+      "values": [
+        "required",
+        "optional",
+        "hidden"
+      ]
+    },
+    "app.record_status": {
+      "name": "record_status",
+      "schema": "app",
+      "values": [
+        "active",
+        "suspended"
+      ]
+    }
+  },
+  "schemas": {
+    "app": "app"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

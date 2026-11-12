@@ -36,3 +36,5 @@ export async function inRollback(
     if (!(error instanceof Rollback)) throw error;
   }
 }
+
+export * from "./tenants";
