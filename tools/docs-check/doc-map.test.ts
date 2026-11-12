@@ -88,6 +88,21 @@ describe("prHookDecision", () => {
     ).toMatchObject({ action: "deny", stamp: "abc" });
   });
 
+  it("denies gh pr create chained after a commit, without a stamp", () => {
+    for (const command of [
+      "git commit -qam 'docs: x' && git push && gh pr create --title x",
+      "git -C repo merge main; gh pr create",
+      "git revert --no-commit HEAD && git commit -m x\ngh pr create",
+    ]) {
+      const decision = prHookDecision({ ...base, review: [], command });
+      expect(decision).toMatchObject({ action: "deny" });
+      expect(decision).not.toHaveProperty("stamp");
+      expect(decision.action === "deny" && decision.reason).toContain(
+        "run gh pr create as a command of its own",
+      );
+    }
+  });
+
   it("allows right away when no mapped code changed", () => {
     expect(
       prHookDecision({ ...base, review: [], command: "gh pr create" }),
