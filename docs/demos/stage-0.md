@@ -7,6 +7,7 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 ## Setup
 - A GitHub account with access to `customcodepl/notqueue`, logged in to Vercel (team NotQueue) and Sentry (`customcode-tv`).
 - A phone for the device checks.
+- Docker running, for the fresh-clone check (step 11).
 
 ## Steps and expected results
 
