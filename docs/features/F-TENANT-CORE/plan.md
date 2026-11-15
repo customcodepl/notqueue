@@ -233,4 +233,6 @@ Resolved during implementation (2026-11-12).
 10. **Staging before production for the role switch:** the health check on the role moved from the test plan to Stage 1 demo steps 5 (preview, staging database) and 6 (production), in that order.
 11. **Stage 0 was closed in this PR** (demo steps 15 and 16 rerun here, hook label renamed), as agreed at the end of F-FOUND-DOCS-REVIEWER.
 
-**After merge (product owner):** set the `notqueue_api` password in both Supabase projects and switch `DATABASE_URL` in Vercel (steps in the PR), Preview first, check its health (demo step 5), then Production, then run Stage 1 demo steps 1–6.
+12. **Production was recreated after the merge.** The original production Supabase project was in `eu-west-1`, contrary to [ADR-0002](../../adr/0002-hosting-and-database.md); it held no tenant data. On 2026-11-15 it was replaced by a new project in `eu-central-1`, with SSL enforcement on and the Data API off. The Deploy run of the merge was rerun, so "Migrate production" applied `0000` and `0001` there, and then Production `DATABASE_URL` was switched from `postgres` to `notqueue_api`. The "Done when" health criterion was met on the new project ([Stage 1 Runs](../../demos/stage-1.md#runs)).
+
+**After merge (product owner):** set the `notqueue_api` password in both Supabase projects and switch `DATABASE_URL` in Vercel (steps in the PR), Preview first, check its health (demo step 5), then Production, then run Stage 1 demo steps 1–6. Done on 2026-11-15 (deviation 12).
