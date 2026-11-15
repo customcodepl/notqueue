@@ -41,3 +41,4 @@ Steps marked _automated_ are checked by Playwright specs that run against every 
 ## Runs
 | Date | Result | Notes |
 |---|---|---|
+| 2026-11-15 | F-TENANT-CORE steps 1–6 pass | Step 4 ran locally before PR #27 was merged. Steps 2 and 3 ran in the staging SQL editor. They also ran on production by mistake, but both roll back. Step 5 was verified on the PR #27 preview, `a423abc`. Step 6 was not run against the original production project because it was in `eu-west-1`, contrary to [ADR-0002](../adr/0002-hosting-and-database.md). That project, which held no tenant data, was replaced by a new one in `eu-central-1`. The "Deploy" run was rerun against the new project: "Migrate production" printed `Migrations applied.`. Production then ran as `postgres`, and was redeployed after `DATABASE_URL` was switched to `notqueue_api`: health returned 200, and `pg_stat_activity` showed `notqueue_api` connections. |
