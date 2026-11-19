@@ -51,6 +51,13 @@ All in DESIGN.md §8, plus the enable-alerts step and the staff fallback signals
 5–6. Staff dashboard, portrait and landscape: queue tabs, entries with party size, wait and the fallback signal; called and overdue marked by border, not color; undo bar; in landscape a separate "Called" panel with served, no-show, call again.
 7–8. **Walk-in** (added after review): staff add a customer (name, party size as one-tap buttons, optional phone and note), then turn the tablet to show a QR code for that entry, so the customer follows the queue without typing; it returns to the queue after "Done" or 60 s.
 
+### Product brand (chosen 2026-11-19)
+- **Name:** "notqueue" is final (product owner). Conflict check on 2026-11-19: no "notqueue" mark or product found; the product owner checked the EU registers (TMview) and found them clear. The closest name is the US mark NOQUEUE (NoQueue Inc, serial 87439071, a waiting-time app; its status is unclear), which doesn't cover the EU. Have a patent attorney confirm before the public launch.
+- **Directions:** [notqueue brand directions](https://claude.ai/artifact/Xev8AmUXsEjAiMfkCuwxz2) (private canvas): A ink and green, B warm signal, C mono and lime, plus C with cyan and violet. C was rejected as too close to an existing restaurant chain's black-and-lime look.
+- **Chosen: B, warm signal.** Warm orange product color on a cream page, a deep blue reserved for the called state, soft shapes (pill buttons, round mark). Wordmark "notqueue." in Inter 800 with the dot in the product color. The mark is a disc with three bars that get shorter: a queue that moves.
+- **Design system reference:** [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1) (private), version 2: light and dark color tokens with usage notes and contrast, type scale, spacing, radii, brand book. The hi-fi mockups install it. Its values are copied into DESIGN.md §3.2 at approval (step 6).
+- **Assets in the repo:** the mark, `public/brand/notqueue-mark.svg`. The wordmark as outlined SVG waits for the self-hosted Inter files from F-DESIGN-SYSTEM (deviation 1).
+
 Feedback: the product owner accepted the flows as sketched. They asked whether joining should be done by the customer or by staff; the answer is both, with the customer as the main path (README and F-STAFF-ACTIONS already include walk-ins), which added boards 7–8 and ROADMAP question 20 (legal basis for walk-ins). A "staff-only joining" venue setting was noted as a possible later addition, not v1.
 
 ## Test plan
@@ -92,4 +99,5 @@ All recommendations were accepted. Decision 5: no venue is available, so people 
 5. **User test:** recommended: 20-minute sessions with 2–3 venue staff (tablet, the dashboard tasks: call, undo, spot who has alerts off) and 2–3 customers (phone, join → status → called), using the hi-fi screens as a click-through, notes only, no recordings, invented data. Recruiting is the product owner's: people from their network stand in for venue staff and customers. Alternative: skip the customer sessions and test with staff only.
 
 ## Deviations
-_To be filled in after implementation._
+1. **The wordmark SVG is not in the repo yet.** An SVG wordmark has to be outlined (text converted to paths) from the Inter font file, which the repo doesn't hold until F-DESIGN-SYSTEM self-hosts it. Step 3 commits only the mark; F-DESIGN-SYSTEM adds `public/brand/notqueue-wordmark.svg`, outlined from that file.
+2. **The conflict check was split.** Claude searched the web; the product owner checked the EU registers (TMview), as search results don't replace them.

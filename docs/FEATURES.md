@@ -62,7 +62,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 |---|---|---|---|---|
 | F-DESIGN-DECISIONS | Design decisions | done | – | Fill in every [DESIGN.md](DESIGN.md) decision: surfaces, branding, components, tokens, icons, fonts, accessibility, dark mode, called moment, text expansion |
 | F-DESIGN-MOCKUPS | Mockups and product brand | planned | F-DESIGN-DECISIONS | Low-fi flow sketches, product brand (name, logo, palette) in parallel, then hi-fi mockups in a design tool of join, status, called, staff dashboard, queue configuration, venue settings, QR poster; tested with real users and approved by the product owner |
-| F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), contrast-adjustment function for the venue accent, lint against ad-hoc colors and sizes, fonts, icons, base components, light/dark, token pairs checked against the contrast targets, pseudo-locale, axe in CI, Stage 1 screens restyled |
+| F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), wordmark SVG outlined from the self-hosted Inter, contrast-adjustment function for the venue accent, lint against ad-hoc colors and sizes, fonts, icons, base components, light/dark, token pairs checked against the contrast targets, pseudo-locale, axe in CI, Stage 1 screens restyled |
 
 ### Stage 3: Queue core & customer journey
 | ID | Name | Status | Depends on | Description |
