@@ -182,3 +182,6 @@ Each question names the features whose plan must not be approved until it's answ
 17. **Staff dark mode default.** Should it be set per venue, per device or per user? **Resolved 2026-11-19:** a venue default (a venue setting in F-VENUE-SETTINGS), overridden per device ([DESIGN.md §5](DESIGN.md#5-light--dark-mode-per-surface)).
 18. **Called-screen sound.** A custom sound or a system-like tone, and should venues be able to choose? **Blocks:** F-CALLED-EXPERIENCE.
 19. **Accessibility beyond AA.** Is the AAA contrast target for customer status screens accepted, given that it may adjust venue brand colors? **Resolved 2026-11-19 → [ADR-0026](adr/0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md):** accepted for key information on the customer status and called screens.
+
+### Legal
+20. **Legal basis for walk-ins.** When staff add a walk-in, the customer ticks no consent box. Is the legal basis the performance of the service (Art. 6(1)(b) GDPR) with the information duty met by the venue's poster and a verbal notice, and what may the optional staff note contain? Raised in F-DESIGN-MOCKUPS (low-fi sketches, 2026-11-19). **Blocks:** F-LEGAL-DOCS, F-STAFF-ACTIONS.

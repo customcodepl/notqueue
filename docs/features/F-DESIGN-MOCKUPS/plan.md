@@ -42,6 +42,17 @@ None. Docs and design artifacts only.
 ## UI screens
 All in DESIGN.md §8, plus the enable-alerts step and the staff fallback signals from §6. Mockup links are added here and to DESIGN.md as they are published.
 
+### Low-fi flow sketches (accepted 2026-11-19)
+[notqueue low-fi flows](https://claude.ai/artifact/MFPp9nM3yKsqBJTjBPUyeE) (private canvas, version 10). Copy in PL, EN behind a `locale` tweak; boards 1–4 and 5 → 7 → 8 are clickable.
+1. Join: venue logo slot, language switch, queue length and ETA range, name (required), party size, phone (optional, with why), consent.
+2. Enable alerts: a separate step after joining, with what works and what doesn't (locked phone).
+3. Status: ticket, people ahead, ETA range, "come back by", alerts and screen-on state, how to restore, leave.
+4. Called: full screen, icon + text + ticket + where to go, "I'm coming", re-alert note.
+5–6. Staff dashboard, portrait and landscape: queue tabs, entries with party size, wait and the fallback signal; called and overdue marked by border, not color; undo bar; in landscape a separate "Called" panel with served, no-show, call again.
+7–8. **Walk-in** (added after review): staff add a customer (name, party size as one-tap buttons, optional phone and note), then turn the tablet to show a QR code for that entry, so the customer follows the queue without typing; it returns to the queue after "Done" or 60 s.
+
+Feedback: the product owner accepted the flows as sketched. They asked whether joining should be done by the customer or by staff; the answer is both, with the customer as the main path (README and F-STAFF-ACTIONS already include walk-ins), which added boards 7–8 and ROADMAP question 20 (legal basis for walk-ins). A "staff-only joining" venue setting was noted as a possible later addition, not v1.
+
 ## Test plan
 - Each hi-fi screen checked at phone (390 × 844) or tablet (820 × 1180 and landscape) size, in PL, and its contrast pairs measured.
 - Hi-fi opened on a real iPhone, an Android phone and a tablet before the user test.
