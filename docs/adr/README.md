@@ -31,3 +31,4 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0025](0025-self-hosted-fonts-and-ui-assets.md) | Self-hosted fonts and UI assets | accepted | 2026-11-19 |
 | [0026](0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md) | Accessibility target: WCAG 2.2 AA, plus AAA contrast on customer status screens | accepted | 2026-11-19 |
 | [0027](0027-called-moment-enable-alerts-and-staff-fallback.md) | The called moment: an enable-alerts step plus staff fallback signals | accepted | 2026-11-19 |
+| [0028](0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md) | Mockups in claude.ai artifacts, with the repo as the source of truth | accepted | 2026-11-19 |

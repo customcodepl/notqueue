@@ -167,12 +167,20 @@ Polish strings typically run 20–30% longer than English, and German (a possibl
 - Venue settings
 - QR poster (print, A4 and A5)
 
-Each hi-fi mockup shows PL and EN, light and dark (where the surface supports both), and the venue-branding variant.
+Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
+| Screens | Locales | Modes | Venue branding |
+|---|---|---|---|
+| Join, status, called | PL and EN | Light and dark | With and without |
+| Staff dashboard (portrait and landscape) | PL and EN | Light and dark | None (product brand, [ADR-0023](adr/0023-venue-branding-logo-and-accent-color.md)) |
+| Queue configuration, venue settings | PL, plus one EN artboard each | Light and dark | None |
+| QR poster (A4, A5) | PL and EN | Print (light) | With and without the venue logo |
 
 **Decision (2026-11-19)** (ROADMAP question 14): sequential, one pass per fidelity.
 1. **Low-fi flow sketches** of join, status, called and the staff dashboard on a tablet: grey boxes with real PL/EN copy, no color or brand. They check steps, information and actions only, and are not approved as a design.
 2. **Product brand** (name, logo, palette; ROADMAP question 15), in parallel with the sketches, since it doesn't depend on the flows.
 3. **Hi-fi mockups in a design tool** of every screen above, built on the tokens in §3.2 and the product brand. They use the same tokens that F-DESIGN-SYSTEM puts in code.
+
+**Where they live:** claude.ai artifacts, with the repo holding everything the code depends on ([ADR-0028](adr/0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md)).
 
 **Review flow:** hi-fi mockups are published as private links → feedback → iterate → a short test with 2–3 real venue staff and customers → **explicit approval** by the product owner, recorded in the decision log below with links and dates.
 
