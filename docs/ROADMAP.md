@@ -70,7 +70,7 @@ The operator and login screens here use unstyled default components. They are al
   - design tokens (color, typography, spacing, radius, motion) implemented as Tailwind theme variables;
   - icon set;
   - self-hosted fonts with full Polish diacritics.
-- **Accessibility target** (proposed: WCAG 2.2 AA, plus AAA contrast for key customer status information).
+- **Accessibility target:** WCAG 2.2 AA, plus AAA contrast (7:1) for key information on the customer status and called screens ([ADR-0026](adr/0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md)).
 - **Light/dark mode** policy per surface.
 - **The "you're called" moment:** handling of browser constraints (no Vibration API on iOS Safari, audio needs a prior user gesture, screen lock and backgrounded tabs) with the chosen mitigations, and the operational fallback for staff.
 - **Layouts that tolerate text expansion**, plus a dev pseudo-locale.
@@ -98,7 +98,7 @@ The operator and login screens here use unstyled default components. They are al
 - Optimistic concurrency.
 - Outbox dispatcher (the table exists from Stage 0); Vercel Cron infrastructure (Vercel Pro here at the latest, if the Hobby cron limits are too tight for the sweep) and an outbox sweep for undelivered events; Supabase Realtime Broadcast (private venue channel for staff, public queue channel for customers); polling fallback.
 - The `NotificationChannel` interface, with the status page as its first channel.
-- The "you're called" experience as designed in Stage 2: enable-alerts step, sound, vibration where supported, wake lock, re-alerts, acknowledgement.
+- The "you're called" experience as designed in Stage 2: enable-alerts step, sound, vibration where supported, wake lock, re-alerts, acknowledgement, a "come back by HH:MM" time, and the staff fallback signals ("alerts on", "last seen online") on the dashboard ([ADR-0027](adr/0027-called-moment-enable-alerts-and-staff-fallback.md)).
 - ETA based on observed throughput.
 
 **Done when:** a staff member calls a customer on a tablet and the customer's phone shows the called state within about a second. A two-browser E2E test covers this. A concurrency test proves that two staff can't call the same entry. The called flow has been verified on a real iPhone and a real Android phone.

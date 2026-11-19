@@ -62,7 +62,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 |---|---|---|---|---|
 | F-DESIGN-DECISIONS | Design decisions | done | – | Fill in every [DESIGN.md](DESIGN.md) decision: surfaces, branding, components, tokens, icons, fonts, accessibility, dark mode, called moment, text expansion |
 | F-DESIGN-MOCKUPS | Mockups and product brand | planned | F-DESIGN-DECISIONS | Low-fi flow sketches, product brand (name, logo, palette) in parallel, then hi-fi mockups in a design tool of join, status, called, staff dashboard, queue configuration, venue settings, QR poster; tested with real users and approved by the product owner |
-| F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), fonts, icons, base components, light/dark, pseudo-locale, axe in CI, Stage 1 screens restyled |
+| F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), contrast-adjustment function for the venue accent, lint against ad-hoc colors and sizes, fonts, icons, base components, light/dark, token pairs checked against the contrast targets, pseudo-locale, axe in CI, Stage 1 screens restyled |
 
 ### Stage 3: Queue core & customer journey
 | ID | Name | Status | Depends on | Description |
@@ -81,14 +81,14 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | F-STAFF-ACTIONS | Staff queue actions | planned | F-STAFF-DASHBOARD, F-QUEUE-JOIN | Call, call next, recall, serve, no-show, remove, return; walk-ins; optimistic concurrency; undo; idempotent mutations (middleware from F-QUEUE-JOIN) |
 | F-EVENTS-OUTBOX | Domain events & outbox | planned | F-FOUND-DB, F-FOUND-PIPELINE | `after()` dispatcher over the outbox table from F-FOUND-DB, Vercel Cron entry and the cron sweep endpoint (`CRON_SECRET` provisioned in F-FOUND-PIPELINE); Vercel Pro if the Hobby cron limits are too tight |
 | F-REALTIME | Real-time updates | planned | F-EVENTS-OUTBOX, F-AUTH-RBAC, F-STAFF-DASHBOARD, F-QUEUE-STATUS | Publisher interface, Supabase Broadcast, private channel authorization, client invalidation, polling fallback, connection indicator; `NotificationChannel` interface with the `status_page` channel |
-| F-CALLED-EXPERIENCE | "You're called" | planned | F-REALTIME, F-STAFF-ACTIONS | Enable-alerts step, sound and vibration, wake lock, re-alerts, acknowledgement, staff fallback signals |
+| F-CALLED-EXPERIENCE | "You're called" | planned | F-REALTIME, F-STAFF-ACTIONS | Enable-alerts step, sound and vibration, wake lock, re-alerts, acknowledgement, "come back by HH:MM" time; staff fallback signals ("alerts enabled" and last seen per entry, from a customer-page heartbeat, anonymized with the entry), shown on the F-STAFF-DASHBOARD screen |
 | F-QUEUE-ETA | Throughput ETA | planned | F-QUEUE-MODEL, F-STAFF-ACTIONS | Rolling throughput from entry events, ETA ranges, fallback to configured defaults |
 
 ### Stage 5: Venue admin
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
 | F-VENUE-SETTINGS | Venue settings | planned | F-VENUE-LOCALES | Timezone, business day start, contact-field policy, privacy notice URL, staff light/dark default |
-| F-VENUE-BRANDING | Venue branding | planned | F-VENUE-SETTINGS | Logo upload (Supabase Storage), accent color with a contrast guard, applied to customer screens |
+| F-VENUE-BRANDING | Venue branding | planned | F-VENUE-SETTINGS | Logo upload (Supabase Storage), accent color adjusted automatically when it fails the contrast check, with a preview in both modes, applied to customer screens |
 | F-VENUE-HOURS | Opening hours | planned | F-VENUE-SETTINGS, F-QUEUE-JOIN | Weekly hours as local wall-clock times (including hours past midnight), exceptions, joining blocked when the venue is closed, DST-safe |
 | F-STAFF-MGMT | Staff management | planned | F-AUTH-INVITES, F-AUDIT-LOG, F-DESIGN-SYSTEM | Invite staff, change role and scope, disable |
 | F-VENUE-QR | QR poster | planned | F-PUBLIC-VENUE, F-VENUE-BRANDING | Printable SVG/PDF poster (A4/A5) with the venue logo and join URL |

@@ -32,7 +32,7 @@ What the dependent features need from this one:
 ## Out of scope
 | Item | Feature that delivers it |
 |---|---|
-| Clickable HTML mockups and their approval | F-DESIGN-MOCKUPS |
+| Low-fi sketches, hi-fi mockups and their approval | F-DESIGN-MOCKUPS |
 | Final token values (exact palette, type sizes), tokens and components in code | F-DESIGN-SYSTEM |
 | Product name, logo and product palette (open question 15) | F-DESIGN-MOCKUPS, in parallel with the low-fi sketches (decision 10); not needed here |
 | Called-screen sound (open question 18) | F-CALLED-EXPERIENCE |
@@ -42,11 +42,11 @@ What the dependent features need from this one:
 Docs only: `docs/DESIGN.md`, `docs/ROADMAP.md` (open questions), `docs/FEATURES.md` (status, "Next up"), new ADRs in `docs/adr/` and the ADR index. No code.
 
 ## Data model and API changes
-None. This feature records decisions. If the staff dark-mode default is set per venue (decision 6), the column is added by F-VENUE-SETTINGS, and this plan only records that need.
+None. This feature records decisions. If the staff dark-mode default is set per venue (decision 7), the column is added by F-VENUE-SETTINGS, and this plan only records that need.
 
 ## Conventions
 - **UI:** this feature defines the tokens, components and accessibility target that the convention "use DESIGN.md tokens and components only" refers to.
-- **GDPR:** fonts self-hosted (no runtime requests to Google); the staff fallback signals (decision 7) must not expose PII, only connection state.
+- **GDPR:** fonts self-hosted (no runtime requests to Google); the staff fallback signals (decision 8) must not expose PII, only connection state.
 - **i18n:** the text-expansion rules and the pseudo-locale (decision 9) build on F-FOUND-I18N; PL is the longest supported locale (ROADMAP question 2).
 
 ## UI screens
@@ -104,3 +104,4 @@ All recommendations were accepted, decision 10 in its revised form (low-fi sketc
 2. **Decisions 3 and 4 share ADR-0024**, as noted under "Decisions"; five ADRs (0023–0027) instead of six.
 3. **More docs updated than step 2 named:** F-VENUE-SETTINGS' description in FEATURES.md and the Stage 5 scope in ROADMAP gained the staff light/dark default (decision 7); FEATURES.md Q-6 is resolved by ADR-0027; the Stage 2 scope in ROADMAP describes the low-fi → hi-fi process and the product brand; the README's DESIGN.md line no longer says "decisions pending".
 4. **ADR-0027 records a consequence the plan didn't spell out:** "last seen online" needs a heartbeat from the customer page, stored per entry and anonymized with it (F-CALLED-EXPERIENCE).
+5. **The staff fallback signals are built in F-CALLED-EXPERIENCE**, on the F-STAFF-DASHBOARD screen: ADR-0027's follow-up "F-STAFF-DASHBOARD shows the signals" names the screen, since F-STAFF-DASHBOARD comes before the feature that stores them. Found by the docs reviewer, with the descriptions in ROADMAP and FEATURES.md it also flagged.
