@@ -70,11 +70,12 @@ The operator and login screens here use unstyled default components. They are al
   - design tokens (color, typography, spacing, radius, motion) implemented as Tailwind theme variables;
   - icon set;
   - self-hosted fonts with full Polish diacritics.
-- **Accessibility target** (proposed: WCAG 2.2 AA, plus AAA contrast for key customer status information).
+- **Accessibility target:** WCAG 2.2 AA, plus AAA contrast (7:1) for key information on the customer status and called screens ([ADR-0026](adr/0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md)).
 - **Light/dark mode** policy per surface.
 - **The "you're called" moment:** handling of browser constraints (no Vibration API on iOS Safari, audio needs a prior user gesture, screen lock and backgrounded tabs) with the chosen mitigations, and the operational fallback for staff.
 - **Layouts that tolerate text expansion**, plus a dev pseudo-locale.
-- **Clickable HTML mockups** for review: join, status, called, staff dashboard (tablet, portrait and landscape), queue configuration, venue settings, QR poster. Each in PL/EN, light/dark where applicable, and with a venue-branding variant.
+- **Mockups** for review ([DESIGN.md §8](DESIGN.md#8-mockups--review-process)): low-fi flow sketches first, then hi-fi mockups in a design tool of join, status, called, staff dashboard (tablet, portrait and landscape), queue configuration, venue settings, QR poster. Each hi-fi screen in PL/EN, light/dark where applicable, and with a venue-branding variant.
+- **Product brand** (name, logo, palette), in parallel with the low-fi sketches.
 - Tokens and base components added to the codebase. Stage 1 screens are restyled with them.
 
 **Done when:** the design principles, tokens and component choices are documented in [DESIGN.md](DESIGN.md) with every decision filled in, the mockups have been reviewed and **approved by the product owner** (recorded in the DESIGN.md decision log), and the token and component foundation is in the codebase with the baseline design checks wired into CI.
@@ -97,7 +98,7 @@ The operator and login screens here use unstyled default components. They are al
 - Optimistic concurrency.
 - Outbox dispatcher (the table exists from Stage 0); Vercel Cron infrastructure (Vercel Pro here at the latest, if the Hobby cron limits are too tight for the sweep) and an outbox sweep for undelivered events; Supabase Realtime Broadcast (private venue channel for staff, public queue channel for customers); polling fallback.
 - The `NotificationChannel` interface, with the status page as its first channel.
-- The "you're called" experience as designed in Stage 2: enable-alerts step, sound, vibration where supported, wake lock, re-alerts, acknowledgement.
+- The "you're called" experience as designed in Stage 2: enable-alerts step, sound, vibration where supported, wake lock, re-alerts, acknowledgement, a "come back by HH:MM" time, and the staff fallback signals ("alerts on", "last seen online") on the dashboard ([ADR-0027](adr/0027-called-moment-enable-alerts-and-staff-fallback.md)).
 - ETA based on observed throughput.
 
 **Done when:** a staff member calls a customer on a tablet and the customer's phone shows the called state within about a second. A two-browser E2E test covers this. A concurrency test proves that two staff can't call the same entry. The called flow has been verified on a real iPhone and a real Android phone.
@@ -105,7 +106,7 @@ The operator and login screens here use unstyled default components. They are al
 ### Stage 5: Venue admin
 **Goal:** venues configure themselves without operator help.
 **Scope:**
-- Venue settings: timezone, business day start, contact-field policy, privacy notice URL, branding (logo and accent color with a contrast check).
+- Venue settings: timezone, business day start, contact-field policy, privacy notice URL, staff light/dark default, branding (logo and accent color, adjusted automatically when it fails the contrast check).
 - Opening hours and exceptions. Joining is blocked while the venue is closed.
 - Staff management: invite, role, venue scope, disable.
 - Printable QR poster.
@@ -174,10 +175,10 @@ Each question names the features whose plan must not be approved until it's answ
 12. **SMS provider.** Confirm SMSAPI.pl before starting v1.1. **Blocks:** none in v1 (v1.1).
 
 ### Design
-13. **Per-venue branding depth.** Product brand only, logo + accent color, or full theming? Should deeper branding be a paid tier later? **Blocks:** F-DESIGN-DECISIONS, F-VENUE-BRANDING.
-14. **Design process.** Claude-generated HTML mockups, Figma with a designer, or a hybrid? Who signs off, and is a test with real venue staff and customers part of the approval? **Blocks:** F-DESIGN-DECISIONS, F-DESIGN-MOCKUPS.
-15. **Product brand identity.** Is "notqueue" the final name? Who designs the logo and the product palette? **Blocks:** F-DESIGN-SYSTEM.
-16. **"You're called" fallback.** Should staff see whether a customer has alerts enabled or was recently online (connection metadata), so they know when to call out a name or phone the customer? **Blocks:** F-DESIGN-DECISIONS, F-CALLED-EXPERIENCE.
-17. **Staff dark mode default.** Should it be set per venue, per device or per user? **Blocks:** F-DESIGN-DECISIONS.
+13. **Per-venue branding depth.** Product brand only, logo + accent color, or full theming? Should deeper branding be a paid tier later? **Resolved 2026-11-19 → [ADR-0023](adr/0023-venue-branding-logo-and-accent-color.md):** venue logo + one accent color, adjusted automatically when it fails the contrast check. Full theming as a paid tier stays a possible later extension.
+14. **Design process.** Claude-generated HTML mockups, Figma with a designer, or a hybrid? Who signs off, and is a test with real venue staff and customers part of the approval? **Resolved 2026-11-19:** low-fi flow sketches, then hi-fi mockups in a design tool, with the product brand in parallel; the product owner approves the hi-fi after a short test with 2–3 real venue staff and customers ([DESIGN.md §8](DESIGN.md#8-mockups--review-process)).
+15. **Product brand identity.** Is "notqueue" the final name? Who designs the logo and the product palette? **Blocks:** F-DESIGN-MOCKUPS (hi-fi mockups), F-DESIGN-SYSTEM.
+16. **"You're called" fallback.** Should staff see whether a customer has alerts enabled or was recently online (connection metadata), so they know when to call out a name or phone the customer? **Resolved 2026-11-19 → [ADR-0027](adr/0027-called-moment-enable-alerts-and-staff-fallback.md):** yes, "alerts on" and "last seen online", connection state only.
+17. **Staff dark mode default.** Should it be set per venue, per device or per user? **Resolved 2026-11-19:** a venue default (a venue setting in F-VENUE-SETTINGS), overridden per device ([DESIGN.md §5](DESIGN.md#5-light--dark-mode-per-surface)).
 18. **Called-screen sound.** A custom sound or a system-like tone, and should venues be able to choose? **Blocks:** F-CALLED-EXPERIENCE.
-19. **Accessibility beyond AA.** Is the AAA contrast target for customer status screens accepted, given that it may adjust venue brand colors? **Blocks:** F-DESIGN-DECISIONS.
+19. **Accessibility beyond AA.** Is the AAA contrast target for customer status screens accepted, given that it may adjust venue brand colors? **Resolved 2026-11-19 → [ADR-0026](adr/0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md):** accepted for key information on the customer status and called screens.
