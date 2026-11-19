@@ -64,6 +64,8 @@ All in DESIGN.md §8, plus the enable-alerts step and the staff fallback signals
 2. **Staff:** dashboard portrait and landscape, add a walk-in, QR handoff; PL/EN, light/dark. Called, overdue and waiting entries differ by border style and a labelled chip, not by color alone.
 3. **Venue admin and poster:** queue configuration and venue settings (PL light, PL dark, EN light; desktop); QR poster A4 and A5 (PL/EN, with and without the venue logo; no text below 16 px).
 
+**For the user test** (step 5): two clickable prototypes built on the hi-fi screens, light mode, product brand: [customer, phone](https://claude.ai/artifact/LQLG2kLsWJ63oCD5jkUUqY) and [staff, tablet](https://claude.ai/artifact/Wp8sevhVtVvWfvwq6YeJBQ). Script, task cards and notes sheet: [user-test.md](user-test.md).
+
 Open placeholders on the poster and the walk-in sheet: the product domain (`[domena]`), the retention period (`[X] dni`, ROADMAP question 7) and the wording of the privacy notice (F-LEGAL-DOCS, ROADMAP question 20).
 
 Feedback: the product owner accepted the flows as sketched. They asked whether joining should be done by the customer or by staff; the answer is both, with the customer as the main path (README and F-STAFF-ACTIONS already include walk-ins), which added boards 7–8 and ROADMAP question 20 (legal basis for walk-ins). A "staff-only joining" venue setting was noted as a possible later addition, not v1.
