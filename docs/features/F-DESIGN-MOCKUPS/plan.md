@@ -58,6 +58,14 @@ All in DESIGN.md §8, plus the enable-alerts step and the staff fallback signals
 - **Design system reference:** [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1) (private), version 2: light and dark color tokens with usage notes and contrast, type scale, spacing, radii, brand book. The hi-fi mockups install it. Its values are copied into DESIGN.md §3.2 at approval (step 6).
 - **Assets in the repo:** the mark, `public/brand/notqueue-mark.svg`. The wordmark as outlined SVG waits for the self-hosted Inter files from F-DESIGN-SYSTEM (deviation 1).
 
+### Hi-fi mockups (reviewed 2026-11-19)
+[notqueue hi-fi mockups](https://claude.ai/artifact/VVwQpFVRfcrK9xxbyjLEiU) (private canvas, version 13), with the design system installed. Made in three rounds, each accepted by the product owner:
+1. **Customer:** join, enable alerts, status, called. Eight variants each: PL/EN, light/dark, product default and venue branding. The sample venue accent `#F59E0B` fails white text (2.2:1), so light mode uses the adjusted `#B45309` (5.0:1) and dark mode keeps `#F59E0B` with dark text (8.1:1). The called screen never takes the venue color.
+2. **Staff:** dashboard portrait and landscape, add a walk-in, QR handoff; PL/EN, light/dark. Called, overdue and waiting entries differ by border style and a labelled chip, not by color alone.
+3. **Venue admin and poster:** queue configuration and venue settings (PL light, PL dark, EN light; desktop); QR poster A4 and A5 (PL/EN, with and without the venue logo; no text below 16 px).
+
+Open placeholders on the poster and the walk-in sheet: the product domain (`[domena]`), the retention period (`[X] dni`, ROADMAP question 7) and the wording of the privacy notice (F-LEGAL-DOCS, ROADMAP question 20).
+
 Feedback: the product owner accepted the flows as sketched. They asked whether joining should be done by the customer or by staff; the answer is both, with the customer as the main path (README and F-STAFF-ACTIONS already include walk-ins), which added boards 7–8 and ROADMAP question 20 (legal basis for walk-ins). A "staff-only joining" venue setting was noted as a possible later addition, not v1.
 
 ## Test plan

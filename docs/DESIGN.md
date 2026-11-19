@@ -184,6 +184,14 @@ Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
 
 **Review flow:** hi-fi mockups are published as private links → feedback → iterate → a short test with 2–3 real venue staff and customers → **explicit approval** by the product owner, recorded in the decision log below with links and dates.
 
+**Mockups** (private claude.ai artifacts; approval pending the user test):
+| What | Link | Version |
+|---|---|---|
+| Low-fi flow sketches (accepted 2026-11-19) | [notqueue low-fi flows](https://claude.ai/artifact/MFPp9nM3yKsqBJTjBPUyeE) | 10 |
+| Product brand directions (B chosen 2026-11-19) | [notqueue brand directions](https://claude.ai/artifact/Xev8AmUXsEjAiMfkCuwxz2) | 7 |
+| Design system reference | [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1) | 2 (`1795088882-b177`) |
+| Hi-fi mockups, all screens above plus enable alerts and walk-in | [notqueue hi-fi mockups](https://claude.ai/artifact/VVwQpFVRfcrK9xxbyjLEiU) | 13 (`1795089983-0be5`) |
+
 **Considered:** low-fi and hi-fi fully in parallel (two sources of truth that drift, every change made twice); hi-fi straight away (polish distracts from the flow, layout changes cost more); Figma with a designer (cost and calendar time, a handoff gap to the code).
 
 ---
