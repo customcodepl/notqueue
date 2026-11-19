@@ -11,13 +11,13 @@ Stage status: `not started` · `in progress` · `done`. A stage is `done` when a
 |---|---|---|
 | 0: Foundations | 8 / 8 | done |
 | 1: Tenancy, auth & operator console | 1 / 6 | in progress |
-| 2: Design foundations | 0 / 3 | not started |
+| 2: Design foundations | 1 / 3 | in progress |
 | 3: Queue core & customer journey | 0 / 6 | not started |
 | 4: Staff dashboard & real-time | 0 / 6 | not started |
 | 5: Venue admin | 0 / 5 | not started |
 | 6: Notifications & i18n completeness | 0 / 3 | not started |
 | 7: Hardening, GDPR & handover | 0 / 6 | not started |
-| **v1.0** | **9 / 43** | in progress |
+| **v1.0** | **10 / 43** | in progress |
 
 ## Next up
 Work runs on two tracks. They don't block each other until a code feature depends on a product feature (e.g. F-DESIGN-SYSTEM needs F-DESIGN-MOCKUPS).
@@ -30,7 +30,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
 | Code | F-AUTH-LOGIN | not started | – |
-| Product | F-DESIGN-DECISIONS | approved | [plan](features/F-DESIGN-DECISIONS/plan.md) |
+| Product | F-DESIGN-MOCKUPS | not started | – |
 | Product | F-LEGAL-DOCS | not started | – |
 
 ## Features
@@ -60,7 +60,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 ### Stage 2: Design foundations
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
-| F-DESIGN-DECISIONS | Design decisions | planned | – | Fill in every [DESIGN.md](DESIGN.md) decision: surfaces, branding, components, tokens, icons, fonts, accessibility, dark mode, called moment, text expansion |
+| F-DESIGN-DECISIONS | Design decisions | done | – | Fill in every [DESIGN.md](DESIGN.md) decision: surfaces, branding, components, tokens, icons, fonts, accessibility, dark mode, called moment, text expansion |
 | F-DESIGN-MOCKUPS | Mockups and product brand | planned | F-DESIGN-DECISIONS | Low-fi flow sketches, product brand (name, logo, palette) in parallel, then hi-fi mockups in a design tool of join, status, called, staff dashboard, queue configuration, venue settings, QR poster; tested with real users and approved by the product owner |
 | F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), fonts, icons, base components, light/dark, pseudo-locale, axe in CI, Stage 1 screens restyled |
 

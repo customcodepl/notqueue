@@ -1,7 +1,7 @@
 # F-DESIGN-DECISIONS: Design decisions
 
 - **Stage:** 2 (Design foundations), product track
-- **Status:** plan approved (2026-11-19)
+- **Status:** done (2026-11-19); plan approved 2026-11-19
 - **Depends on:** none
 - **Unblocks:** F-DESIGN-MOCKUPS; through it F-DESIGN-SYSTEM and every UI feature from Stage 2 on. Its decisions also feed F-VENUE-BRANDING (branding depth, contrast guard), F-CALLED-EXPERIENCE (called moment, staff fallback signals) and F-VENUE-SETTINGS (a staff theme default, if chosen)
 - **ADRs:** ADR-0023 to ADR-0027 from the decisions marked **(ADR)** below (written in step 3); [ADR-0003](../../adr/0003-eu-regions-of-us-providers.md) (EU data residency, relevant to self-hosted fonts)
@@ -100,4 +100,7 @@ All recommendations were accepted, decision 10 in its revised form (low-fi sketc
     Consequences for other docs, done in step 2: F-DESIGN-MOCKUPS' description in FEATURES.md changes from "HTML mockups" to "low-fi flow sketches, then hi-fi mockups in a design tool", the product brand moves into its scope, and ROADMAP question 15 then blocks F-DESIGN-MOCKUPS (hi-fi) as well as F-DESIGN-SYSTEM.
 
 ## Deviations
-_To be filled in after implementation._
+1. **Steps 2 and 3 were committed in reverse order.** DESIGN.md and ROADMAP link to the new ADRs, so the ADRs went in first to keep every commit's `docs:check` green.
+2. **Decisions 3 and 4 share ADR-0024**, as noted under "Decisions"; five ADRs (0023–0027) instead of six.
+3. **More docs updated than step 2 named:** F-VENUE-SETTINGS' description in FEATURES.md and the Stage 5 scope in ROADMAP gained the staff light/dark default (decision 7); FEATURES.md Q-6 is resolved by ADR-0027; the Stage 2 scope in ROADMAP describes the low-fi → hi-fi process and the product brand; the README's DESIGN.md line no longer says "decisions pending".
+4. **ADR-0027 records a consequence the plan didn't spell out:** "last seen online" needs a heartbeat from the customer page, stored per entry and anonymized with it (F-CALLED-EXPERIENCE).
