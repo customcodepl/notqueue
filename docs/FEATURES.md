@@ -30,7 +30,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | Track | Feature | Plan state | Plan |
 |---|---|---|---|
 | Code | F-AUTH-LOGIN | not started | – |
-| Product | F-DESIGN-DECISIONS | not started | – |
+| Product | F-DESIGN-DECISIONS | approved | [plan](features/F-DESIGN-DECISIONS/plan.md) |
 | Product | F-LEGAL-DOCS | not started | – |
 
 ## Features
