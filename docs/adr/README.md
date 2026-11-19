@@ -26,3 +26,8 @@ Decisions that affect more than one feature or the whole system and are costly t
 | [0020](0020-stage-demos-partly-automated-on-previews.md) | Stage demos partly automated on PR previews | accepted | 2026-11-11 |
 | [0021](0021-documentation-review-by-a-reviewer-agent.md) | Documentation review by a reviewer agent | accepted | 2026-11-12 |
 | [0022](0022-database-roles-and-tenant-scoped-transactions.md) | Database roles and tenant-scoped transactions | accepted | 2026-11-12 |
+| [0023](0023-venue-branding-logo-and-accent-color.md) | Venue branding: logo and one accent color, contrast adjusted automatically | accepted | 2026-11-19 |
+| [0024](0024-ui-foundation-shadcn-and-two-layer-tokens.md) | UI foundation: shadcn/ui on Radix with two-layer Tailwind tokens | accepted | 2026-11-19 |
+| [0025](0025-self-hosted-fonts-and-ui-assets.md) | Self-hosted fonts and UI assets | accepted | 2026-11-19 |
+| [0026](0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md) | Accessibility target: WCAG 2.2 AA, plus AAA contrast on customer status screens | accepted | 2026-11-19 |
+| [0027](0027-called-moment-enable-alerts-and-staff-fallback.md) | The called moment: an enable-alerts step plus staff fallback signals | accepted | 2026-11-19 |
