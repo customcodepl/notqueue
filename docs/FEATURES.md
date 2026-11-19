@@ -61,7 +61,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
 | F-DESIGN-DECISIONS | Design decisions | planned | – | Fill in every [DESIGN.md](DESIGN.md) decision: surfaces, branding, components, tokens, icons, fonts, accessibility, dark mode, called moment, text expansion |
-| F-DESIGN-MOCKUPS | Clickable mockups | planned | F-DESIGN-DECISIONS | HTML mockups of join, status, called, staff dashboard, queue configuration, venue settings, QR poster; approved by the product owner |
+| F-DESIGN-MOCKUPS | Mockups and product brand | planned | F-DESIGN-DECISIONS | Low-fi flow sketches, product brand (name, logo, palette) in parallel, then hi-fi mockups in a design tool of join, status, called, staff dashboard, queue configuration, venue settings, QR poster; tested with real users and approved by the product owner |
 | F-DESIGN-SYSTEM | Design system in code | planned | F-DESIGN-MOCKUPS, F-FOUND-I18N, F-FOUND-PIPELINE, F-PLATFORM-CONSOLE | Tokens (including a runtime `brand` token), fonts, icons, base components, light/dark, pseudo-locale, axe in CI, Stage 1 screens restyled |
 
 ### Stage 3: Queue core & customer journey
@@ -87,7 +87,7 @@ Plan states: `not started` → `drafted` → `approved` → `in implementation`.
 ### Stage 5: Venue admin
 | ID | Name | Status | Depends on | Description |
 |---|---|---|---|---|
-| F-VENUE-SETTINGS | Venue settings | planned | F-VENUE-LOCALES | Timezone, business day start, contact-field policy, privacy notice URL |
+| F-VENUE-SETTINGS | Venue settings | planned | F-VENUE-LOCALES | Timezone, business day start, contact-field policy, privacy notice URL, staff light/dark default |
 | F-VENUE-BRANDING | Venue branding | planned | F-VENUE-SETTINGS | Logo upload (Supabase Storage), accent color with a contrast guard, applied to customer screens |
 | F-VENUE-HOURS | Opening hours | planned | F-VENUE-SETTINGS, F-QUEUE-JOIN | Weekly hours as local wall-clock times (including hours past midnight), exceptions, joining blocked when the venue is closed, DST-safe |
 | F-STAFF-MGMT | Staff management | planned | F-AUTH-INVITES, F-AUDIT-LOG, F-DESIGN-SYSTEM | Invite staff, change role and scope, disable |
@@ -375,7 +375,7 @@ The one place a cycle could appear is **F-REALTIME ↔ F-NOTIF-CORE**. The statu
 | Q-3 | **F-LEGAL-DOCS has no dependencies but is consumed by F-QUEUE-JOIN** (consent text version) **and F-VENUE-SETTINGS** (privacy URL) | **Resolved 2026-10-11:** it runs on the product track from now on. Consent is recorded against a placeholder text until it's final, and the text must be final before any real customer data |
 | Q-4 | **F-ABUSE-PROTECT is in Stage 7, but the public join endpoint exists from Stage 3** | **Resolved 2026-10-11:** F-QUEUE-JOIN includes a basic per-IP rate limit; Turnstile and per-device or per-phone caps stay in F-ABUSE-PROTECT |
 | Q-5 | **Customer language switching is split** between F-QUEUE-JOIN (switcher, Stage 3) and F-I18N-CUSTOMER-LOCALE (persisting a mid-wait change, Stage 6) | **Resolved 2026-10-11:** intentional; ROADMAP Stage 3 and Stage 6 wording updated |
-| Q-6 | **F-CALLED-EXPERIENCE "staff fallback signals"** | Depends on open question 16 (showing connection metadata to staff). Its scope is uncertain until that's decided |
+| Q-6 | **F-CALLED-EXPERIENCE "staff fallback signals"** | **Resolved 2026-11-19 → [ADR-0027](adr/0027-called-moment-enable-alerts-and-staff-fallback.md):** staff see "alerts on" and "last seen online" per entry, connection state only |
 | Q-7 | **F-VENUE-BRANDING adds Supabase Storage** (logo uploads), which isn't mentioned elsewhere | Same provider and region, so no new subprocessor. Still needs upload size and type limits and a storage RLS or signed-URL strategy |
 
 ---
