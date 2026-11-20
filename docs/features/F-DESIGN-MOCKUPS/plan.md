@@ -108,6 +108,9 @@ All recommendations were accepted. Decision 5: no venue is available, so people 
 4. **Hi-fi variant matrix:** DESIGN.md §8 says each hi-fi screen shows PL and EN, light and dark, and the branding variant, which is 8 artboards per screen. Recommended: the full matrix for the customer screens (join, status, called); the staff dashboard in PL and EN, light and dark, without venue branding (staff screens use the product brand, ADR-0023); admin screens in PL, light and dark, plus one EN artboard each; the QR poster in PL and EN, with and without the venue logo. This changes DESIGN.md §8, so the wording is updated in step 1. Alternative: the full matrix everywhere.
 5. **User test:** recommended: 20-minute sessions with 2–3 venue staff (tablet, the dashboard tasks: call, undo, spot who has alerts off) and 2–3 customers (phone, join → status → called), using the hi-fi screens as a click-through, notes only, no recordings, invented data. Recruiting is the product owner's: people from their network stand in for venue staff and customers. Alternative: skip the customer sessions and test with staff only.
 
+## User test
+Run by the product owner on 2026-11-19 with people from their network, using the two prototypes and [user-test.md](user-test.md). The product owner reported the screens tested well and asked for no changes; no per-participant notes were handed over, so none are recorded here. Limitation as planned: no real venue staff took part (see "Risks").
+
 ## Deviations
 1. **The wordmark SVG is not in the repo yet.** An SVG wordmark has to be outlined (text converted to paths) from the Inter font file, which the repo doesn't hold until F-DESIGN-SYSTEM self-hosts it. Step 3 commits only the mark; F-DESIGN-SYSTEM adds `public/brand/notqueue-wordmark.svg`, outlined from that file.
 2. **The conflict check was split.** Claude searched the web; the product owner checked the EU registers (TMview), as search results don't replace them.
