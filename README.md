@@ -148,6 +148,6 @@ Sentry org and project slugs live in `next.config.ts` (not secret). Supabase app
 - [docs/ROADMAP.md](docs/ROADMAP.md): delivery stages, definitions of done, open questions.
 - [docs/FEATURES.md](docs/FEATURES.md): progress per stage, feature IDs and status, dependency graph, happy paths.
 - `docs/features/<feature-id>/plan.md`: the approved plan of each feature, including its deviations.
-- [docs/DESIGN.md](docs/DESIGN.md): surface principles, branding, design system, accessibility, the "you're called" moment, mockup process (decisions made; mockups pending).
+- [docs/DESIGN.md](docs/DESIGN.md): surface principles, branding, design system, accessibility, the "you're called" moment, mockup process, approved mockups and token values.
 - [docs/api/openapi.json](docs/api/openapi.json): the `/api/v1` contract (OpenAPI 3.1), generated from the routes and checked in CI; also served at `/api/v1/openapi.json`.
 - [docs/adr/](docs/adr/README.md): architecture decision records: the rationale and rejected alternatives behind system-wide choices.

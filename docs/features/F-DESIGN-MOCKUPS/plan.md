@@ -1,7 +1,7 @@
 # F-DESIGN-MOCKUPS: Mockups and product brand
 
 - **Stage:** 2 (Design foundations), product track
-- **Status:** plan approved (2026-11-19)
+- **Status:** done (2026-11-20); plan approved 2026-11-19
 - **Depends on:** F-DESIGN-DECISIONS (done)
 - **Unblocks:** F-DESIGN-SYSTEM, and through it every UI feature from Stage 2 on
 - **ADRs:** [ADR-0023](../../adr/0023-venue-branding-logo-and-accent-color.md) (branding), [ADR-0024](../../adr/0024-ui-foundation-shadcn-and-two-layer-tokens.md) (tokens), [ADR-0026](../../adr/0026-accessibility-target-wcag-aa-plus-aaa-status-contrast.md) (contrast), [ADR-0027](../../adr/0027-called-moment-enable-alerts-and-staff-fallback.md) (called moment); [ADR-0028](../../adr/0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md) (decision 1)
@@ -114,3 +114,7 @@ Run by the product owner on 2026-11-19 with people from their network, using the
 ## Deviations
 1. **The wordmark SVG is not in the repo yet.** An SVG wordmark has to be outlined (text converted to paths) from the Inter font file, which the repo doesn't hold until F-DESIGN-SYSTEM self-hosts it. Step 3 commits only the mark; F-DESIGN-SYSTEM adds `public/brand/notqueue-wordmark.svg`, outlined from that file.
 2. **The conflict check was split.** Claude searched the web; the product owner checked the EU registers (TMview), as search results don't replace them.
+3. **Two clickable prototypes were added for the test** (customer on a phone, staff on a tablet). The hi-fi canvas compares variants side by side and can't be clicked through, so the test needed working flows. They are not approved artifacts of their own; the hi-fi mockups are.
+4. **The user test left no notes in the repo.** The product owner ran it and reported no issues; "User test" records that instead of findings.
+5. **No PDF export of the approved screens yet** (ADR-0028 asks for `docs/design/mockups-v1.pdf`). The design tool's export runs in the product owner's browser; the PDF is added in a follow-up commit, and until then the approved versions are pinned by number in DESIGN.md §8 and the decision log.
+6. **More docs updated at close-out:** README's line on DESIGN.md.

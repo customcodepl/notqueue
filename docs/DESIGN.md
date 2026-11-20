@@ -1,6 +1,6 @@
 # Design
 
-> Status: **decisions made (2026-11-19); mockups pending** ([F-DESIGN-MOCKUPS](FEATURES.md)). Each section states its **Decision**; the options not picked are kept as a short "Considered" note. Token values are a proposal until F-DESIGN-SYSTEM puts them in code; the hi-fi mockups may refine them.
+> Status: **decisions made (2026-11-19); mockups approved (2026-11-20).** Each section states its **Decision**; the options not picked are kept as a short "Considered" note. F-DESIGN-SYSTEM puts the tokens in §3.2 into code.
 
 This document is the reference for every UI stage. The baseline definition of done in [ROADMAP.md](ROADMAP.md) requires each stage to match it.
 
@@ -52,14 +52,36 @@ The customer-facing screens show the venue's identity. Staff, admin and operator
 - **Primitive tokens**: the palette and scales.
 - **Semantic tokens**: `bg`, `fg`, `muted`, `border`, `primary`, `brand` (set per venue at runtime), and the statuses `waiting`, `called`, `served`, `no-show`, `danger`, `success`, `warning`.
 
-| Category | Proposal (values final in F-DESIGN-SYSTEM) |
+**Values (approved with the mockups, 2026-11-20).** The source is the [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1), version 2. This table is the repo copy and wins over it ([ADR-0028](adr/0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md)).
+
+| Color token | Light | Dark | Use and contrast |
+|---|---|---|---|
+| `bg` | `#FFFBF5` | `#1C1917` | Page background |
+| `surface` | `#FFFFFF` | `#292524` | Cards, rows, sheets, inputs |
+| `fg` | `#1C1917` | `#FAFAF9` | Text, ticket, position, ETA (≥ 14.5:1) |
+| `muted` | `#57534E` | `#A8A29E` | Secondary text only (light 7.4:1, dark 6.0:1) |
+| `border` | `#E7E5E4` | `#44403C` | Decorative dividers |
+| `border-input` | `#78716C` | `#78716C` | Inputs, steppers, secondary buttons (light 4.8:1, dark 3.2:1) |
+| `primary` | `#C2410C` | `#FDBA74` | Product color, fill only |
+| `on-primary` | `#FFFFFF` | `#1C1917` | Labels on `primary` (light 5.2:1, AA only: never key status) |
+| `primary-text` | `#9A3412` | `#FDBA74` | Product color as text or link (≥ 7.1:1) |
+| `brand` | = `primary` | = `primary-text` | Venue accent at runtime, adjusted for contrast (ADR-0023) |
+| `called` | `#1E3A8A` | `#93C5FD` | Called state; never branded |
+| `on-called` | `#FFFFFF` | `#1C1917` | Text on `called` (≥ 9.7:1) |
+| `waiting`, `no-show` | `#57534E` | `#A8A29E` | Status labels, always with a word |
+| `served` | `#14532D` | `#86EFAC` | Served and success (≥ 8.8:1) |
+| `warning` | `#78350F` | `#FCD34D` | Warnings, overdue calls (≥ 8.8:1) |
+| `danger` | `#991B1B` | `#FCA5A5` | Errors, destructive actions (≥ 8.1:1) |
+| `focus` | `#1E3A8A` | `#93C5FD` | 2 px focus ring, 2 px offset |
+
+| Category | Values |
 |---|---|
-| Color | Neutral gray scale plus one product primary; separate status colors; `brand` set per venue at runtime, with a product default |
-| Typography | A type scale with an extra-large **display** step for ticket numbers and positions; tabular numerals for numbers |
-| Spacing | A 4 px base scale |
-| Radius | A small set: `sm`, `md`, `lg`, `full` |
-| Elevation | Minimal: borders before shadows |
-| Motion | Short and functional; respects `prefers-reduced-motion` |
+| Typography (Inter) | `display-xl` 96/1 800 · `display` 72/1 800 · `h1` 32/38 700 · `h2` 24/30 700 · `title` 20/26 600 · `body` 16/24 400 · `body-strong` 16/24 600 · `small` 14/20 400 · `caption` 13/18 500; tabular numerals for numbers |
+| Spacing | `space-1` 4 · `space-2` 8 · `space-3` 12 · `space-4` 16 · `space-6` 24 · `space-8` 32 · `space-12` 48 (px) |
+| Radius | `radius-sm` 8 · `radius-md` 16 · `radius-lg` 24 · `radius-full` 9999 (px); buttons are pills |
+| Elevation | None: borders before shadows |
+| Motion | 150–250 ms ease-out, state changes only; respects `prefers-reduced-motion` |
+| Touch targets | ≥ 44 px customer, ≥ 48 px staff, 56 px primary staff actions |
 
 **Considered:** a single layer of semantic tokens only (simpler, but no shared scale behind the light, dark and brand variants).
 
@@ -184,7 +206,7 @@ Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
 
 **Review flow:** hi-fi mockups are published as private links → feedback → iterate → a short test with 2–3 real venue staff and customers → **explicit approval** by the product owner, recorded in the decision log below with links and dates.
 
-**Mockups** (private claude.ai artifacts; approval pending the user test):
+**Mockups** (private claude.ai artifacts; approved 2026-11-20):
 | What | Link | Version |
 |---|---|---|
 | Low-fi flow sketches (accepted 2026-11-19) | [notqueue low-fi flows](https://claude.ai/artifact/MFPp9nM3yKsqBJTjBPUyeE) | 10 |
@@ -209,3 +231,5 @@ Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
 | 2026-11-19 | 6. Called moment | Enable-alerts step + staff fallback signals + "come back by" | ADR-0027; ROADMAP question 16 |
 | 2026-11-19 | 7. Text expansion | Flexible layouts + pseudo-locale | |
 | 2026-11-19 | 8. Mockups | Low-fi sketches → hi-fi in a design tool, product brand in parallel; owner approves after a user test | ROADMAP question 14 |
+| 2026-11-19 | 2, 3.2 Product brand | Direction B, warm signal; "notqueue" final | ROADMAP question 15; F-DESIGN-MOCKUPS |
+| 2026-11-20 | 8. Mockups | **Approved** by the product owner after the user test: [hi-fi mockups](https://claude.ai/artifact/VVwQpFVRfcrK9xxbyjLEiU) version 13, [design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1) version 2; token values in §3.2 | F-DESIGN-MOCKUPS |
