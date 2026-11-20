@@ -50,7 +50,7 @@ The customer-facing screens show the venue's identity. Staff, admin and operator
 ### 3.2 Design tokens
 **Decision (2026-11-19):** Tailwind v4 `@theme` CSS variables in two layers ([ADR-0024](adr/0024-ui-foundation-shadcn-and-two-layer-tokens.md)). Components use semantic tokens only.
 - **Primitive tokens**: the palette and scales.
-- **Semantic tokens**: `bg`, `fg`, `muted`, `border`, `primary`, `brand` (set per venue at runtime), and the statuses `waiting`, `called`, `served`, `no-show`, `danger`, `success`, `warning`.
+- **Semantic tokens**: the color tokens in the table below: surfaces and text (`bg`, `surface`, `fg`, `muted`, `border`, `border-input`), the product color (`primary`, `on-primary`, `primary-text`), `brand` (set per venue at runtime), the called state (`called`, `on-called`), the statuses `waiting`, `served` (also used for success), `no-show`, `warning`, `danger`, and `focus`.
 
 **Values (approved with the mockups, 2026-11-20).** The source is the [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1), version 2. This table is the repo copy and wins over it ([ADR-0028](adr/0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md)).
 
@@ -86,7 +86,7 @@ The customer-facing screens show the venue's identity. Staff, admin and operator
 **Considered:** a single layer of semantic tokens only (simpler, but no shared scale behind the light, dark and brand variants).
 
 ### 3.3 Icon set
-**Decision (2026-11-19):** **Lucide**. Icons always come with a text label on primary actions, since meaning varies across cultures.
+**Decision (2026-11-19):** **Lucide**. Icons always come with a text label on primary actions, since meaning varies across cultures. Sizes (approved with the mockups, 2026-11-20): 2 px stroke; 20 px next to text, 24 px on buttons; colored by the text token beside them.
 
 **Considered:** Phosphor (several weights, not the shadcn default); Heroicons (smaller set).
 
@@ -204,7 +204,7 @@ Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
 
 **Where they live:** claude.ai artifacts, with the repo holding everything the code depends on ([ADR-0028](adr/0028-mockups-in-artifacts-with-the-repo-as-source-of-truth.md)).
 
-**Review flow:** hi-fi mockups are published as private links → feedback → iterate → a short test with 2–3 real venue staff and customers → **explicit approval** by the product owner, recorded in the decision log below with links and dates.
+**Review flow:** hi-fi mockups are published as private links → feedback → iterate → a short test with 2–3 venue staff and customers (or stand-ins from the product owner's network when no venue is available) → **explicit approval** by the product owner, recorded in the decision log below with links and dates.
 
 **Mockups** (private claude.ai artifacts; approved 2026-11-20):
 | What | Link | Version |
