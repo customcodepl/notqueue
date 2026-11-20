@@ -213,6 +213,7 @@ Hi-fi variants (F-DESIGN-MOCKUPS decision 4):
 | Product brand directions (B chosen 2026-11-19) | [notqueue brand directions](https://claude.ai/artifact/Xev8AmUXsEjAiMfkCuwxz2) | 7 |
 | Design system reference | [notqueue design system](https://claude.ai/artifact/9697Y5HQEFTNeRETjUBkg1) | 2 (`1795088882-b177`) |
 | Hi-fi mockups, all screens above plus enable alerts and walk-in | [notqueue hi-fi mockups](https://claude.ai/artifact/VVwQpFVRfcrK9xxbyjLEiU) | 13 (`1795089983-0be5`) |
+| Repo copy of the approved hi-fi mockups | [mockups-v1.pdf](design/mockups-v1.pdf) | 13 |
 
 **Considered:** low-fi and hi-fi fully in parallel (two sources of truth that drift, every change made twice); hi-fi straight away (polish distracts from the flow, layout changes cost more); Figma with a designer (cost and calendar time, a handoff gap to the code).
 
